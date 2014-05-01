@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN" 
+  "http://java.sun.com/dtd/application_1_3.dtd">
+
+<application id="Application_KonaKart">
+  <display-name>KonaKart</display-name>
+  <description>KonaKart</description>
+
+  <module id="WebModule_KonaKart">
+    <web>
+      <web-uri>konakart.war</web-uri>
+      <context-root>konakart</context-root>
+    </web>
+  </module>
+
+  <module id="WebModule_BirtViewer">
+    <web>
+      <web-uri>birtviewer.war</web-uri>
+      <context-root>birtviewer</context-root>
+    </web>
+  </module>
+
+  <module id="WebModule_KonaKartAdmin">
+    <web>
+      <web-uri>konakartadmin.war</web-uri>
+      <context-root>konakartadmin</context-root>
+    </web>
+  </module>
+
+</application>
