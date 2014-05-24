@@ -104,6 +104,26 @@ public class ProdTileTag extends BaseTag
             getImageLink(sb, KKAppEng.IMAGE_SMALL);
             // Title
             getTitleLink(sb);
+            
+            //Code Added by Ram for Add cart item
+            com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) pageContext.getSession().getAttribute("konakartKey") ;
+            com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();
+            int j=0;
+            for (int i = 0; i < customerMgr.getCurrentCustomer().getBasketItems().length; i++){ 
+			 com.konakart.appif.BasketIf item = customerMgr.getCurrentCustomer().getBasketItems()[i];
+				if (item.getProduct() != null && item.getProduct().getId() == prod.getId()) { 					
+					 j=1;
+					break;
+				}			
+			}
+            if(j==1)
+            { 
+            	
+            	sb.append("<span class='badge'>In Cart</span>");
+            }
+             
+			//End Code Added by Ram for Add cart item
+            
             // Reviews
             getReviews(sb);
             // Prices
@@ -113,9 +133,33 @@ public class ProdTileTag extends BaseTag
             sb.append(END_DIV);
         } else
         {
+        	
+        
+        //Code Added by Ram for Add cart item
+        com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) pageContext.getSession().getAttribute("konakartKey") ;
+        com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();
+        int j=0;
+        for (int i = 0; i < customerMgr.getCurrentCustomer().getBasketItems().length; i++){ 
+		 com.konakart.appif.BasketIf item = customerMgr.getCurrentCustomer().getBasketItems()[i];
+			if (item.getProduct() != null && item.getProduct().getId() == prod.getId()) { 					
+				 j=1;
+				break;  
+			}			
+		}
+        if(j==1)
+        {              	
+        	 sb.append(getStartDiv("item in-cart")); 
+        }    
+        else 
+        {
+        	 sb.append(getStartDiv("item"));
+        }
+		//End Code Added by Ram for Add cart item
+        	
             // Outer div for product tile
-            sb.append(getStartDiv("item"));
+            //sb.append(getStartDiv("item"));
 
+                    
             // Float over
             sb.append(getStartDiv("item-over", rand + "ov-" + Integer.toString(prod.getId())));
 
@@ -135,11 +179,22 @@ public class ProdTileTag extends BaseTag
                 sb.append(getMsg("product.tile.out.of.stock"));
                 sb.append(END_DIV);
             }
+            
+         
+			
             sb.append(getStartDiv("item-buttons-container"));
             sb.append(getStartDiv("item-buttons centered"));
             if (eng.getQuotaMgr().canAddToBasket(prod, null) > 0)
             {
-                sb.append(getStartA("add-to-cart-button button small-rounded-corners", "#", rand
+            	//Code Added by Ram for Quantity
+            	 sb.append("<select name='prodQuantity' id='prodQuantityId' class='add-to-cart-qty' style='padding:2px 0 ;margin-right:5px;'>");
+            	 for (int i=1; i<31; i++) { 																
+            		 sb.append("<option value="+i+ ">"+i+"</option>");  
+				 }            	 
+            	 sb.append("</select>");
+            	//End Code Added by Ram for Quantity
+            	 
+                 sb.append(getStartA("add-to-cart-button button small-rounded-corners", "#", rand
                         + "atc-" + Integer.toString(prod.getId())));
                 sb.append(getMsg("common.add.to.cart"));
                 sb.append(END_A);
@@ -170,11 +225,14 @@ public class ProdTileTag extends BaseTag
             // Title
             getTitleLink(sb);
 
+                       
             // Reviews
             getReviews(sb);
 
             // Pricing
             BigDecimal saving = getPrices(sb);
+            
+           
 
             // Shipping
             if (prod.getType() == com.konakart.bl.ProductMgr.FREE_SHIPPING
@@ -337,6 +395,24 @@ public class ProdTileTag extends BaseTag
                 sb.append(END_DIV);
             }
         }
+        
+        //Code Added by Ram for Add cart item
+        com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) pageContext.getSession().getAttribute("konakartKey") ;
+        com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();
+        int j=0;
+        for (int i = 0; i < customerMgr.getCurrentCustomer().getBasketItems().length; i++){ 
+		 com.konakart.appif.BasketIf item = customerMgr.getCurrentCustomer().getBasketItems()[i];
+			if (item.getProduct() != null && item.getProduct().getId() == prod.getId()) { 					
+				 j=1;
+				break;  
+			}			
+		}
+        if(j==1)
+        {              	
+        	sb.append("&nbsp;&nbsp;<span class='badge'>In Cart</span>"); 
+        }             
+		//End Code Added by Ram for Add cart item
+        
         sb.append(END_DIV);
         return saving;
     }
