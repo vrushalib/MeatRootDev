@@ -1,0 +1,361 @@
+<project name="konakart_storefront_jar_builds" default="build" basedir=".">
+
+	<!-- === PROPERTIES === -->
+	<property environment="env" />
+
+	<!-- build.local.properties will override the build.properties file if present -->
+	<property file="build.local.properties" />
+	<property file="build.properties" />
+
+	<import file="./ant/sharedPatternSets.xml" />
+
+	<!-- Set java.source if it hasn't already been defined -->
+	<condition property="java.source" value="1.6">
+		<not>
+			<isset property="java.source" />
+		</not>
+	</condition>
+
+	<!-- Set java.target if it hasn't already been defined -->
+	<condition property="java.target" value="1.6">
+		<not>
+			<isset property="java.target" />
+		</not>
+	</condition>
+	
+	<dirname property="kke.custom.home" file="${ant.file}" />
+
+	<!-- To figure out which files are available in this environment -->
+	
+	<available file="${kke.custom.home}/src/com/konakart/bl/OrderIntegrationMgr.java"                property="appn.code.present" />
+	<available file="${kke.custom.home}/src/com/konakart/bl/LDAPMgr.java"                            property="appnEE.code.present" />
+	<available file="${kke.custom.home}/src/com/konakart/util/TaxUtils.java"                         property="utils.code.present" />
+	<available file="${kke.custom.home}/../../webapps/konakart/WEB-INF/lib/konakart_enterprise.jar"  property="kk.enterprise.present" />
+	<available file="${kke.custom.home}/src/com/konakart/al/KKAppEng.java"                           property="appEngEE.code.present" />
+
+	<exec executable="hostname" outputproperty="host.name" />
+
+	<!-- Set custom.home if it hasn't already been defined -->
+	<condition property="custom.home" value="${kke.custom.home}/../">
+		<not>
+			<isset property="custom.home" />
+		</not>
+	</condition>
+
+	<!-- Set konakart.dir if it hasn't already been defined -->
+	<condition property="konakart.dir" value="${custom.home}/../webapps/konakart/">
+		<not>
+			<isset property="konakart.dir" />
+		</not>
+	</condition>
+
+	<!-- Set konakart.libs.dir if it hasn't already been defined -->
+	<condition property="konakart.libs.dir" value="../../webapps/konakart/WEB-INF/lib/">
+		<not>
+			<isset property="konakart.libs.dir" />
+		</not>
+	</condition>
+
+	<!-- Set konakartadmin.dir if it hasn't already been defined -->
+	<condition property="konakartadmin.dir" value="${custom.home}/../webapps/konakartadmin/">
+		<not>
+			<isset property="konakartadmin.dir" />
+		</not>
+	</condition>
+
+	<!-- Set konakartadmin.libs.dir if it hasn't already been defined -->
+	<condition property="konakartadmin.libs.dir" value="../../webapps/konakartadmin/WEB-INF/lib/">
+		<not>
+			<isset property="konakartadmin.libs.dir" />
+		</not>
+	</condition>
+
+	<condition property="libs.dir" value="${kke.custom.home}/../../lib">
+		<not>
+			<isset property="libs.dir" />
+		</not>
+	</condition>
+
+	<!-- Set DSUK_BUILD if DSUKBuild is true -->
+	<condition property="DSUK_BUILD">
+		<istrue value="${DSUKBuild}" />
+	</condition>
+	
+	<tstamp>
+		<format property="KK_DATETIMESTAMP" pattern="h:mmaa d-MMM-yyyy z" />
+	</tstamp>
+
+	<path id="kkadminlibs.path">
+		<fileset dir="${konakartadmin.libs.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="kklibs.path">
+		<fileset dir="${konakart.libs.dir}">
+			<include name="**/*.jar" />
+			<exclude name="konakart_app-s1.jar" />
+			<exclude name="konakart_custom-s1.jar" />
+			<exclude name="konakart_customEE-1.jar" />
+		</fileset>
+		<fileset dir="${libs.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="compile.path">
+		<pathelement location="./build/classes" />
+		<path refid="kklibs.path" />
+	</path>
+
+	<target name="debugenv" description="Debug the environment">
+		<echo message="custom.home              = ${custom.home}" />
+		<echo message="kke.custom.home          = ${kke.custom.home}" />
+		<echo message="java.source              = ${java.source}" />
+		<echo message="java.target              = ${java.target}" />
+		<echo message="debug_javac              = ${debug_javac}" />
+		<echo message="appn.code.present        = ${appn.code.present}" />
+		<echo message="appnEE.code.present      = ${appnEE.code.present}" />
+		<echo message="engine.code.present      = ${engine.code.present}" />
+		<echo message="utils.code.present       = ${utils.code.present}" />
+	</target>
+	
+	<target name="clean"
+	        description="Clears away everything that's created during a build">
+		<echo message="Cleanup..." />
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${kke.custom.home}/build/classes" />
+		</delete>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${kke.custom.home}/jar" />
+		</delete>
+	</target>
+	
+	<target name="clean_manifest_file" description="Clean the MANIFEST file for all jars">
+		<echo message="Clean the MANIFEST file for all jars" />
+		<delete includeEmptyDirs="false" failonerror="false">
+			<fileset dir="${kke.custom.home}">
+				<include name="MANIFEST.MF" />
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="make_manifest_file" description="Create the MANIFEST file for all jars" unless="DSUK_BUILD">
+		<echo message="Create the MANIFEST.MF file for all jars" />
+		<manifest file="${kke.custom.home}/MANIFEST.MF">
+			<section name="KonaKart">
+				<attribute name="Implementation-Vendor" value="DS Data Systems (UK) Ltd."/>
+				<attribute name="Implementation-Title" value="KonaKart"/>
+				<attribute name="Implementation-Version" value="N.N.N.N"/>
+				<attribute name="Build-Date" value="${KK_DATETIMESTAMP}"/>
+				<attribute name="Build-Host" value="${host.name}"/>
+			</section>
+		</manifest>
+	</target>
+
+	<target name="compile" description="Compile the storefront code">
+		<echo message="Compile the storefront code" />
+
+		<echo message="Compile the storefront" />
+		<mkdir dir="${kke.custom.home}/build/classes" />
+		<javac srcdir="${kke.custom.home}/src/"
+		       destdir="${kke.custom.home}/build/classes"
+		       debug="${debug_javac}"
+		       fork="yes"
+		       source="${java.source}"
+		       target="${java.target}"
+		       includes="**/*.java">
+			<classpath refid="compile.path" />
+		<!-- <compilerarg value="-Xlint:unchecked"/> -->
+		</javac>
+
+		<echo message="Copy the properties over to build/classes" />
+		<copy todir="${kke.custom.home}/build/classes/">
+			<fileset dir="${kke.custom.home}/src/">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="make_jar_modules" description="Create the module jars">
+		<echo message="Create the module jars" />
+
+		<subant target="make_payment_module_jar" genericantfile="./build.xml">
+			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/payment/"
+			        includes="*" />
+		</subant>
+
+		<subant target="make_ordertotal_module_jar" genericantfile="./build.xml">
+			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/ordertotal/"
+			        includes="*" />
+		</subant>
+
+		<subant target="make_shipping_module_jar" genericantfile="./build.xml">
+			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/shipping/"
+			        includes="*" />
+		</subant>
+
+		<subant target="make_other_module_jar" genericantfile="./build.xml">
+			<dirset dir="${kke.custom.home}/src/com/konakartadmin/modules/others/"
+			        includes="*" />
+		</subant>
+	</target>
+
+	<target name="make_payment_module_jar" description="Create the payment module jar">
+		<echo message="Create the payment module jar" />
+		<make_module_jar module.type="payment" />
+	</target>
+
+	<target name="make_ordertotal_module_jar" description="Create the ordertotal module jar">
+		<echo message="Create the order total module jar" />
+		<make_module_jar module.type="ordertotal" />
+	</target>
+
+	<target name="make_other_module_jar" description="Create the other module jar">
+		<echo message="Create the other module jar" />
+		<make_module_jar module.type="others" />
+	</target>
+
+	<target name="make_shipping_module_jar" description="Create the shipping module jar">
+		<echo message="Create the shipping module jar" />
+		<make_module_jar module.type="shipping" />
+	</target>
+
+	<macrodef name="make_module_jar" description="Create the module jar of the specified type">
+		<attribute name="module.type" />
+		<sequential>
+			<mkdir dir="${kke.custom.home}/jar" />
+			<basename property="mod_name" file="${basedir}" />
+			<jar destfile="${kke.custom.home}/jar/konakart_@{module.type}_${mod_name}.jar"
+				manifest="${kke.custom.home}/MANIFEST.MF">
+				<fileset dir="${kke.custom.home}/build/classes" casesensitive="false">
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.*" />
+					<include name="com/konakart/actions/*/${mod_name}*Action.class" />
+				</fileset>
+				<fileset dir="${kke.custom.home}/src" casesensitive="false">
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/README.TXT" />
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.properties" />
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.ldif" />
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.java" />
+					<include name="com/konakart/actions/*/${mod_name}*Action.java" />
+				</fileset>
+			</jar>
+		</sequential>
+	</macrodef>
+
+	<target name="make_jars" description="Create the konakart custom jars">
+		<echo message="Create the konakart custom jars" />
+
+		<antcall target="make_jar_custom"/>
+		<antcall target="make_jar_customEE"/>
+		<antcall target="make_jar_custom_utils"/>
+		<antcall target="make_jar_modules"/>
+		<antcall target="make_jar_konakart_app"/>
+	</target>
+
+	<target name="make_jar_konakart_app" description="Create the konakart_app jar"
+		if="appEngEE.code.present">
+		<echo message="Create the konakart_app.jar" />
+
+		<mkdir dir="${kke.custom.home}/jar" />
+		<jar destfile="${kke.custom.home}/jar/konakart_app.jar"
+			manifest="${kke.custom.home}/MANIFEST.MF"
+			whenmanifestonly="skip">
+			<fileset dir="${kke.custom.home}/build/classes">
+				<patternset refid="kkappeng_files" />
+			</fileset>
+			<fileset dir="./licenses/">
+				<include name="COMMUNITY-LICENSE.txt" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="make_jar_custom" description="Create the konakart_custom jar"
+		if="appn.code.present">
+		<echo message="Create the konakart_custom.jar" />
+
+		<mkdir dir="${kke.custom.home}/jar" />
+		<jar destfile="${kke.custom.home}/jar/konakart_custom.jar"
+			manifest="${kke.custom.home}/MANIFEST.MF"
+			whenmanifestonly="skip">
+			<fileset dir="${kke.custom.home}/build/classes">
+				<patternset refid="konakart_custom_jar_contents" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="make_jar_customEE" description="Create the konakart_customEE.jar"
+		if="appnEE.code.present">
+		<echo message="Create the konakart_customEE.jar" />
+
+		<mkdir dir="${kke.custom.home}/jar" />
+
+		<echo message="Create the konakart_customEE.jar" />
+		<jar destfile="${kke.custom.home}/jar/konakart_customEE.jar"
+			manifest="${kke.custom.home}/MANIFEST.MF"
+			whenmanifestonly="skip">
+			<fileset dir="${kke.custom.home}/build/classes">
+				<patternset refid="enterprise_konakart_customEE_files" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="make_jar_custom_utils" description="Create the konakart_custom_utils.jar"
+		if="utils.code.present">
+		<echo message="Create the konakart_custom_utils.jar" />
+		<jar destfile="${kke.custom.home}/jar/konakart_custom_utils.jar"
+			manifest="${kke.custom.home}/MANIFEST.MF"
+			whenmanifestonly="skip">
+			<fileset dir="${kke.custom.home}/build/classes">
+				<patternset refid="custom_utils" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="copy_app_artifacts" description="Copy the Application Artifacts into the main konakart webapp">
+		<echo message="Copy the resources" />
+		<copy todir="${konakart.dir}/WEB-INF/classes">
+			<fileset dir="${kke.custom.home}/resources/" />
+		</copy>
+
+		<echo message="Copy the javascript" />
+		<copy todir="${konakart.dir}/script">
+			<fileset dir="${kke.custom.home}/WebContent/script" />
+		</copy>
+
+		<echo message="Copy the styles" />
+		<copy todir="${konakart.dir}/styles">
+			<fileset dir="${kke.custom.home}/WebContent/styles" />
+		</copy>
+
+		<echo message="Copy the jsps" />
+		<copy todir="${konakart.dir}/WEB-INF/jsp">
+			<fileset dir="${kke.custom.home}/WebContent/WEB-INF/jsp" />
+		</copy>
+	</target>
+
+	<target name="copy_jars" description="Copy the jars into the main custom jar directory">
+		<echo message="Copy the jars into the main custom jar directory" />
+		<copy todir="${custom.home}/jar">
+			<fileset dir="${kke.custom.home}/jar/" />
+		</copy>
+		
+		<echo message="Execute copy_jars in main custom build" />
+		<ant dir="${custom.home}" antfile="build.xml" target="copy_jars" />
+	</target>
+
+	<target name="make_wars" description="Make the WARs using the main custom build">
+		<echo message="Make the WARs using the main custom build" />
+		<ant dir="${custom.home}" antfile="build.xml" target="make_wars" />
+	</target>
+
+	<target name="build"
+	        description="Compiles all the storefront code and creates all the jars"
+	        depends="
+			debugenv,
+			clean,
+			make_manifest_file,
+			compile,
+			make_jars
+		" />
+</project>

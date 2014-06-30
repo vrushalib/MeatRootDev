@@ -1,0 +1,402 @@
+/*
+# (c) 2013 DS Data Systems UK Ltd, All rights reserved.
+#
+# DS Data Systems and KonaKart and their respective logos, are 
+# trademarks of DS Data Systems UK Ltd. All rights reserved.
+#
+# The information in this document below this text is free software; you can redistribute 
+# it and/or modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+*/
+
+/* Product details */
+.price{
+	color: #333;
+	display: inline;
+}
+
+#product-price{
+	font-weight: bold;
+	font-size: 130%;
+}
+
+.prod-name {
+	font-weight: bold;
+	font-size: 1.4em;
+}
+
+.old{
+	color: #666;
+	text-decoration: line-through;
+	margin-right: 2px;
+}
+
+.label{
+	color: #fff;
+	display: inline;
+	float: left;
+	font-size: 11px;
+	font-weight: bold;
+	line-break: 0;
+	margin: 5px 2px 0 0;
+	padding: 0 5px 2px 5px;
+	vertical-align: top;
+}
+
+.free-shipping, .shipped{
+	background-color: #3a9f4b;
+}
+
+.save{
+	background-color: #d41d0a;
+}
+
+#left-in-stock{
+	font-weight: bold;
+}
+
+#gallery_output{
+	width: 100%;
+	margin-top: 4px;	
+}
+
+#gallery_output .ui-block-a {
+	margin: 0 auto;
+	float:none;
+	max-width:360px;
+}
+/* Reviews */
+.star{
+	float: left;
+	height: 13px;
+	width: 13px;
+}
+
+.star.full{
+	background-image: url('../images/star-full.png');
+}
+
+.star.half{
+	background-image: url('../images/star-half.png');
+}
+
+.star.empty{
+	background-image: url('../images/star-empty.png');
+}
+
+.star-big{
+	float: left;
+	height: 17px;
+	width: 17px;
+}
+
+.star-big.full{
+	background-image: url('../images/star-full-big.png');
+}
+
+.star-big.half{
+	background-image: url('../images/star-half-big.png');
+}
+
+.star-big.empty{
+	background-image: url('../images/star-empty-big.png');
+}
+
+.product-review .rating{
+	float: left;
+	margin-right: 5px;
+}
+
+.product-review-title{
+	margin-bottom: 5px;
+}
+
+.product-review-details{
+	margin-top: 5px;
+	color: #666;
+}
+
+.product-review-details > span{
+	margin: 3px;
+}
+
+.product-review-details-date{
+	float: right;
+}
+
+.product-review-details-author{
+	font-weight: bold;
+}
+
+/* Banners */
+
+.ui-grid img {
+    width  : 100%;
+    height : auto;
+}
+
+/* Validation messages */
+.messageStackError{
+	color: #A00000;
+}
+
+.messageStackSuccess{
+	color: #00A000;
+}
+
+ .validation-msg {
+	color: #A00000;
+}
+
+/* Search */
+
+.search-grid .ui-block-b { 
+	margin-top: 5px;
+} 
+
+/* Product list */	
+.product-list-item img {
+	 vertical-align:middle;
+	 position: relative;
+}
+
+.order-by-section {
+	margin-bottom:20px;
+}
+
+/* Cart popup */
+#wish-list-items, #shopping-cart-items{
+	border-bottom: 1px #cfcfcf solid;
+	padding-bottom: 5px;
+	overflow-x:hidden;
+}
+
+.shopping-cart-item{
+	display: table;
+	height: 1%; /* For IE 7 */
+	*display: block; /* For IE 7 */
+	width:240px;	
+}
+
+.shopping-cart-item img{
+	float: left;
+	height: 60px;
+	margin: 7px 15px 5px 15px;
+	width: 60px;
+}
+
+.shopping-cart-item-title{
+	color: #000;
+	display: inline-block;
+	font-weight: bold;
+	font-size: 100%;
+	margin-top: 5px;
+	overflow: hidden;
+	text-decoration: none;
+	width: 150px;
+}
+
+.shopping-cart-item-title:hover	{
+	text-decoration: underline;
+}
+
+.shopping-cart-item-price{
+	margin-left: 90px;  
+	position: relative;
+	font-size: 85%;
+}
+
+.shopping-cart-item-option{
+	font-size: 70%;
+	font-style: italic;  
+}
+
+.subtotal{
+	color: #333;
+	font-weight: bold;
+	padding: 10px 0 5px 0;
+}
+
+.subtotal-label{
+	padding-top: 5px;
+	text-transform: uppercase;
+}
+
+
+/* Bread Crumbs */
+
+#breadcrumbs{
+	color: #999;
+	font-size: 80%;
+	margin-bottom: 3px;
+	margin-left: 3px;
+}
+
+#breadcrumbs a{
+	color: #666;
+	text-decoration: none;
+}
+
+.breadcrumb-separator{
+	background-image: url('../images/arrow-right-inactive.png');
+	display: inline-block;
+	margin: 0 7px;
+	height: 7px;
+	width: 5px;
+}
+
+/* Edit Cart */
+
+.update-button{
+	text-transform: uppercase;
+	display:none;
+}
+
+.prod-price {
+}	
+.prod-price-label {
+	margin-right: 10px;
+}
+
+.cart-footer {
+	margin-top: 10px;
+}
+.cart-totals {
+	border-top: 1px solid #aaaaaa;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding-top: 5px;
+	font-weight: bold;
+}
+
+
+/* Forms */
+.kk-label {
+	font-weight: normal;
+}
+
+.required-blue, .required-green{
+	float: right;
+	height: 13px;
+	margin: 3px 20px 0 5px;
+	width: 13px;
+}
+
+.required-blue{
+	background-image: url('../images/icons/required-blue.png');
+}
+
+.required-green{
+	background-image: url('../images/icons/required-green.png');
+}
+
+/* General */
+.notification-header {
+	margin-bottom: 20px;
+}
+
+.odd, .even {
+	border-bottom: 1px solid #aaaaaa;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+}
+
+.kk-bold {
+	font-weight: bold;
+}
+
+.discount{
+	color: #cc0000;
+}
+
+.kk-right{
+	text-align: right;
+}
+
+/* Orders */
+
+.free-shipping, .shipped{
+	background-color: #3a9f4b;
+}
+
+.save{
+	background-color: #d41d0a;
+}
+
+.pending{
+	background-color: #f08d00;
+}
+
+.pending, .shipped{
+	margin: 0;
+}
+
+.order-summary{
+	background-color: #e0e0e0;
+}
+
+.shipment-header{
+	background-color: #e0e0e0;
+	margin-top: 10px;
+}
+
+.shipment-details{
+	border-bottom: 1px solid #aaaaaa;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
+/* address panels */
+.addr-book-explanation{
+	margin-bottom:20px;
+}
+.addr-book-addr{
+	margin-bottom:30px;
+}
+
+/* Order confirmation page */
+#order-conf-cart .ui-block-a {
+	border-top: 1px solid #aaaaaa;
+	margin-top: 10px;
+	padding-top: 5px;
+}
+#order-conf-cart .ui-block-b {
+	border-top: 1px solid #aaaaaa;
+	margin-top: 10px;
+	padding-top: 5px;
+}
+
+
+.underline {
+	text-decoration:underline;
+}
+
+/* add validation panel */
+#addr-val-ok, #addr-val-error {
+	margin-top:20px;
+}
+
+#addr-val-confirm {
+	margin-left:40px;
+}
+
+/* Copyright */
+
+#copyright a{
+	color: #fff;
+	text-decoration: none;
+}
+
+#copyright a:hover{
+	text-decoration: underline;
+}
+
+
