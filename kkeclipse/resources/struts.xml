@@ -267,6 +267,10 @@
 			  <param name="bufferSize">1024</param>
 			</result>
 		</action>
+		<action name="DeliveryArea" class="com.konakart.actions.DeliveryAreaAction">
+			<result name="success" type="tiles">catalog.deliveryarea.page</result>
+		</action>		
+		
 		<action name="EditAddr" class="com.konakart.actions.EditAddrAction">
 			<result name="success"  type="tiles">catalog.editaddr.page</result>
 		</action>
@@ -343,6 +347,7 @@
 		<action name="FAQ" class="com.konakart.actions.FAQAction">
 			<result name="success" type="tiles">catalog.faq.page</result>
 		</action>
+		
 		<action name="InitFromToken" class="com.konakart.actions.InitFromTokenSubmitAction">
 			<result name="success" type="chain">Checkout</result>
 		</action>
