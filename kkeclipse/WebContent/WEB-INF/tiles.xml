@@ -178,6 +178,11 @@
 		<put-attribute name="defName" value="catalog.changepassword.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/ChangePasswordBody.jsp"/>
 	</definition>
+	<!-- Page shown to Delivery Area -->
+	<definition name="catalog.deliveryarea.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.deliveryarea.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/DeliveryAreaBody.jsp"/>
+	</definition>
 	<!-- Page shown to edit the newsletter -->
 	<definition name="catalog.editnewsletter.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.editnewsletter.page"/>

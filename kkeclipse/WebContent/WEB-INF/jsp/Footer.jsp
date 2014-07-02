@@ -21,37 +21,13 @@
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
-<script>
-function onBlur(el) {
-    if (el.value == '') {
-        el.value = el.defaultValue;
-    }
-}
-function onFocus(el) {
-    if (el.value == el.defaultValue) {
-        el.value = '';
-    }
-}
 
-$(function() {
-	$("#newsletter-input").keydown(function (e){
-	    if(e.keyCode == 13){
-	    	submitNewsletterForm();
-	    }
-	});
-});		
-</script>
 
-<div  class="item-area wide rounded-corners">
+<div  class="footer-area wide rounded-corners">
 <div id="kkfooter">
 	<div id="links-1" class="footer-area narrow">
-	<h2 class="title">Popular Brand</h2>	
- 	<% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();%>
- 	<% for (com.konakart.appif.CategoryIf cat : cats) { %>
- 	<%String menuClass; %>
-	<% menuClass = "menu-item rounded-corners"; %>
-     <a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
- 	<% } %>
+	<h3 class="title">Popular Categories</h3>	
+ 	
    	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
 		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
 		<%String menuClass; %>
@@ -67,14 +43,8 @@ $(function() {
 
   
    	<div id="links-1" class="footer-area narrow">
-   	<h2 class="title">Popular Categories</h2>
-   
- 	<% for (com.konakart.appif.CategoryIf cat : cats) { %>
- 	<%String menuClass; %>
-	<% menuClass = "menu-item rounded-corners"; %>
-     <a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
- 	<% } %>
-   	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
+	<h3 class="title">Popular Products</h3>
+		<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
 		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
 		<%String menuClass; %>
 		<%if (i == catMgr.getCats().length-1){ %>
@@ -100,6 +70,15 @@ $(function() {
 		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
    	</div>
    	<div id="social" class="footer-area narrow last-child">
+   	<h4 class="title">Safe&Secure Shopping<br/>Payment Methods </h4>
+   	
+  			 	<ul>
+                	<li ><img src="<%=kkEng.getImageBase()%>/icons/visa2.jpg" alt="Visa card" /></li>
+                    <li><img src="<%=kkEng.getImageBase()%>/icons/masterCard2.jpg" alt="Master Card" /></li>
+                    <li><img src="<%=kkEng.getImageBase()%>/icons/netBanking2.jpg" alt="" /></li>
+                    <li><img src="<%=kkEng.getImageBase()%>/icons/cardOnDel2.jpg" alt="" /></li>
+                    <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>
+                </ul>
 		<kk:msg  key="footer.connect"/><br />
 		<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
 		<a href="http://www.facebook.com" target="_blank" class="facebook-grey social-icon"></a>
