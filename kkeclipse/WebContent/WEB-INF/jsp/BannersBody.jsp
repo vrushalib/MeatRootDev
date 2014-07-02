@@ -20,28 +20,8 @@
 <link rel="stylesheet"	href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/overcast/jquery-ui.min.css"
 	type="text/css" media="all" />
 <link	href="styles/uiv2_main.min.css"	rel="stylesheet" type="text/css" />
-
-
 <script	src="js/jquery.cycle.js"></script>
-
- <script src="js/uiv2_main.min.js"	type="text/javascript"></script>
-
-<style>
-.uiv2-slider-block-one {
-	display: inline-block;
-	position: absolute;
-}
-
-.button2 {
-	position: relative;
-	background-color:rgb(226, 66, 94);
-	bottom: 0;
-	right: 0;
-	border-radius:5px;
-	height:70px;
-	width:250px;
-}
-</style>
+<script src="js/uiv2_main.min.js"	type="text/javascript"></script>
 
 <%@include file="Taglibs.jsp" %>
 
@@ -107,29 +87,34 @@
 		<div id="uiv2-slideshow">
 			<div class="uiv2-slides">
 				<ul style="width: 940px; height: 255px;">
-					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><a
-						href="#"><div
+					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.png') center left no-repeat;"></div></a></li>
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><a
-						href="#"><div
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.png') center left no-repeat;">
+								<a href="SelectCat.action?catId=1"><input type="button" class="button2" value="Explore Button" /></a></div></li>
+								
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.png') center left no-repeat;"></div></a></li>
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><a
-						href="#"><div
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.png') center left no-repeat;">
+								<a href="SelectCat.action?catId=2"><input type="button" class="button2" value="Explore Button" /></a></div></li>
+								
+								
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.png') center left no-repeat;"></div></a></li>
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-four"><a
-						href="#"><div
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.png') center left no-repeat;">
+								<a href="SelectCat.action?catId=3"><input type="button" class="button2" value="Explore Button" /></a></div></li>
+								
+								
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-four"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat;">
-								<input type="button" class="button2" value="Explore Button" /></div></a></li>
+								</div></li>
+								
 				</ul>
 			</div>
-		<% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();
-		%>
+		<%-- <% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();
+		%> --%>
  <ul class="uiv2-slides-nav">
- <% for (com.konakart.appif.CategoryIf cat : cats) { 
+<%--  <% for (com.konakart.appif.CategoryIf cat : cats) { 
 	 String value= null;
   	//System.out.println("categories=="+cat+" cat.getId=="+cat.getId());
   	if(cat.getId()==1){
@@ -138,29 +123,30 @@
   		value="two";
   	}else if(cat.getId()==3){
   		value="three";
-  	}
-  	
+  	}   	
   	%>
 			
-				<li class="on"><span class="arrow  caption-four"></span><a
-					href="#uiv2-slide-<%=value%>>"></a><span><%=cat.getName()%></span></li>
+				<li class=""><span class="arrow  caption-four"></span><a
+					href="#uiv2-slide-<%=value%>"></a><span><%=cat.getName()%></span></li>
 				
-            <%
-            
-	}
- 
-%>
+           
+	 <%}%> --%>
+			<li class="on
+            "><span class="arrow  caption-four"></span><a
+				href="#uiv2-slide-one"></a> <span>Fresh</span></li>
+			<li class="
+            "><span class="arrow  caption-four"></span><a
+				href="#uiv2-slide-two"></a><span>Frozen</span></li>
+			<li class="
+            "><span class="arrow  caption-four"></span><a
+				href="#uiv2-slide-three"></a><span>Processed</span></li>
 
-<li class=""> 
-            <span class="arrow  caption-four"></span><a
+			<li class=""><span class="arrow  caption-four"></span><a
 					href="#uiv2-slide-four"></a><span>Delivery Area</span></li>
 			</ul>
 		</div>
 	</div>
 	
-	
-	
-
 <%
 	}
 %>
