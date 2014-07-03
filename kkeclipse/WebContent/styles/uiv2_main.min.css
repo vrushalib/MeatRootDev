@@ -335,11 +335,11 @@
 	padding: 0
 }
  */
-body {
+/* body {
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	background: #f3f3f3
 }
-
+ */
 ul.messagelist li {
 	font-size: 13px;
 	display: block;
@@ -2944,12 +2944,12 @@ ul.uiv2-deliveryslots-list {
 	margin-left: 0
 }
 
-body {
+/* body {
 	width: 100%;
 	background-color: #f2f2f2;
 	margin: 0 auto;
 	padding: 0
-}
+} */
 
 a {
 	text-decoration: none
@@ -2965,11 +2965,11 @@ input:focus,textarea:focus,isindex:focus,keygen:focus,select:focus {
 	outline: 0
 }
 
-ul,li {
+/* ul,li {
 	margin: 0;
 	padding: 0
 }
-
+ */
 .uiv2-clear-b {
 	clear: both;
 	margin: 0 auto
@@ -10397,12 +10397,12 @@ a.play.paused:hover {
 	line-height: 26px;
 	font-family: Lato
 }
-
+/* 
 li,.uiv2-location .uiv2-location-dropdown li,nav ul,.uiv2-product-thumbs-img-container ul
 	{
 	list-style: none
 }
-
+ */
 img,img a,.uiv2-order-tabs ul li:last-child {
 	border: 0
 }

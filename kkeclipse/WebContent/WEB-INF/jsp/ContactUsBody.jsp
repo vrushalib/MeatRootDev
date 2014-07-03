@@ -23,10 +23,11 @@
  				<h1 id="page-title"><kk:msg  key="header.contact.us"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="about-us">
-		    			<kk:msg  key="common.add.info"/>
-						<div class="form-buttons-wide">
+		    			Your comments, suggestions, and concerns are very important to us. We welcome any
+suggestions you have that will help us provide better service to our customers.
+Please reach us at customercare@meatroot.com with your comments.
 							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
-						</div>
+						
 			    	</div>
 	    		</div>
 
