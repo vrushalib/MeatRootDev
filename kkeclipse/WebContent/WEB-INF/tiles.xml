@@ -26,10 +26,11 @@
 	<!-- Catalog Main Page -->
 	<definition name="catalog.main.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.main.page"/>
-	    <put-attribute name="body1" value="/WEB-INF/jsp/BannersBody.jsp"/>
+	    	<put-attribute name="body1" value="/WEB-INF/jsp/BannersBody.jsp"/>
 		<put-attribute name="body2" value="/WEB-INF/jsp/NewProductsBody.jsp"/>
-		<put-attribute name="body3" value="/WEB-INF/jsp/FeaturedProductsBody.jsp"/>
-		<put-attribute name="body4" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
+		<put-attribute name="body3" value="/WEB-INF/jsp/CategorywiseProducts.jsp"/>
+		<put-attribute name="body4" value="/WEB-INF/jsp/FeaturedProductsBody.jsp"/>
+		<put-attribute name="body5" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
 	</definition>
 		<!-- Page shown for the detail of one product -->
 	<definition name="catalog.showprod.details.page" extends="main.layout">

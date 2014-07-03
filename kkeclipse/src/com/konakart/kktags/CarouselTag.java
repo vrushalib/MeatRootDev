@@ -47,6 +47,7 @@ public class CarouselTag extends BaseTag
     {
         try
         {
+	    rand = String.valueOf(new Random().nextInt(1000));
             setEng((com.konakart.al.KKAppEng) pageContext.getSession().getAttribute("konakartKey"));
             if (prods != null && prods.length > 0)
             {

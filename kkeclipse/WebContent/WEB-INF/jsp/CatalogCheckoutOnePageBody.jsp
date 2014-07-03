@@ -379,7 +379,7 @@ $(function() {
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 				    				<%if (!isMultivendor){ %>
-										<div id="shipping-info" class="order-confirmation-area-content-select">
+										<div id="shipping-info" class="order-confirmation-area-content-select" hidden="true">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<select name="shipping" onchange="javascript:shippingRefresh();" id="shippingQuotes">
 												<%if (orderMgr.getShippingQuotes() != null && orderMgr.getShippingQuotes().length > 0){ %>										
@@ -434,7 +434,7 @@ $(function() {
 											<% } %>
 										</select>
 									</div>
-									<div id="promotion-codes">
+								<%-- 	<div id="promotion-codes">
 										<div id="promotion-codes-container">
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>
 									    		<div class="promotion-codes-field">				
@@ -464,8 +464,8 @@ $(function() {
 												<% } %>
 											<% } %>
 										</div>
-		    						</div>
-								</div>		    				
+		    						</div>--%>    
+								</div>						
 			    			</div>
 			    			<div id="delivery-notes" class="order-confirmation-area">
 			    				<div class="heading-container">
@@ -622,10 +622,10 @@ $(function() {
 														<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
 														    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
 															<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
-														<%}else{%>
+														<%}  else{ %>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	
-															<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td>
-														<%}%>		    																		
+															<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td> 
+														<%}  %>		    																		
 													</tr>
 												<%}%>
 											<%}%>
@@ -641,6 +641,7 @@ $(function() {
 						</div>
 					</form>			    	
 	    		</div>
+
 
 
 

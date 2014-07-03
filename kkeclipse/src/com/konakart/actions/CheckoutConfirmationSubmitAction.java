@@ -18,6 +18,9 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,265 +39,294 @@ import com.konakart.appif.OrderStatusHistoryIf;
 import com.konakart.appif.PaymentDetailsIf;
 
 /**
- * Gets called after submitting the checkout confirmation page. Where we go from here depends on the
- * payment gateway chosen.
+ * Gets called after submitting the checkout confirmation page. Where we go from
+ * here depends on the payment gateway chosen.
  */
-public class CheckoutConfirmationSubmitAction extends BaseAction
-{
-    private static final long serialVersionUID = 1L;
+public class CheckoutConfirmationSubmitAction extends BaseAction {
+	private static final long serialVersionUID = 1L;
 
-    private String comment;
+	private String comment;
 
-    public String execute()
-    {
-        HttpServletRequest request = ServletActionContext.getRequest();
-        HttpServletResponse response = ServletActionContext.getResponse();
+	public String execute() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+		try {
+			int custId;
 
-        try
-        {
-            int custId;
+			KKAppEng kkAppEng = this.getKKAppEng(request, response);
 
-            KKAppEng kkAppEng = this.getKKAppEng(request, response);
+			custId = this.loggedIn(request, response, kkAppEng, "Checkout");
 
-            custId = this.loggedIn(request, response, kkAppEng, "Checkout");
+			// Check to see whether the user is logged in
+			if (custId < 0) {
+				return KKLOGIN;
+			}
 
-            // Check to see whether the user is logged in
-            if (custId < 0)
-            {
-                return KKLOGIN;
-            }
+			// Ensure we are using the correct protocol. Redirect if not.
+			String redirForward = checkSSL(kkAppEng, request, custId, /* forceSSL */
+					false);
+			if (redirForward != null) {
+				setupResponseForSSLRedirect(response, redirForward);
+				return null;
+			}
 
-            // Ensure we are using the correct protocol. Redirect if not.
-            String redirForward = checkSSL(kkAppEng, request, custId, /* forceSSL */false);
-            if (redirForward != null)
-            {
-                setupResponseForSSLRedirect(response, redirForward);
-                return null;
-            }
+			// Ensure that the user hasn't submitted the order and then got back
+			// to here using the
+			// back button. We check to see whether the basket is null
+			// Check to see whether there is something in the cart
+			CustomerIf cust = kkAppEng.getCustomerMgr().getCurrentCustomer();
+			if (cust.getBasketItems() == null
+					|| cust.getBasketItems().length == 0) {
+				return "ShowCartItems";
+			}
 
-            // Ensure that the user hasn't submitted the order and then got back to here using the
-            // back button. We check to see whether the basket is null
-            // Check to see whether there is something in the cart
-            CustomerIf cust = kkAppEng.getCustomerMgr().getCurrentCustomer();
-            if (cust.getBasketItems() == null || cust.getBasketItems().length == 0)
-            {
-                return "ShowCartItems";
-            }
+			// Get the host name and port number
+			String hostAndPort = "";
+			if (!kkAppEng.isPortlet()) {
+				// Throws exception if called when running as a portlet
+				hostAndPort = request.getServerName() + ":"
+						+ request.getServerPort();
+			}
 
-            // Get the host name and port number
-            String hostAndPort = "";
-            if (!kkAppEng.isPortlet())
-            {
-                // Throws exception if called when running as a portlet
-                hostAndPort = request.getServerName() + ":" + request.getServerPort();
-            }
+			// Check that order is there and valid
+			OrderIf checkoutOrder = kkAppEng.getOrderMgr().getCheckoutOrder();
+			if (checkoutOrder == null) {
+				return "Checkout";
+			}
 
-            // Check that order is there and valid
-            OrderIf checkoutOrder = kkAppEng.getOrderMgr().getCheckoutOrder();
-            if (checkoutOrder == null)
-            {
-                return "Checkout";
-            }
+			// Set the comment
+			String escapedComment = escapeFormInput(getComment());
+			OrderStatusHistoryIf osh = new OrderStatusHistory();
+			osh.setComments(escapedComment);
+			OrderStatusHistoryIf[] oshArray = new OrderStatusHistoryIf[1];
+			oshArray[0] = osh;
+			osh.setUpdatedById(kkAppEng.getOrderMgr()
+					.getIdForUserUpdatingOrder(checkoutOrder));
+			checkoutOrder.setStatusTrail(oshArray);
 
-            // Set the comment
-            String escapedComment = escapeFormInput(getComment());
-            OrderStatusHistoryIf osh = new OrderStatusHistory();
-            osh.setComments(escapedComment);
-            OrderStatusHistoryIf[] oshArray = new OrderStatusHistoryIf[1];
-            oshArray[0] = osh;
-            osh.setUpdatedById(kkAppEng.getOrderMgr().getIdForUserUpdatingOrder(checkoutOrder));
-            checkoutOrder.setStatusTrail(oshArray);
+			// Uncomment this for Canada Post - it sets the packaging details
+			// checkoutOrder.setCustom4(checkoutOrder.getShippingQuote().getCustom4());
 
-            // Uncomment this for Canada Post - it sets the packaging details
-            //checkoutOrder.setCustom4(checkoutOrder.getShippingQuote().getCustom4());
-            
-            /*
-             * Check to see whether the order total is set to 0. Don't bother with a payment gateway
-             * if it is.
-             */
-            BigDecimal orderTotal = checkoutOrder.getTotalIncTax();
-            if (orderTotal != null && orderTotal.compareTo(java.math.BigDecimal.ZERO) == 0)
-            {
-                // Set the order status
-                checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS);
+			// To set the delivery time - morning/evening
+			// For now it is set to "m" by default. It will be changed later.
+			// String deliverySlot = request.getParameter("deliverySlot"); //
+			// should get the user selected value from UI
+			String deliverySlot = "m"; // should be removed when even evening
+										// slot will be started
+			checkoutOrder.setCustom1(deliverySlot);
 
-                // Save the order
-                int orderId = kkAppEng.getOrderMgr().saveOrder(/* sendEmail */true,
-                        getEmailOptions(kkAppEng));
+			// To set the delivery date for order
+			// For now it's tomorrow's date by default
+			Calendar c = new GregorianCalendar();
+			c.add(Calendar.DATE, 1);
+			checkoutOrder.setCustom2(new SimpleDateFormat("yyyy-MM-dd")
+					.format(c.getTime()));
 
-                // Update the inventory
-                kkAppEng.getOrderMgr().updateInventory(orderId);
+			/*
+			 * Check to see whether the order total is set to 0. Don't bother
+			 * with a payment gateway if it is.
+			 */
+			BigDecimal orderTotal = checkoutOrder.getTotalIncTax();
+			if (orderTotal != null
+					&& orderTotal.compareTo(java.math.BigDecimal.ZERO) == 0) {
+				// Set the order status
+				checkoutOrder
+						.setStatus(com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS);
 
-                // If we received no exceptions, delete the basket
-                kkAppEng.getBasketMgr().emptyBasket();
+				// Save the order
+				int orderId = kkAppEng.getOrderMgr().saveOrder(
+				/* sendEmail */true, getEmailOptions(kkAppEng));
 
-                return "CheckoutFinished";
-            }
+				// Update the inventory
+				kkAppEng.getOrderMgr().updateInventory(orderId);
 
-            int paymentType = kkAppEng.getOrderMgr().getPaymentType();
-            if (paymentType == PaymentDetails.BROWSER_PAYMENT_GATEWAY
-                    || paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY)
-            {
-                /*
-                 * This payment gateway is a type where the customer enters the credit card details
-                 * on a browser window belonging to the gateway. The result is normally returned
-                 * through a callback. Therefore we don't update the inventory here, but leave it
-                 * for the callback action which will do it if the payment was approved.
-                 */
+				// If we received no exceptions, delete the basket
+				kkAppEng.getBasketMgr().emptyBasket();
 
-                // Set the order status
-                checkoutOrder.setStatus(com.konakart.bl.OrderMgr.WAITING_PAYMENT_STATUS);
+				return "CheckoutFinished";
+			}
 
-                // Save the order
-                int orderId = kkAppEng.getOrderMgr().saveOrder(/* sendEmail */true,
-                        getEmailOptions(kkAppEng));
+			int paymentType = kkAppEng.getOrderMgr().getPaymentType();
+			if (paymentType == PaymentDetails.BROWSER_PAYMENT_GATEWAY
+					|| paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY) {
+				/*
+				 * This payment gateway is a type where the customer enters the
+				 * credit card details on a browser window belonging to the
+				 * gateway. The result is normally returned through a callback.
+				 * Therefore we don't update the inventory here, but leave it
+				 * for the callback action which will do it if the payment was
+				 * approved.
+				 */
 
-                // Get a fully populated PaymentDetails object and attach it to the order
-                PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(kkAppEng.getSessionId(),
-                        checkoutOrder.getPaymentDetails().getCode(), orderId, hostAndPort,
-                        kkAppEng.getLangId());
-                checkoutOrder.setPaymentDetails(pd);
-                checkoutOrder.setPaymentMethod(pd.getTitle());
-                checkoutOrder.setPaymentModuleCode(pd.getCode());
-                checkoutOrder.setPaymentModuleSubCode(pd.getSubCode());
+				// Set the order status
+				checkoutOrder
+						.setStatus(com.konakart.bl.OrderMgr.WAITING_PAYMENT_STATUS);
 
-                // Save pd.getCustom1() on the session with key: orderId + "-CUSTOM1"
-                kkAppEng.setCustomConfig(Integer.toString(orderId) + "-CUSTOM1", pd.getCustom1());
-                // Save pd.getCustom2() on the session with key: orderId + "-CUSTOM2"
-                kkAppEng.setCustomConfig(Integer.toString(orderId) + "-CUSTOM2", pd.getCustom2());
+				// Save the order
+				int orderId = kkAppEng.getOrderMgr().saveOrder(
+				/* sendEmail */true, getEmailOptions(kkAppEng));
 
-                // If we received no exceptions, delete the basket
-                kkAppEng.getBasketMgr().emptyBasket();
+				// Get a fully populated PaymentDetails object and attach it to
+				// the order
+				PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(
+						kkAppEng.getSessionId(),
+						checkoutOrder.getPaymentDetails().getCode(), orderId,
+						hostAndPort, kkAppEng.getLangId());
+				checkoutOrder.setPaymentDetails(pd);
+				checkoutOrder.setPaymentMethod(pd.getTitle());
+				checkoutOrder.setPaymentModuleCode(pd.getCode());
+				checkoutOrder.setPaymentModuleSubCode(pd.getSubCode());
 
-                if (pd.getPreProcessCode() != null)
-                {
-                    return pd.getPreProcessCode();
-                }
+				// Save pd.getCustom1() on the session with key: orderId +
+				// "-CUSTOM1"
+				kkAppEng.setCustomConfig(
+						Integer.toString(orderId) + "-CUSTOM1", pd.getCustom1());
+				// Save pd.getCustom2() on the session with key: orderId +
+				// "-CUSTOM2"
+				kkAppEng.setCustomConfig(
+						Integer.toString(orderId) + "-CUSTOM2", pd.getCustom2());
 
-                if (paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY)
-                {
-                    return "CheckoutExternalPaymentFrame";
-                }
-                return "CheckoutExternalPayment";
-            } else if (paymentType == PaymentDetails.SERVER_PAYMENT_GATEWAY)
-            {
-                /*
-                 * This payment gateway is a type where the customer enters the credit card details
-                 * on a browser window belonging to KonaKart. The details are passed to the KonaKart
-                 * server which communicates with the Gateway server side. A response is returned
-                 * immediately but we still save the order and change the state later.
-                 * 
-                 * Some notes on this:
-                 * 
-                 * -- If we save it after receiving payment notification, something may go wrong and
-                 * we would have a payment notification for an unknown order.
-                 * 
-                 * -- If we save it after receiving payment notification, we don't have an order id
-                 * to send to the gateway. The order id often appears in the email response from the
-                 * gateway in order to match the response to the order.
-                 * 
-                 * -- We save the order with a pending status but don't send an email immediately.
-                 * If the payment is approved, we change the status and then send an email.
-                 * 
-                 * -- If the payment request is never made, we keep the order in the database with a
-                 * pending status.
-                 * 
-                 * -- If the payment is never approved, we keep the order in the database with a
-                 * payment declined status. If the user made at least one attempt to pay for the
-                 * order, we should also have an ipnHistory object with details of the gateway
-                 * transaction.
-                 */
-                // Set the order status
-                checkoutOrder.setStatus(com.konakart.bl.OrderMgr.WAITING_PAYMENT_STATUS);
+				// If we received no exceptions, delete the basket
+				kkAppEng.getBasketMgr().emptyBasket();
 
-                // Save the order
-                int orderId = kkAppEng.getOrderMgr().saveOrder(/* sendEmail */false, null);
+				if (pd.getPreProcessCode() != null) {
+					return pd.getPreProcessCode();
+				}
 
-                // Get a fully populated PaymentDetails object and attach it to the order
-                PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(kkAppEng.getSessionId(),
-                        checkoutOrder.getPaymentDetails().getCode(), orderId, hostAndPort,
-                        kkAppEng.getLangId());
-                checkoutOrder.setPaymentDetails(pd);
-                checkoutOrder.setPaymentMethod(pd.getTitle());
-                checkoutOrder.setPaymentModuleCode(pd.getCode());
-                checkoutOrder.setPaymentModuleSubCode(pd.getSubCode());
+				if (paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY) {
+					return "CheckoutExternalPaymentFrame";
+				}
+				return "CheckoutExternalPayment";
+			} else if (paymentType == PaymentDetails.SERVER_PAYMENT_GATEWAY) {
+				/*
+				 * This payment gateway is a type where the customer enters the
+				 * credit card details on a browser window belonging to
+				 * KonaKart. The details are passed to the KonaKart server which
+				 * communicates with the Gateway server side. A response is
+				 * returned immediately but we still save the order and change
+				 * the state later.
+				 * 
+				 * Some notes on this:
+				 * 
+				 * -- If we save it after receiving payment notification,
+				 * something may go wrong and we would have a payment
+				 * notification for an unknown order.
+				 * 
+				 * -- If we save it after receiving payment notification, we
+				 * don't have an order id to send to the gateway. The order id
+				 * often appears in the email response from the gateway in order
+				 * to match the response to the order.
+				 * 
+				 * -- We save the order with a pending status but don't send an
+				 * email immediately. If the payment is approved, we change the
+				 * status and then send an email.
+				 * 
+				 * -- If the payment request is never made, we keep the order in
+				 * the database with a pending status.
+				 * 
+				 * -- If the payment is never approved, we keep the order in the
+				 * database with a payment declined status. If the user made at
+				 * least one attempt to pay for the order, we should also have
+				 * an ipnHistory object with details of the gateway transaction.
+				 */
+				// Set the order status
+				checkoutOrder
+						.setStatus(com.konakart.bl.OrderMgr.WAITING_PAYMENT_STATUS);
 
-                // Save pd.getCustom1() on the session with key: orderId + "-CUSTOM1"
-                kkAppEng.setCustomConfig(Integer.toString(orderId) + "-CUSTOM1", pd.getCustom1());
-                // Save pd.getCustom2() on the session with key: orderId + "-CUSTOM2"
-                kkAppEng.setCustomConfig(Integer.toString(orderId) + "-CUSTOM2", pd.getCustom2());
+				// Save the order
+				int orderId = kkAppEng.getOrderMgr().saveOrder(
+				/* sendEmail */false, null);
 
-                return "CheckoutServerPayment";
-            } else if (paymentType == PaymentDetails.COD)
-            {
-                /*
-                 * Cash On Delivery. The order is saved with a pending status and the inventory is
-                 * updated.
-                 */
+				// Get a fully populated PaymentDetails object and attach it to
+				// the order
+				PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(
+						kkAppEng.getSessionId(),
+						checkoutOrder.getPaymentDetails().getCode(), orderId,
+						hostAndPort, kkAppEng.getLangId());
+				checkoutOrder.setPaymentDetails(pd);
+				checkoutOrder.setPaymentMethod(pd.getTitle());
+				checkoutOrder.setPaymentModuleCode(pd.getCode());
+				checkoutOrder.setPaymentModuleSubCode(pd.getSubCode());
 
-                // Set the order status
-                checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PENDING_STATUS);
+				// Save pd.getCustom1() on the session with key: orderId +
+				// "-CUSTOM1"
+				kkAppEng.setCustomConfig(
+						Integer.toString(orderId) + "-CUSTOM1", pd.getCustom1());
+				// Save pd.getCustom2() on the session with key: orderId +
+				// "-CUSTOM2"
+				kkAppEng.setCustomConfig(
+						Integer.toString(orderId) + "-CUSTOM2", pd.getCustom2());
 
-                kkAppEng.getOrderMgr().addPaymentDetailsToOrder("cod");
+				return "CheckoutServerPayment";
+			} else if (paymentType == PaymentDetails.COD) {
+				/*
+				 * Cash On Delivery. The order is saved with a pending status
+				 * and the inventory is updated.
+				 */
 
-                // Save the order
-                int orderId = kkAppEng.getOrderMgr().saveOrder(/* sendEmail */true,
-                        getEmailOptions(kkAppEng));
+				// Set the order status
+				checkoutOrder
+						.setStatus(com.konakart.bl.OrderMgr.PENDING_STATUS);
 
-                // Update the inventory
-                kkAppEng.getOrderMgr().updateInventory(orderId);
+				kkAppEng.getOrderMgr().addPaymentDetailsToOrder("cod");
 
-                // If we received no exceptions, delete the basket
-                kkAppEng.getBasketMgr().emptyBasket();
+				// Save the order
+				int orderId = kkAppEng.getOrderMgr().saveOrder(
+				/* sendEmail */true, getEmailOptions(kkAppEng));
 
-                return "CheckoutFinished";
-            } else
-            {
-                throw new KKAppException("This Payment Type is not supported");
-            }
-        } catch (Exception e)
-        {
-            return super.handleException(request, e);
-        }
-    }
+				// Update the inventory
+				kkAppEng.getOrderMgr().updateInventory(orderId);
 
-    /**
-     * Instantiate an EmailOptions object. Edit this method if you have installed Enterprise
-     * Extensions and want to attach an invoice to the eMail.
-     * 
-     * @param kkAppEng
-     * @return Returns a populated EmailOptions object
-     */
-    private EmailOptionsIf getEmailOptions(KKAppEng kkAppEng)
-    {
-        EmailOptionsIf options = new EmailOptions();
-        options.setCountryCode(kkAppEng.getLocale().substring(0, 2));
-        options.setTemplateName("OrderConfReceived");
+				// If we received no exceptions, delete the basket
+				kkAppEng.getBasketMgr().emptyBasket();
 
-        // Attach the invoice to the confirmation email (Enterprise Only). Defaults to false.
-        // options.setAttachInvoice(true);
+				return "CheckoutFinished";
+			} else {
+				throw new KKAppException("This Payment Type is not supported");
+			}
+		} catch (Exception e) {
+			return super.handleException(request, e);
+		}
+	}
 
-        // Create the invoice (if not already present) for attaching to the confirmation email
-        // (Enterprise Only). Defaults to false.
-        // options.setCreateInvoice(true);
+	/**
+	 * Instantiate an EmailOptions object. Edit this method if you have
+	 * installed Enterprise Extensions and want to attach an invoice to the
+	 * eMail.
+	 * 
+	 * @param kkAppEng
+	 * @return Returns a populated EmailOptions object
+	 */
+	private EmailOptionsIf getEmailOptions(KKAppEng kkAppEng) {
+		EmailOptionsIf options = new EmailOptions();
+		options.setCountryCode(kkAppEng.getLocale().substring(0, 2));
+		options.setTemplateName("OrderConfReceived");
+		System.out.println("options: \n"+options.getTemplateName());
+		// Attach the invoice to the confirmation email (Enterprise Only).
+		// Defaults to false.
+		// options.setAttachInvoice(true);
 
-        return options;
-    }
+		// Create the invoice (if not already present) for attaching to the
+		// confirmation email
+		// (Enterprise Only). Defaults to false.
+		// options.setCreateInvoice(true);
 
-    /**
-     * @return the comment
-     */
-    public String getComment()
-    {
-        return comment;
-    }
+		return options;
+	}
 
-    /**
-     * @param comment
-     *            the comment to set
-     */
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
+	/**
+	 * @return the comment
+	 */
+	public String getComment() {
+		return comment;
+	}
+
+	/**
+	 * @param comment
+	 *            the comment to set
+	 */
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
+

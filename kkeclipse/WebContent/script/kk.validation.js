@@ -58,13 +58,13 @@ var validationRules = {
 		},
 		postcode : {
 			required : true,
-			minlength : 2,
-			maxlength : 10
+	/*		minlength : 6,
+			maxlength : 6 */
 		},
 		city : {
 			required : true,
-			minlength : 2,
-			maxlength : 32
+	/*		minlength : 2,
+			maxlength : 32*/
 		},
 		state : {
 			required : true,
@@ -72,12 +72,12 @@ var validationRules = {
 		},
 		telephoneNumber : {
 			required : true,
-			minlength : 3,
+			minlength : 10,
 			maxlength : 32
 		},
 		telephoneNumber1 : {
 			required : false,
-			minlength : 3,
+			minlength : 10,
 			maxlength : 32
 		},
 		faxNumber : {
@@ -227,8 +227,8 @@ function addrValidate(form) {
 		var streetAddress = $('input[name="streetAddress"]').val();
 		var streetAddress1 = $('input[name="streetAddress1"]').val();
 		var suburb = $('input[name="suburb"]').val();
-		var postcode = $('input[name="postcode"]').val();
-		var city = $('input[name="city"]').val();
+		var postcode = $('select[name="postcode"]').val();
+		var city = $('select[name="city"]').val();
 		var state = $('select[name="state"]').val();
 		var countryId = $('select[name="countryId"]').val();
 	
@@ -296,3 +296,4 @@ function closeAddrValPopup() {
 	$("#addr-val-dialog").dialog("close");
 	$('#continue-button').removeClass().text($('#buttonLabel_conf').val()).addClass('button small-rounded-corners');
 }
+
