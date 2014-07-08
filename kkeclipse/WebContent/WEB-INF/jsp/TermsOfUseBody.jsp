@@ -27,7 +27,7 @@
 The purpose of this site is to provide a simple and convenient service to our customers by
 delivering good quality meat at their doorsteps. The website shows information about our meat
 categories and their prices.<br/>
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 						
 			    	</div>
 	    		</div>

@@ -105,7 +105,7 @@ or visit the Contact Us page and complete the form. We will
 do our best to get Back to you in 24 hours.<br/><br/>
 <br/>
 		    			
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 						
 			    	</div>
 	    		</div>

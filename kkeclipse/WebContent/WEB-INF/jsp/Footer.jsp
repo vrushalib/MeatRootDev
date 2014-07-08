@@ -70,7 +70,7 @@
 		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
    	</div>
    	<div id="social" class="footer-area narrow last-child">
-   	<h4 class="title">Safe&Secure Shopping<br/>Payment Methods </h4>
+   	<h4 class="title" style="margin-top: 6px;">Payment Methods</h4>
    	
   			 	<ul>
                 	<li ><img src="<%=kkEng.getImageBase()%>/icons/visa2.jpg" alt="Visa card" /></li>
@@ -78,7 +78,7 @@
                     <li><img src="<%=kkEng.getImageBase()%>/icons/netBanking2.jpg" alt="" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/cardOnDel2.jpg" alt="" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>
-                </ul>
+                </ul><br/>
 		<kk:msg  key="footer.connect"/><br />
 		<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
 		<a href="http://www.facebook.com" target="_blank" class="facebook-grey social-icon"></a>

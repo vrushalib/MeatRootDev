@@ -30,7 +30,7 @@ products before agreeing to receive an order.
 Incorrect personal details may lead to problems or delays in delivery, so please ensure that you
 have included your correct address, email address and contact telephone number when
 ordering.<br/>
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 						
 			    	</div>
 	    		</div>

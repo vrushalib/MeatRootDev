@@ -498,18 +498,69 @@ li.ui-menu-item a.ui-state-focus {
 }
 
 .button2 {
-	position: absolute;
-	background-color: #DF1B5E;
-	bottom: 0;
-	/* right: 0; */
-	border-radius: 20px;
-	height: 45px;
-	width: 170px;
-	float: right;
-	margin-left: 81%;
-	margin-bottom: 2%;
+opacity: 0.6;
+position: absolute;
+background-color: #000;
+bottom: 0;
+color: #FFFFFF;
+/* right: 0; */
+/* border-radius: 20px; */
+height: 65px;
+width: 354px;
+float: right;
+margin-left: 60%;
+margin-bottom: 1%;
+font: 400 17px/20px 'Roboto Slab', serif;
+display: table;
 }
 
+.button2 span{
+	vertical-align:middle;
+    display: table-cell;
+	padding-left: 11px;
+}
+
+.button3 {
+	position: absolute;
+	background-color: #B22222;
+	bottom: 0;
+	color: #FFFFFF;
+	/* right: 0; */
+	height: 34px;
+	width: 99px;
+	float: right;
+	margin-left: -34%;
+	margin-bottom: 4%;
+	font: 400 17px/20px 'Roboto Slab', serif;
+}
+
+.deliveryarea {
+	position: absolute;
+	bottom: 0;
+	/* right: 0; */
+	height: 27px;
+	width: 246px;
+	float: right;
+	margin-left: 4%;
+	margin-bottom: 5%;
+	font: 400 17px/20px 'Roboto Slab', serif;
+}
+
+.gobutton {
+	position: absolute;
+	background-color: #B22222;
+	bottom: 0;
+	color: #FFFFFF;
+	/* right: 0; */
+	height: 34px;
+	width: 68px;
+	float: right;
+	margin-left: 78%;
+	margin-bottom: 5%;
+	font: 400 17px/20px 'Roboto Slab', serif;
+}
+
+}
 #content.narrow #banner {
 	height: 252px;
 	width: 760px;
@@ -706,7 +757,7 @@ li.ui-menu-item a.ui-state-focus {
 /* Item */
 .item {
 	float: left;
-	height: 280px;
+	height: 274px;
 	overflow: hidden;
 	margin-right: 10px;
 	padding: 10px;
@@ -818,7 +869,7 @@ li.ui-menu-item a.ui-state-focus {
 /* Item Mouse Over */
 .item-over-container {
 	border: 1px solid #bfc2c4;
-	margin: -2px 9px -1px -1px;
+	margin: -1px 9px -1px -1px;
 }
 
 .carousel-item .item-over-container {
@@ -920,7 +971,7 @@ li.ui-menu-item a.ui-state-focus {
 .button:hover,.button-small:hover,.button-medium:hover {
 	text-decoration: underline;
 	color: #fff;
-	background-color: #2372b0;
+	background-color: #a9a9a9;
 	cursor: pointer;
 }
 
@@ -980,7 +1031,7 @@ li.ui-menu-item a.ui-state-focus {
 	line-height: 20px;
 	border-top: 1px solid #d8d8d8;
 	padding: 20px 0px 0px -2px;
-	margin-bottom: 12px;
+	margin-bottom: 16px;
 }
 
 #kkfooter a {
@@ -1017,6 +1068,7 @@ ul,li {
 
 #links-1 {
 	width: 249px;
+	margin-top: 11px;
 }
 
 #links-2 {

@@ -40,7 +40,7 @@
 			don’t like going meat shopping or just don’t feel like stepping out –
 			let us handle the meat part for you. Enjoy your food and enjoy the
 			delightful feeling of being taken care of!<br/>
-			 <a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+			 
 						
 			    	</div>
 	    		</div>

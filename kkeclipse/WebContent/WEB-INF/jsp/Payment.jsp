@@ -26,7 +26,7 @@
 		    		Once the order has been accepted, this represents an agreement between the customer and
 MeatRoot. Prices are subject to change without notice and all goods are subject to availability.<br/>
 		    			
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 						
 			    	</div>
 	    		</div>

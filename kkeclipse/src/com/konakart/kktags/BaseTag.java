@@ -54,7 +54,8 @@ public class BaseTag extends ComponentTagSupport
     protected static final String REL = " rel=";
 
     protected static final String HREF = " href=";
-
+    
+   
     protected KKAppEng eng;
 
     /**
@@ -333,41 +334,19 @@ public class BaseTag extends ComponentTagSupport
     }
     
     protected StringBuffer getStartSelect(String select,String id,String className,String name){
-    	 StringBuffer sb = new StringBuffer();
-    	
-    	
-    	 sb.append("<select id="+D_QUOTE+id+D_QUOTE+" class=" + D_QUOTE + className + D_QUOTE + "name="+D_QUOTE+name+">");
-    	 for(int i=0;i<31;i++){
-    		 sb.append("<option value="+D_QUOTE+i+D_QUOTE+">"+i+"</option>");
-    	  	 }
-    	 sb.append("</select>");
-    	 
-    	 return sb;
-
-    }
-   /* protected StringBuffer getTick(String select,String id){
-   	 StringBuffer sb = new StringBuffer();  
-   	String style = "display:none;";
-   	 sb.append("<span id="+D_QUOTE+id+D_QUOTE+" style="+style+">");
-   	 String imgBase = eng.getImageBase();
-   	String src= imgBase + "/tick-mark.png";
-   	String title = "Mark";
-   	 sb.append("<img ");
-     if (select != null)
-     {
-         sb.append(CLASS + D_QUOTE + select + D_QUOTE + " ");
-     }
-     sb.append("src=" + D_QUOTE+ src + D_QUOTE
-             + " ");
-     sb.append("border=" + D_QUOTE + "0" + D_QUOTE + " ");
-     sb.append("alt=" + D_QUOTE + title + D_QUOTE + " ");
-     sb.append("title=" + D_QUOTE + title + D_QUOTE + " ");
-     sb.append("/>");
-   	 sb.append("</span>");
+   	 StringBuffer sb = new StringBuffer();
+   	
+   	
+   	 sb.append("<select id="+D_QUOTE+id+D_QUOTE+" class=" + D_QUOTE + className + D_QUOTE + "name="+D_QUOTE+name+">");
+   	 for(int i=0;i<31;i++){
+   		 sb.append("<option value="+D_QUOTE+i+D_QUOTE+">"+i+"</option>");
+   	  	 }
+   	 sb.append("</select>");
    	 
    	 return sb;
 
-   }*/
+   }
+
     
     
     

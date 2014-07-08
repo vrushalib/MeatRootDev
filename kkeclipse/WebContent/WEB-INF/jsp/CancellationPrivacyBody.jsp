@@ -32,7 +32,7 @@ by our service team.
 While every effort is made to ensure that accurate pricing and descriptions are maintained, we
 reserve the right to cancel any order that is based on inaccurate information. We will endeavor to
 notify you immediately of any such cancellation.<br/>
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 					
 			    	</div>
 	    		</div>

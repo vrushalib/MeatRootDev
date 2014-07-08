@@ -4870,13 +4870,15 @@ nav li a.active {
 }
 
 #uiv2-slideshow .uiv2-slides-nav li.on span.arrow {
-	width: 13px;
-	height: 7px;
-	background: url(images/SliderArrow.png) no-repeat center top;
-	position: absolute;
-	z-index: 30;
-	margin-top: -7px;
-	display: block
+	width: 28px;
+height: 12px;
+background: url(../images/SliderArrow.png) no-repeat center top;
+position: absolute;
+z-index: 30;
+margin-top: -8px;
+display: block;
+color: #000;
+	
 }
 
 #uiv2-slideshow .uiv2-slides-nav li a+span {
@@ -4894,7 +4896,7 @@ nav li a.active {
 }
 
  #uiv2-slideshow .uiv2-slides-nav li.on {
-	background-color: #424b20;
+	background-color: #000;
 }
 
 #uiv2-slideshow .uiv2-slides-nav li.uiv2-width-30-p {

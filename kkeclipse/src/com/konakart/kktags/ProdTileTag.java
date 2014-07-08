@@ -118,10 +118,12 @@ public class ProdTileTag extends BaseTag
 
             // Float over
             sb.append(getStartDiv("item-over", rand + "ov-" + Integer.toString(prod.getId())));
+           
             String value = rand + "atc-" + Integer.toString(prod.getId());
             
             //sb.append(getTick("tick-button","tickId"));
 
+            
             if (prod.getQuantity() > qtyWarn)
             {
             	 
@@ -148,7 +150,7 @@ public class ProdTileTag extends BaseTag
             sb.append(getStartDiv("item-buttons centered"));
             sb.append(getStartDiv("product-buttons"));
             
-            sb.append(getStartSelect("product-buttons","prodQuantityId","add-to-cart-qty","prodQuantity"));
+            sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"add-to-cart-qty","prodQuantity"));
           
             if (eng.getQuotaMgr().canAddToBasket(prod, null) > 0)
             {            	
@@ -165,7 +167,7 @@ public class ProdTileTag extends BaseTag
                 sb.append(getImg("plus-button", imgBase + "/plus-button.png",
                         getMsg("common.add.to.wishlist"), /* add base */false));
                 sb.append(getStartA("add-to-wishlist", "#",
-                        rand + "atc-" + Integer.toString(prod.getId())));
+                        value));
                 sb.append(getMsg("common.add.to.wishlist"));
                 sb.append(END_A);
                 sb.append(END_SPAN);

@@ -304,10 +304,12 @@ $(function() {
 	$(".add-to-cart-button")
 	.click(
 			function() {
-				var prodId = (this.id).split('-')[1];				
-				var id = $("#prodQuantityId option:selected").text();				
 				
-				callAction(new Array("prodId",prodId,"dropDownId",id), 
+				var prodId = (this.id).split('-')[1];			
+				
+				 var id = $("#prodQuantityId_"+prodId).val();			
+				
+				callAction(new Array("prodId",prodId,"id",id), 
 						addToCartCallback,
 						"AddToCartFromProdId.action?id="+id);
 				

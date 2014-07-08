@@ -25,7 +25,7 @@
 		    		<div id="content-changes">
 		    			We reserve the right to change these terms and conditions at any time without notice and you
 agree to be bound by such changes. Those changes shall be posted on the website.<br/>
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 					
 			    	</div>
 	    		</div>

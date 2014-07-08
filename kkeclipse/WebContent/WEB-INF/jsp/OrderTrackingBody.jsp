@@ -28,7 +28,7 @@ update.
 or
 Call us on : +91 9642658111
 <br/>
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 					
 			    	</div>
 	    		</div>

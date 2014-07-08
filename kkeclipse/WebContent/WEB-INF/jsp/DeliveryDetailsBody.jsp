@@ -31,7 +31,7 @@ Evening 47.30pm
 We deliver all seven days.
 <br/>
 		    			
-							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
+							
 						
 			    	</div>
 	    		</div>

@@ -35,6 +35,17 @@
 <% boolean hideRow1 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row1", false);%>
 <% boolean hideRow2 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row2", false);%>
 
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$('#go').click(function(){
+		var pincode = $("#go").val();
+		$("#go").hide();
+		$("#done").show();
+		$("#pincode").append(pincode);
+	});
+});
+</script>
 
 <!-- <script type="text/javascript">
     // Space out menu evenly
@@ -87,30 +98,48 @@
 		<div id="uiv2-slideshow">
 			<div class="uiv2-slides">
 				<ul style="width: 940px; height: 255px;">
+	<% 	for (int i = 0; i <catMgr.getCats().length; i++) {%>
+	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
+
+	<%String menuClass; %>
+	
+	<%if (i == catMgr.getCats().length-1){ %>
+	<% menuClass = "menu-item rounded-corners last-child"; %>
+	<% } else { %>
+	<% menuClass = "menu-item rounded-corners"; %>
+	<% } %>
+	<%if(cat.getName().contains("Computer Peripherals")) {%>
 					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.png') center left no-repeat;">
-								<a href="SelectCat.action?catId=1"><input type="button" class="button2" value="Explore Button" /></a></div></li>
-								
+								<div class="button2"><span>Tender, healthier and tastier<br/> meat straight from the farms!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
+								</div></li>
+		<%}else if(cat.getName().contains("Games")){ %>						
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.png') center left no-repeat;">
-								<a href="SelectCat.action?catId=2"><input type="button" class="button2" value="Explore Button" /></a></div></li>
-								
+								<div class="button2"><span>Why wait for a season<br/>frozen gives the  same freshness <br/> throughout the year!!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div></div></li>
+						<%}else if(cat.getName().contains("DVD Movies")){ %>				
 								
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.png') center left no-repeat;">
-								<a href="SelectCat.action?catId=3"><input type="button" class="button2" value="Explore Button" /></a></div></li>
-								
-								
+								<div class="button2"><span>From starters to mains,<br/> prepare anything within no time.</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
+								</div></li>
+							<%}else{ %>	
+								<% } %>
+									<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat;">
+								<div id="pincode"></div>
+								<div class="button2" id="go"><input type="text" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" /> </div>
+								<div class="button2" id="done" style="display:none;"><input type="text" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" /> </div>
 								</div></li>
 								
 				</ul>
 			</div>
+		
 		<%-- <% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();
 		%> --%>
  <ul class="uiv2-slides-nav">
