@@ -32,7 +32,7 @@ public class GetCategoryTree
 		List<CategoryIf> categories = null;
 		try {
 			List<Record> records = KKBasePeer
-					.executeQuery("SELECT cats.categories_id, categories_name, categories_image from categories cats join categories_description description on cats.categories_id = description.categories_id where cats.parent_id = 0 and categories_invisible = 1 and language_id = 1 order by description.categories_name ");
+					.executeQuery("SELECT cats.categories_id, categories_name from categories cats join categories_description description on cats.categories_id = description.categories_id where cats.parent_id = 0 and cats.custom1 = 'i' and language_id = 1 order by description.categories_name ");
 
 			if (records == null || records.size() == 0) {
 				return null;
@@ -51,3 +51,4 @@ public class GetCategoryTree
 		return categories;
 	}
 }
+

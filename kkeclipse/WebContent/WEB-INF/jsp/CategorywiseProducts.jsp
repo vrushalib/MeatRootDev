@@ -9,8 +9,11 @@
 <% com.konakart.appif.CategoryIf[] categories = catMgr.getCats(); %>
 <% for (int i = 0; i < noOfCategories; i++) {%>
    <% com.konakart.appif.CategoryIf cat = categories[i]; %>
-   <% com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, null, cat.getId(), true, -1); %>
-   <kk:carousel prods="<%=products.getProductArray()%>" title="<%=cat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
- <% } %>
+   <% if(cat.getCustom1() == null ){ //category is not invisible. custom1 value for invisible categories is "i".%>
+       <% com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, null, cat.getId(), true, -1); %>
+       <kk:carousel prods="<%=products.getProductArray()%>" title="<%=cat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
+   <% } %>
+<% } %>
  
+
 

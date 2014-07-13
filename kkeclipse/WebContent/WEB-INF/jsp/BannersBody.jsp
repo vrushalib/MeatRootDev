@@ -39,9 +39,10 @@
 
 $(document).ready(function(){
 	$('#go').click(function(){
-		var pincode = $("#go").val();
+		var pincode = $("#pincode").val();
 		$("#go").hide();
 		$("#done").show();
+		var emailId = $("#emailId").val();
 		$("#pincode").append(pincode);
 	});
 });
@@ -98,43 +99,39 @@ $(document).ready(function(){
 		<div id="uiv2-slideshow">
 			<div class="uiv2-slides">
 				<ul style="width: 940px; height: 255px;">
-	<% 	for (int i = 0; i <catMgr.getCats().length; i++) {%>
-	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
-
-	<%String menuClass; %>
-	
-	<%if (i == catMgr.getCats().length-1){ %>
-	<% menuClass = "menu-item rounded-corners last-child"; %>
-	<% } else { %>
-	<% menuClass = "menu-item rounded-corners"; %>
-	<% } %>
-	<%if(cat.getName().contains("Computer Peripherals")) {%>
+	<% for (int i = 0; i <catMgr.getCats().length; i++) {%>
+	    <%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
+	    <%String menuClass; %>
+	    <%if (i == catMgr.getCats().length-1){ %>
+	        <% menuClass = "menu-item rounded-corners last-child"; %>
+	    <% } else { %>
+	        <% menuClass = "menu-item rounded-corners"; %>
+	    <% } %>
+	    <%if(cat.getName().contains("Fresh")) {%>
 					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.png') center left no-repeat;">
 								<div class="button2"><span>Tender, healthier and tastier<br/> meat straight from the farms!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
 								</div></li>
-		<%}else if(cat.getName().contains("Games")){ %>						
+		<%}else if(cat.getName().contains("Frozen")){ %>						
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.png') center left no-repeat;">
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.jpg') center left no-repeat; background-size: 100%;">
 								<div class="button2"><span>Why wait for a season<br/>frozen gives the  same freshness <br/> throughout the year!!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div></div></li>
-						<%}else if(cat.getName().contains("DVD Movies")){ %>				
-								
+			    <%}else if(cat.getName().contains("Processed")){ %>				
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.png') center left no-repeat;">
 								<div class="button2"><span>From starters to mains,<br/> prepare anything within no time.</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
 								</div></li>
-							<%}else{ %>	
-								<% } %>
-									<% } %>
+		<% } %>
+	<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four"><div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat;">
 								<div id="pincode"></div>
-								<div class="button2" id="go"><input type="text" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" /> </div>
-								<div class="button2" id="done" style="display:none;"><input type="text" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" /> </div>
+								<div class="button2" id="go"><input type="text" id="pincode" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" /> </div>
+								<div class="button2" id="done" style="display:none;"><input type="text" id="emailId" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" /> </div>
 								</div></li>
 								
 				</ul>
@@ -142,7 +139,7 @@ $(document).ready(function(){
 		
 		<%-- <% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();
 		%> --%>
- <ul class="uiv2-slides-nav">
+ 
 <%--  <% for (com.konakart.appif.CategoryIf cat : cats) { 
 	 String value= null;
   	//System.out.println("categories=="+cat+" cat.getId=="+cat.getId());
@@ -160,6 +157,7 @@ $(document).ready(function(){
 				
            
 	 <%}%> --%>
+	     <ul class="uiv2-slides-nav">
 			<li class="on
             "><span class="arrow  caption-four"></span><a
 				href="#uiv2-slide-one"></a> <span>Fresh</span></li>
@@ -210,6 +208,7 @@ $(document).ready(function(){
 
 	
 <% } %>  --%>
+
 
 
 
