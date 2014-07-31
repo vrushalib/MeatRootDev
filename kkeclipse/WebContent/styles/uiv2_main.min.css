@@ -4882,7 +4882,7 @@ color: #000;
 }
 
 #uiv2-slideshow .uiv2-slides-nav li a+span {
-	font: 400 17px/20px 'Roboto Slab', serif;
+	font: 400 17px/20px Helvetica Neue, Arial, sans-serif;;
 	display: block;
 	color: #fff
 }

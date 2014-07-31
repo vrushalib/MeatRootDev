@@ -240,7 +240,7 @@
 													<%String rowClass = "costs-and-promotions";%>
 													<%if (ot.getClassName().equals("ot_total")){ %>
 														<%rowClass = "shopping-cart-total";%>
-													<% } %>										
+													<% } %>	
 													<tr class="<%=rowClass%>">															
 														<%if (ot.getClassName().equals("ot_reward_points")){%>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	

@@ -23,11 +23,10 @@
 
 
 
-<div  class="footer-area wide rounded-corners">
+<div id="footer-area" class="footer-area wide rounded-corners" >
 <div id="kkfooter">
 	<div id="links-1" class="footer-area narrow">
 	<h3 class="title">Popular Categories</h3>	
- 	
    	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
 		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
 		<%String menuClass; %>
@@ -41,19 +40,20 @@
 		
    	</div>
 
-  
+    <% com.konakart.appif.ProductIf[] prods = kkEng.getProductMgr().getCustomProducts1(); %>
+    <% if(prods != null && prods.length > 0){ %>
    	<div id="links-1" class="footer-area narrow">
 	<h3 class="title">Popular Products</h3>
-		<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
-		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
+		<%for (int i = 0; i < prods.length; i++) {%>
 		<%String menuClass; %>
-		<%if (i == catMgr.getCats().length-1){ %>
+		<%if (i == prods.length-1){ %>
 			<% menuClass = "menu-item rounded-corners last-child"; %>
 		<% } else { %>
 			<% menuClass = "menu-item rounded-corners"; %>
 		<% } %>
-		<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
-	<% } %>				
+		<a href='<%="SelectProd.action?prodId="+prods[i].getId()%>' class="<%=menuClass%>" style="width: auto;"><%=prods[i].getName()%></a><br />
+	  <% } %>				
+	<% } %>
 		
    	</div>
    	<div id="links-2" class="footer-area narrow">

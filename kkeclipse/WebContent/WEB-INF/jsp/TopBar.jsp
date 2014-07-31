@@ -46,6 +46,9 @@ $(function() {
 
 <div id="top-bar-container">
   	<div id="top-bar">
+  	    <div id="area-message">
+           Currently we deliver in Aundh, Baner, Hinjewadi and Wakad.
+        </div>
   		<div id="options">
 	  		<div id="language-selector" class="top-bar-menu-item">
 	  			<form action="SetLocale.action" method="post">  
@@ -57,8 +60,8 @@ $(function() {
 						<option  value="pt_BR" data-icon="flag flag-pt-BR"  <%=kkEng.getLocale().equals("pt_BR")?"selected=\"selected\"":""%>>Português</option>
 					</select> --%>
 				</form>									
-	  		</div>
-	  		<div id="currency-selector"  class="top-bar-menu-item">
+	  		</div> 
+	  	 	<div id="currency-selector"  class="top-bar-menu-item">
 				<form action="SelectCurrency.action" method="post">  
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 					<%-- <select id="currency-select" name="currencyCode"  onchange="submit()">
@@ -70,7 +73,7 @@ $(function() {
 						<% } %>
 					</select> --%>
 				</form>										  			
-	  		</div>
+	  		</div> 
 	  		<%if (kkEng.getSessionId() != null && kkEng.getSessionId().length() > 0) {%>	
 		  		<div  class="top-bar-menu-item">
 		  			<a href="LogOut.action" class="header2-top"><kk:msg  key="header.logout.page"/></a>

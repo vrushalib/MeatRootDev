@@ -11,7 +11,11 @@
    <% com.konakart.appif.CategoryIf cat = categories[i]; %>
    <% if(cat.getCustom1() == null ){ //category is not invisible. custom1 value for invisible categories is "i".%>
        <% com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, null, cat.getId(), true, -1); %>
-       <kk:carousel prods="<%=products.getProductArray()%>" title="<%=cat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
+       <% com.konakart.appif.ProductIf[] prods = products.getProductArray(); %>
+       <% if(prods != null && prods.length > 0 ){ %>
+       <%     prods[0].setCategoryId(cat.getId()); %>
+       <% } %>
+       <kk:carousel prods="<%=prods%>" title="<%=cat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
    <% } %>
 <% } %>
  

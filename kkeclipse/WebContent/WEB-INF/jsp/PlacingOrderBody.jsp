@@ -28,7 +28,7 @@ however we accept no responsibility or liability for the quality or quantity of 
 from said third parties. It is the responsibility of the customer to thoroughly check the supplied
 products before agreeing to receive an order.
 Incorrect personal details may lead to problems or delays in delivery, so please ensure that you
-have included your correct address, email address and contact telephone number when
+have included your correct address, email address and contact number when
 ordering.<br/>
 							
 						

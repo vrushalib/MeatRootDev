@@ -23,13 +23,8 @@
  				<h1 id="page-title"><kk:msg  key="header.order.tracking"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="order-tracking">
-		    			You can track your order online using your Order Reference Number for an immediate status
-update.
-or
-Call us on : +91 9642658111
-<br/>
-							
-					
+		    			To track your order please call us on : +91 9642658111
+                        <br/>
 			    	</div>
 	    		</div>
 

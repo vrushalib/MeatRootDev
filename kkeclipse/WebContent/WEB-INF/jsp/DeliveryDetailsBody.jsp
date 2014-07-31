@@ -23,11 +23,7 @@
  				<h1 id="page-title"><kk:msg  key="header.delivery.details"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="delivery-details">
-		    		All the orders till 6pm gets delivered the next day morning and evening. User while placing an
-order can choose delivery slot to ensure freshest possible meat.
-Slots,
-Morning 7am9.30am
-Evening 47.30pm
+		    		All orders till 6:00 pm will be delivered the next day morning between 7:00 am to 9:30 am .
 We deliver all seven days.
 <br/>
 		    			
