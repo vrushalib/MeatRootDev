@@ -17,7 +17,6 @@
 //
 --%>
 <%@include file="Taglibs.jsp" %>
-
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <% com.konakart.appif.OrderIf order = orderMgr.getSelectedOrder(); %>
@@ -34,13 +33,14 @@
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 									<%if (!isMultivendor){ %>
-										<div id="shipping-info-view" class="order-confirmation-area-content-select">
+									<%-- 	<div id="shipping-info-view" class="order-confirmation-area-content-select">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<p><%=order.getShippingMethod()%></p>
-										</div>
+										</div> --%>
 									<%}%>
 								</div>		    				
 			    			</div>
+			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">
 			    				<div class="heading-container">
 			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3>
