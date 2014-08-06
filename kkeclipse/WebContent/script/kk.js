@@ -333,7 +333,7 @@ $(function() {
 					});
 	
 	/*
-	 * Subscribe to newslette
+	 * Subscribe to newsletter
 	 */
 	$("#newsletter-button").click(submitNewsletterForm);
 	
@@ -358,8 +358,58 @@ $(function() {
 						"AgreeToCookies.action");
 				return false;
 			});
+	
+	/*
+	 * Add postcode suggested by user
+	 */
+	$('#go')
+	.click(
+			function(){
+				$("#pincode_area").hide();
+				$("#email_area").show();
+			//	$("#pincode").append(pincode);
+			});
+	
+	$("#done")
+	.click(
+			function(){
+				var pincode = $("#pincode").val();
+				var emailId = $("#emailId").val();
+				var valid = validate(pincode, emailId);
+				$("#email_area").hide();
+				$("#message_area").show();
+				if(valid){
+					$("#success_message").show();
+					$("#pincode").val("");
+					$("#emailId").val("");
+				}
+				else{
+					$("#error_message").show();
+				}
+			});
+	
+	$("#back")
+	.click(
+			function(){
+				$("#message_area").hide();
+				$("#error_message").hide();
+				$("#success_message").hide();
+				$("#pincode_area").show();
+			});
 
 });
+
+function validate(pincode, emailId){
+	if(pincode == "" || emailId == ""){
+		return false;
+	}
+	var mailformat = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+	var pinformat = /^\d{6}$/;
+	if(mailformat.test(emailId) && pinformat.test(pincode)){
+		return true;
+	}
+	return false;
+}
 
 /*
  * Submits the sign up to newsletter form

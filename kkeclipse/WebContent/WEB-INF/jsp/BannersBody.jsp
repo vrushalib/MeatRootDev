@@ -35,67 +35,10 @@
 <% boolean hideRow1 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row1", false);%>
 <% boolean hideRow2 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row2", false);%>
 
-<script type="text/javascript">
-
-$(document).ready(function(){
-	$('#go').click(function(){
-		var pincode = $("#pincode").val();
-		$("#go").hide();
-		$("#done").show();
-		var emailId = $("#emailId").val();
-		$("#pincode").append(pincode);
-	});
-});
-</script>
-
-<!-- <script type="text/javascript">
-    // Space out menu evenly
-	$(function() {
-		var total=0;
-		var itemArray = new Array();
-		$("#main-menuBanner a").each(function(index){
-			var margin = $(this).css("margin-right");
-			var marginInt = parseInt(margin.substring(0, margin.length-2)); // remove px
-			total += ($(this).width()+marginInt);
-			itemArray[index]=$(this).width();
-		});		
-		var width =  $("#page").css("width");
-		var widthInt = parseInt(width.substring(0, width.length-2)); // remove px	
-		var extra = widthInt-total;
-		extra = Math.floor((extra / itemArray.length));
-		$("#main-menuBanner a").each(function(index){$(this).width(itemArray[index]+extra);});		
-	});				
-</script> -->
-
-
-
-
-
-
 <%
 	if (!hideRow1) {
 %>
 <div id="slideshow" class="rounded-corners">
-	<%-- <%
-		if ((int) (Math.random() * 100) > 50) {
-	%>
-	<a href="SelectProd.action?prodId=34"><div id="slide-1"
-			class="slide rounded-corners"
-			style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/kindle-fire-hd.jpg');"></div></a>
-	<%
-		} else {
-	%>
-	<a href="SelectProd.action?prodId=33"><div id="slide-1"
-			class="slide rounded-corners"
-			style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/delonghi.jpg');"></div></a>
-	<%
-		}
-	%> --%>
-	
-	 
- 
-	
-	
 		<div id="uiv2-slideshow">
 			<div class="uiv2-slides">
 				<ul style="width: 940px; height: 255px;">
@@ -126,37 +69,17 @@ $(document).ready(function(){
 								</div></li>
 		<% } %>
 	<% } %>
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-four"><div
-								class="uiv2-slider-block-one"
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-four">
+								<div class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat;">
-								<div id="pincode"></div>
-								<div class="button2" id="go"><input type="text" id="pincode" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" /> </div>
-								<div class="button2" id="done" style="display:none;"><input type="text" id="emailId" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" /> </div>
+								<div class="button2" id="pincode_area"><input type="text" id="pincode" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" id="go"/> </div>
+								<div class="button2" id="email_area" style="display:none;"><input type="text" id="emailId" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" id="done"/> </div>
+								<div class="button2" id="message_area" style="display:none;"><span class="deliveryarea" id="success_message" style="display:none;">Thank you for your valuable input</span><span class="deliveryarea" id="error_message" style="display:none;">Please enter valid pincode/emailId</span><input type="button" class="gobutton" value="Back" id="back"/> </div>
 								</div></li>
 								
 				</ul>
 			</div>
 		
-		<%-- <% List<com.konakart.appif.CategoryIf> cats = com.konakart.app.GetCategoryTree.getAllInvisibleCategories();
-		%> --%>
- 
-<%--  <% for (com.konakart.appif.CategoryIf cat : cats) { 
-	 String value= null;
-  	//System.out.println("categories=="+cat+" cat.getId=="+cat.getId());
-  	if(cat.getId()==1){
-  		value="one";
-  	}else if(cat.getId()==2){
-  		value="two";
-  	}else if(cat.getId()==3){
-  		value="three";
-  	}   	
-  	%>
-			
-				<li class=""><span class="arrow  caption-four"></span><a
-					href="#uiv2-slide-<%=value%>"></a><span><%=cat.getName()%></span></li>
-				
-           
-	 <%}%> --%>
 	     <ul class="uiv2-slides-nav">
 			<li class="on
             "><span class="arrow  caption-four"></span><a
@@ -192,22 +115,6 @@ $(document).ready(function(){
 	<% } %>					
 </div> --%>
 
-<%-- <%if (!hideRow2) { %>
-	<div id="banners">
-		<a href="ShowSpecials.action"><div id="banner-1" class="banner-small rounded-corners" style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale.jpg');"></div></a>
-		<a href="SelectCat.action?catId=24"><div id="banner-2" class="banner-small rounded-corners" style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/gifts-for-the-home.jpg');"></div></a>
-
-		<%if ((int) (Math.random() * 100) > 50) { %>
-		<a href="SelectProd.action?prodId=32"><div id="banner-2" class="banner-small rounded-corners" style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/windows-8.jpg');"></div></a>
-		<% } else { %>
-		<a href="SelectCat.action?catId=23"><div id="banner-2" class="banner-small rounded-corners" style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale-2.jpg');"></div></a>
-		<% } %> 
-
-		<a href="SelectProd.action?prodId=35"><div id="banner-2" class="banner-small rounded-corners last-child" style="background-image: url('<%=kkEng.getImageBase()%>/banners/home-page/iphone-5.jpg');"></div></a>
-	</div>
-
-	
-<% } %>  --%>
 
 
 

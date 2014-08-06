@@ -550,7 +550,7 @@ display: table;
 	float: right;
 	margin-left: 4%;
 	margin-bottom: 5%;
-	font: 400 17px/20px 'Roboto Slab', serif;
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;;
 }
 
 .gobutton {
@@ -564,7 +564,7 @@ display: table;
 	float: right;
 	margin-left: 78%;
 	margin-bottom: 5%;
-	font: 400 17px/20px 'Roboto Slab', serif;
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;;
 }
 
 }
