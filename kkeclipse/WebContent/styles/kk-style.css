@@ -517,7 +517,8 @@ width: 354px;
 float: right;
 margin-left: 60%;
 margin-bottom: 1%;
-font: 400 17px/20px 'Roboto Slab', serif;
+/*font: 400 17px/20px 'Roboto Slab', serif;*/
+font: 400 16px/20px Helvetica Neue, Arial, sans-serif;
 display: table;
 }
 
@@ -538,7 +539,8 @@ display: table;
 	float: right;
 	margin-left: -34%;
 	margin-bottom: 4%;
-	font: 400 17px/20px 'Roboto Slab', serif;
+	/*font: 400 17px/20px 'Roboto Slab', serif;*/
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;
 }
 
 .deliveryarea {
