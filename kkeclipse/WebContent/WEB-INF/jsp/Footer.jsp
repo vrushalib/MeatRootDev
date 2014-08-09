@@ -51,7 +51,11 @@
 		<% } else { %>
 			<% menuClass = "menu-item rounded-corners"; %>
 		<% } %>
-		<a href='<%="SelectProd.action?prodId="+prods[i].getId()%>' class="<%=menuClass%>" style="width: auto;"><%=prods[i].getName()%></a><br />
+		<% String prodName = prods[i].getName(); %>
+		<% if(prodName.contains("-")) { %>
+		<%   prodName = prodName.substring(0, prodName.lastIndexOf("-")); %>
+		<% } %>
+		<a href='<%="SelectProd.action?prodId="+prods[i].getId()%>' class="<%=menuClass%>" style="width: auto;"><%=prodName%></a><br />
 	  <% } %>				
 	<% } %>
 		

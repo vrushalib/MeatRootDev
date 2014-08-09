@@ -42,7 +42,7 @@ whereby, virtually all the properties of most of the parent foodstuffs can be pr
 preferred method over usual block freezing because consumers can use only as much of the
 product as they need, eliminating the need to defrost the whole box.<br/><br/>
 <b>4: How is frozen fish through IQF technique better than fresh fish?</b><br/><br/>
-So called fresh fish actually takes minimum 23
+So called fresh fish actually takes minimum 2-3
 days to reach your kitchen. During the transit period, it
 is preserved using methods like block freezing, dry ice, etc. causing cellular damage and
 moisture loss.
