@@ -53,25 +53,25 @@
 	    <%if(cat.getName().contains("Fresh")) {%>
 					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.png') center left no-repeat;">
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.jpg') center left no-repeat; background-size: 100% 100%;">
 								<div class="button2"><span>Tender, healthier and tastier<br/> meat straight from the farms!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
 								</div></li>
 		<%}else if(cat.getName().contains("Frozen")){ %>						
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.jpg') center left no-repeat; background-size: 100%;">
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.jpg') center left no-repeat; background-size: 100% 100%;">
 								<div class="button2"><span>Why wait for a season<br/>frozen gives the  same freshness <br/> throughout the year!!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div></div></li>
 			    <%}else if(cat.getName().contains("Processed")){ %>				
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><div
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.png') center left no-repeat;">
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.jpg') center left no-repeat; background-size: 100% 100%;">
 								<div class="button2"><span>From starters to mains,<br/> prepare anything within no time.</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
 								</div></li>
 		<% } %>
 	<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four">
 								<div class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat;">
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat; background-size: 100% 100%;">
 								<div class="button2" id="pincode_area"><input type="text" id="pincode" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" id="go"/> </div>
 								<div class="button2" id="email_area" style="display:none;"><input type="text" id="emailId" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" id="done"/> </div>
 								<div class="button2" id="message_area" style="display:none;"><span class="deliveryarea" id="success_message" style="display:none;">Thank you for your valuable input</span><span class="deliveryarea" id="error_message" style="display:none;">Please enter valid pincode/emailId</span><input type="button" class="gobutton" value="Back" id="back"/> </div>
