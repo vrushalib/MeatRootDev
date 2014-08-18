@@ -23,7 +23,7 @@
  				<h1 id="page-title"><kk:msg  key="header.order.tracking"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="order-tracking">
-		    			To track your order please call us on : +91 9642658111
+		    			To track your order please call us on : +91&#8208;9642658111
                         <br/>
 			    	</div>
 	    		</div>

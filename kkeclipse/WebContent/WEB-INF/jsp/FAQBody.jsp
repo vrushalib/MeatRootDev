@@ -57,7 +57,7 @@ All the products will be delivered in a vehicle having a frozen container. This 
 freshness is sealed in once frozen and delivered to you in great condition. Once delivered, all
 you have to do is pop your meat into the freezer and its as easy as that.<br/><br/>
 <b>7: I want an item that I can't see on the website, are you able to provide it for me?</b><br/><br/>
-Nine times out of ten we can – there are very few cuts that we can't provide for you. Just give us
+Nine times out of ten we can &#8210; there are very few cuts that we can't provide for you. Just give us
 a call or send us an email we'd be more than happy to discuss the items that you would like not
 currently on our website.<br/><br/>
 <b>8: Is there a minimum order?</b><br/><br/>
@@ -97,7 +97,7 @@ factors like traffic and so on. Please contact MeatRoot to find out where your o
 <b>21: My transaction failed but money was deducted from my account. What do I do?</b><br/><br/>
 Your money is safe and will be refunded. Do not worry.<br/><br/>
 <b>22: I have a question that is not listed above. Who can I speak to?</b><br/><br/>
-You can call us on 91964265811 or visit the Contact Us page. We will
+You can call us on +91&#8208;9642658111 or visit the Contact Us page. We will
 do our best to get back to you in 24 hours.<br/><br/>
 <!-- <b>23: Are there any flexible delivery slots?</b><br/><br/>
 Yes. User gets to select from two slots, morning and evening. It works better when it comes to
