@@ -26,18 +26,18 @@
 		    			
 			Welcome to the mecca of meat lovers! MeatRoot opened its doors in
 			June 2014 bringing in the Meat on Wheels concept to life, at your
-			very own doorstep! MeatRoot is for all occasions, whether it’s a
+			very own doorstep! MeatRoot is for all occasions, whether it's a
 			party hosted at home, a snack after work or just another meal at
 			home. We deliver you the freshest, firmest and the best quality meat
-			and meat products to help you create recipes you’ll be proud to serve
-			to your family and friends. We believe we’ve created a concept that
+			and meat products to help you create recipes you'll be proud to serve
+			to your family and friends. We believe we've created a concept that
 			people can completely engage in whilst enjoying some of the finest
 			meat products. The entire process of choosing meat, getting it
 			cleaned, chopped, weighed and then packed, can not only get tiring
 			but can also kill your appetite. This is why online buying and
 			doorstep delivery is the best thing to do and we work to make it the
-			best possible experience for you. So whether you’re working late,
-			don’t like going meat shopping or just don’t feel like stepping out –
+			best possible experience for you. So whether you're working late,
+			don't like going meat shopping or just don't feel like stepping out &#8210;
 			let us handle the meat part for you. Enjoy your food and enjoy the
 			delightful feeling of being taken care of!<br/>
 			 
