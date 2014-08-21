@@ -249,6 +249,18 @@
 		<put-attribute name="defName" value="catalog.cancellationpolicy.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/CancellationPrivacyBody.jsp"/>
 	</definition>
+	<definition name="catalog.refundpolicy.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.refundpolicy.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/RefundPolicyBody.jsp"/>
+	</definition>
+	<definition name="catalog.deliverypolicy.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.deliverypolicy.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/DeliveryPolicyBody.jsp"/>
+	</definition>
+	<definition name="catalog.privacypolicy.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.privacypolicy.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/PrivacyPolicyBody.jsp"/>
+	</definition>
 	<definition name="catalog.contentchanges.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.contentchanges.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/ContentChangesBody.jsp"/>

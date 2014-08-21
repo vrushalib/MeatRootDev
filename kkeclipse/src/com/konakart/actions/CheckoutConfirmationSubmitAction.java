@@ -301,7 +301,6 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 		EmailOptionsIf options = new EmailOptions();
 		options.setCountryCode(kkAppEng.getLocale().substring(0, 2));
 		options.setTemplateName("OrderConfReceived");
-		System.out.println("options: \n"+options.getTemplateName());
 		// Attach the invoice to the confirmation email (Enterprise Only).
 		// Defaults to false.
 		// options.setAttachInvoice(true);

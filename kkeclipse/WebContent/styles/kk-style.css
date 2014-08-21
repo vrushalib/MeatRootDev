@@ -1085,12 +1085,21 @@ ul,li {
 }
 
 #links-1 {
-	width: 249px;
+	width: 200px;
+	margin-top: 11px;
+}
+
+#product-links {
+	width: 200px;
 	margin-top: 11px;
 }
 
 #links-2 {
-	width: 180px;
+	width: 120px;
+}
+
+#links-3 {
+	width: 140px;
 }
 
 #kkfooter .wide {

@@ -22,7 +22,6 @@
 <% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
 
-
 <div id="footer-area" class="footer-area wide rounded-corners" >
 <div id="kkfooter">
 	<div id="links-1" class="footer-area narrow">
@@ -42,7 +41,7 @@
 
     <% com.konakart.appif.ProductIf[] prods = kkEng.getProductMgr().getCustomProducts1(); %>
     <% if(prods != null && prods.length > 0){ %>
-   	<div id="links-1" class="footer-area narrow">
+   	<div id="product-links" class="footer-area narrow">
 	<h3 class="title">Popular Products</h3>
 		<%for (int i = 0; i < prods.length; i++) {%>
 		<%String menuClass; %>
@@ -58,21 +57,27 @@
 		<a href='<%="SelectProd.action?prodId="+prods[i].getId()%>' class="<%=menuClass%>" style="width: auto;"><%=prodName%></a><br />
 	  <% } %>				
 	<% } %>
-		
+	
    	</div>
    	<div id="links-2" class="footer-area narrow">
-   	<a href ="AboutUs.action"><kk:msg  key="footer.about.us"/></a><br />
-   	<a href ="PlacingOrder.action"><kk:msg  key="footer.placing.order"/></a><br />
-   	
+   		<a href ="AboutUs.action"><kk:msg  key="footer.about.us"/></a><br />
+   		<a href ="PlacingOrder.action"><kk:msg  key="footer.placing.order"/></a><br />
 		<a href ="Payment.action"><kk:msg  key="footer.payment"/></a><br />
-		<a href ="DeliveryDetails.action"><kk:msg  key="footer.delivery.details"/></a><br />
+	<!--  	<a href ="DeliveryDetails.action"><kk:msg  key="footer.delivery.details"/></a><br />-->
 		<a href ="OrderTracking.action"><kk:msg  key="footer.order.tracking"/></a><br />
-		<a href ="CancellationPolicy.action"><kk:msg  key="footer.cancellation.policy"/></a><br />
 		<a href ="ContentChanges.action"><kk:msg  key="footer.content.changes"/></a><br />
 		<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
+   	</div>
+   	
+   	<div id="links-3" class="footer-area narrow">
+   		<a href ="PrivacyPolicy.action"><kk:msg  key="footer.privacy.policy"/></a><br />
+   		<a href ="DeliveryPolicy.action"><kk:msg  key="footer.delivery.policy"/></a><br />
+		<a href ="CancellationPolicy.action"><kk:msg  key="footer.cancellation.policy"/></a><br />
+		<a href ="RefundPolicy.action"><kk:msg  key="footer.refund.policy"/></a><br />
 		<a href ="FAQ.action"><kk:msg  key="footer.faq"/></a><br />
 		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
    	</div>
+   	
    	<div id="social" class="footer-area narrow last-child">
    	<h4 class="title" style="margin-top: 6px;">Payment Methods</h4>
    	

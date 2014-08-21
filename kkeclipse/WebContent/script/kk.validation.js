@@ -58,8 +58,8 @@ var validationRules = {
 		},
 		postcode : {
 			required : true,
-	/*		minlength : 6,
-			maxlength : 6 */
+		/*	minlength : 6,
+			maxlength : 6 */ 
 		},
 		city : {
 			required : true,

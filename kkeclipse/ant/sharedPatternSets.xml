@@ -121,7 +121,7 @@
 		<include name="**/bl/LoginIntegrationMgr.*" />
 		<include name="**/bl/ReorderMgr.*" />
 		<include name="**/blif/LDAPMgrIf.*" />
-		<include name="**/com/konakart/actions/SuggestedSearch.*" />
+		<include name="**/com/konakart/actions/Suggested*.*" />
 		<include name="**/com/konakart/actions/*Action.*" />
 		<include name="**/com/konakart/actions/gateways/BaseGatewayAction.*" />
 		<include name="**/com/konakart/kktags/*.*" />

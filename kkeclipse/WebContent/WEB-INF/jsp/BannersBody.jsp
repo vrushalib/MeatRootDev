@@ -38,6 +38,7 @@
 <%
 	if (!hideRow1) {
 %>
+
 <div id="slideshow" class="rounded-corners">
 		<div id="uiv2-slideshow">
 			<div class="uiv2-slides">
@@ -100,7 +101,6 @@
 <%
 	}
 %>
-
 
 <%-- <div id="main-menuBanner">
 	<%for (int i = 0; i <=3; i++) {%>

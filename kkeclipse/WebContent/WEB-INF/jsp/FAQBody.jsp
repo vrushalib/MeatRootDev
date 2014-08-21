@@ -17,7 +17,6 @@
 //
 --%>
 <%@include file="Taglibs.jsp" %>
-
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 
  				<h1 id="page-title"><kk:msg  key="header.faq"/></h1>			

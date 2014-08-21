@@ -73,6 +73,10 @@
   			</param>
   			</result>
 		</action>
+		<action name="SuggestedArea" class="com.konakart.actions.SuggestedArea">
+			<result type="json">
+  			</result>
+		</action>
 		<action name="OnePageRefresh" class="com.konakart.actions.CheckoutOnePageRefreshAction">
 			<result type="json">
   			</result>
@@ -411,6 +415,15 @@
 		</action>
 		<action name="CancellationPolicy" class="com.konakart.actions.CancellationPolicyAction">
 			<result name="success" type="tiles">catalog.cancellationpolicy.page</result>
+		</action>
+		<action name="DeliveryPolicy" class="com.konakart.actions.DeliveryPolicyAction">
+			<result name="success" type="tiles">catalog.deliverypolicy.page</result>
+		</action>
+		<action name="RefundPolicy" class="com.konakart.actions.RefundPolicyAction">
+			<result name="success" type="tiles">catalog.refundpolicy.page</result>
+		</action>
+		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyPolicyAction">
+			<result name="success" type="tiles">catalog.privacypolicy.page</result>
 		</action>
 		<action name="ProdPageSize" class="com.konakart.actions.ProdPageSizeAction">
 			<result name="success" type="tiles">catalog.showprods.page</result>

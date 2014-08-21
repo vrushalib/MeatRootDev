@@ -20,7 +20,7 @@ function callAction(parmArray, callback, url) {
 	        
 			$.ajax({
 				type : 'POST',
-				timeout : '20000',
+				//timeout : '20000',
 				scriptCharset : "utf-8",
 				contentType : "application/json; charset=utf-8",
 				url : url,
@@ -55,7 +55,6 @@ function callAction(parmArray, callback, url) {
 			parms = parms + ',"xsrf_token":"'+ document.getElementById('kk_xsrf_token').value + '"';
 	        parms = parms + '}';
 		}
-		
 		$.ajax({
 			type : 'POST',
 			timeout : '20000',
@@ -63,6 +62,7 @@ function callAction(parmArray, callback, url) {
 			contentType : "application/json; charset=utf-8",
 			url : url,
 			data : parms,
+			dataType : 'json',
 			success : callback,
 			error : function(jqXHR, textStatus, errorThrown) {
 				var errorMsg = "JSON API call to the URL " + url
@@ -74,8 +74,7 @@ function callAction(parmArray, callback, url) {
 					errorMsg += "\nError:\t" + errorThrown;
 				}
 				alert(errorMsg);
-			},
-			dataType : 'json'
+			}
 		});
 	}
 }
@@ -367,25 +366,6 @@ $(function() {
 			function(){
 				$("#pincode_area").hide();
 				$("#email_area").show();
-			//	$("#pincode").append(pincode);
-			});
-	
-	$("#done")
-	.click(
-			function(){
-				var pincode = $("#pincode").val();
-				var emailId = $("#emailId").val();
-				var valid = validate(pincode, emailId);
-				$("#email_area").hide();
-				$("#message_area").show();
-				if(valid){
-					$("#success_message").show();
-					$("#pincode").val("");
-					$("#emailId").val("");
-				}
-				else{
-					$("#error_message").show();
-				}
 			});
 	
 	$("#back")
@@ -396,8 +376,34 @@ $(function() {
 				$("#success_message").hide();
 				$("#pincode_area").show();
 			});
+	
+	$("#done")
+	.click(
+			function(){
+				var pincode = $("#pincode").val().trim();
+				var emailId = $("#emailId").val().trim();
+				var valid = validate(pincode, emailId);
+				$("#email_area").hide();
+				$("#message_area").show();
+				if(valid){
+				callAction(new Array("pincode", pincode, "emailId", emailId), suggestedAreaCallback, "SuggestedArea.action");
+					$("#success_message").show();
+					$("#pincode").val("");
+					$("#emailId").val("");
+				}
+				else{
+					$("#error_message").show();
+				}
+			});
 
 });
+
+var suggestedAreaCallback = function(result, textStatus, jqXHR) {
+	$("#success_message").show();
+	$("#pincode").val("");
+	$("#emailId").val("");
+};
+
 
 function validate(pincode, emailId){
 	if(pincode == "" || emailId == ""){
@@ -409,6 +415,7 @@ function validate(pincode, emailId){
 		return true;
 	}
 	return false;
+	return true;
 }
 
 /*
