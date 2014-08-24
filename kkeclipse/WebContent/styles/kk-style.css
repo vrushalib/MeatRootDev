@@ -412,7 +412,7 @@ li.ui-menu-item a.ui-state-focus {
 
 /* Page */
 #page-container {
-	overflow: hidden;
+	/*overflow-x: hidden;*/
 }
 
 #page {
@@ -1068,7 +1068,8 @@ display: table;
 
 #kkfooter .last-child {
 	margin-right: 0;
-	margin-top: 14px;
+	margin-top: 22px; /*14px;*/
+	width: 265px;
 }
 
 /* #kkfooter .narrow{
@@ -1091,11 +1092,11 @@ ul,li {
 
 #product-links {
 	width: 200px;
-	margin-top: 11px;
+	margin-top: 11px; 
 }
 
 #links-2 {
-	width: 120px;
+	width: 210px; /*120px;*/
 }
 
 #links-3 {
@@ -1143,8 +1144,8 @@ ul,li {
 
 /* Social Media Icons */
 .social-icon {
-	display: block;
-	float: left;
+	display: inline-block;
+/*	float: left;*/
 	height: 17px;
 	margin: 1px 3px 0 0;
 	width: 17px;

@@ -88,6 +88,12 @@
 				%>
 				<base href="<%=base%>"/>										
 				<!--- KonaKart v7.2.0.2.11093 -->
+				
+				<script type="text/javascript">
+				$(window).bind("load", function(){
+					$("#page-container").css("overflow","hidden");
+				});
+				</script>
 			</head>
 			<%if (defName != null) {%>
 				<body id="<%=defName%>">
@@ -131,7 +137,7 @@
 							<tiles:insertAttribute name="body3" />
 							<tiles:insertAttribute name="body4" />
 							<tiles:insertAttribute name="body5" />
-							<tiles:insertAttribute name="body6" />
+ 							<tiles:insertAttribute name="body6" /> 
 				    	</div>
 						<tiles:insertAttribute name="footer1" />
 		    		</div>

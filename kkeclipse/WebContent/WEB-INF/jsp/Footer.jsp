@@ -66,19 +66,16 @@
 	<!--  	<a href ="DeliveryDetails.action"><kk:msg  key="footer.delivery.details"/></a><br />-->
 		<a href ="OrderTracking.action"><kk:msg  key="footer.order.tracking"/></a><br />
 		<a href ="ContentChanges.action"><kk:msg  key="footer.content.changes"/></a><br />
-		<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
-   	</div>
-   	
-   	<div id="links-3" class="footer-area narrow">
-   		<a href ="PrivacyPolicy.action"><kk:msg  key="footer.privacy.policy"/></a><br />
    		<a href ="DeliveryPolicy.action"><kk:msg  key="footer.delivery.policy"/></a><br />
 		<a href ="CancellationPolicy.action"><kk:msg  key="footer.cancellation.policy"/></a><br />
 		<a href ="RefundPolicy.action"><kk:msg  key="footer.refund.policy"/></a><br />
-		<a href ="FAQ.action"><kk:msg  key="footer.faq"/></a><br />
-		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
+		<a href ="PrivacyPolicy.action"><kk:msg  key="footer.privacy.policy"/></a><br />
    	</div>
    	
    	<div id="social" class="footer-area narrow last-child">
+   	<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
+		<a href ="FAQ.action"><kk:msg  key="footer.faq"/></a><br />
+		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
    	<h4 class="title" style="margin-top: 6px;">Payment Methods</h4>
    	
   			 	<ul>
@@ -86,10 +83,10 @@
                     <li><img src="<%=kkEng.getImageBase()%>/icons/masterCard2.jpg" alt="Master Card" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/netBanking2.jpg" alt="" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/cardOnDel2.jpg" alt="" /></li>
-                    <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>
+                <%--      <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>--%>
                 </ul><br/>
-		<kk:msg  key="footer.connect"/><br />
-		<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
+ 		<b><kk:msg  key="footer.connect"/>:&nbsp;&nbsp;</b>
+	 	<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
 		<a href="http://www.facebook.com" target="_blank" class="facebook-grey social-icon"></a>
 		<a href="http://www.pinterest.com" target="_blank" class="pinterest-grey social-icon"></a>
 		<a href="https://plus.google.com" target="_blank" class="google-grey social-icon"></a>

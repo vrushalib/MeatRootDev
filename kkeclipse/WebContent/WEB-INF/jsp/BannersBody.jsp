@@ -102,18 +102,6 @@
 	}
 %>
 
-<%-- <div id="main-menuBanner">
-	<%for (int i = 0; i <=3; i++) {%>
-		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
-		<%String menuClass; %>
-		<%if (i == catMgr.getCats().length-1){ %>
-			<% menuClass = "menu-item rounded-corners last-child"; %>
-		<% } else { %>
-			<% menuClass = "menu-item rounded-corners"; %>
-		<% } %>
-		<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a>
-	<% } %>					
-</div> --%>
 
 
 
