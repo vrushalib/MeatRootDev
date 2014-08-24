@@ -1069,7 +1069,7 @@ display: table;
 #kkfooter .last-child {
 	margin-right: 0;
 	margin-top: 22px; /*14px;*/
-	width: 265px;
+	width: 240px;
 }
 
 /* #kkfooter .narrow{
@@ -1096,7 +1096,8 @@ ul,li {
 }
 
 #links-2 {
-	width: 210px; /*120px;*/
+	width: 190px; /*120px;*/
+	padding-left: 45px;
 }
 
 #links-3 {
