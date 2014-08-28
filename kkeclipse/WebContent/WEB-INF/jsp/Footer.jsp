@@ -70,10 +70,12 @@
 		<a href ="CancellationPolicy.action"><kk:msg  key="footer.cancellation.policy"/></a><br />
 		<a href ="RefundPolicy.action"><kk:msg  key="footer.refund.policy"/></a><br />
 		<a href ="PrivacyPolicy.action"><kk:msg  key="footer.privacy.policy"/></a><br />
+		<a href ="TermsAndConditions.action"><kk:msg  key="footer.terms.and.conditions"/></a><br />
    	</div>
    	
    	<div id="social" class="footer-area narrow last-child">
    	<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
+   	<a href ="Help.action"><kk:msg  key="footer.help"/></a><br />
 		<a href ="FAQ.action"><kk:msg  key="footer.faq"/></a><br />
 		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
    	<h4 class="title" style="margin-top: 6px;">Payment Methods</h4>

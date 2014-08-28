@@ -228,6 +228,14 @@
 		<put-attribute name="defName" value="catalog.aboutus.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/AboutUsBody.jsp"/>
 	</definition>
+	<definition name="catalog.help.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.help.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/HelpBody.jsp"/>
+	</definition>
+	<definition name="catalog.termsandconditions.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.termsandconditions.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/TermsAndConditionsBody.jsp"/>
+	</definition>
 	<definition name="catalog.placingorder.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.placingorder.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/PlacingOrderBody.jsp"/>

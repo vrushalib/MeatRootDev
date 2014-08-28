@@ -23,16 +23,18 @@
  				<h1 id="page-title"><kk:msg  key="header.cancellation.policy"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="cancellation-policy">
+		    		<p align="justify">
 		    			We have a very liberal cancellation policy.
 Cancellation will be considered only if requested within 1 hour of order placement. However,
-there won’t be any cancellation if order is in Process state.
+there won't be any cancellation if order is in Process state.
 In case of quality deliverance failure, there will be refund or replacement. But it should bring to
 our notice within 1 hour of delivery. After inspecting the delivered products decision will be taken
 by our service team.
+<br>
 While every effort is made to ensure that accurate pricing and descriptions are maintained, we
 reserve the right to cancel any order that is based on inaccurate information. We will endeavor to
 notify you immediately of any such cancellation.<br/>
-							
+						</p>	
 					
 			    	</div>
 	    		</div>

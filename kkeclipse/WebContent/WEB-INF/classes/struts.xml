@@ -113,6 +113,14 @@
 			<result name="success" type="tiles">catalog.aboutus.page</result>
 		</action>
 		
+		<action name="Help" class="com.konakart.actions.HelpAction">
+			<result name="success" type="tiles">catalog.help.page</result>
+		</action>
+		
+		<action name="TermsAndConditions" class="com.konakart.actions.TermsAndConditionsAction">
+			<result name="success" type="tiles">catalog.termsandconditions.page</result>
+		</action>
+		
 		<action name="PlacingOrder" class="com.konakart.actions.PlacingOrderAction">
 			<result name="success" type="tiles">catalog.placingorder.page</result>
 		</action>

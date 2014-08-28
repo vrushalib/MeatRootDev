@@ -23,11 +23,17 @@
  				<h1 id="page-title"><kk:msg  key="header.contact.us"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="about-us">
+		    		<p align="justify">
 		    			Your comments, suggestions, and concerns are very important to us. We welcome any
 suggestions you have that will help us provide better service to our customers.
-Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9642658111.
-							
-						
+<br>Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9642658111.<br>
+<br>
+Mail us:
+<br>Mohini Apartments,
+<br>Lane No. 11, Prabhat Road,
+<br>Pune - 411004
+<br>Maharashtra, India.
+						</p>
 			    	</div>
 	    		</div>
 
