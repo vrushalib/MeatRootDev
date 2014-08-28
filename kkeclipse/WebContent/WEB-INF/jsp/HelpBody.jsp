@@ -21,14 +21,7 @@ Frozen meat can be stored for much longer times depending upon the packaging. Ho
 <br><br>
 <b>Processed meat&#8208;</b><br>
 Processed meat refers to meat that has been preserved by smoking, curing, salting or adding preservatives. In addition to fresh and frozen meat, processed meat helps to offer a wide range of products for your consumption. These are generally for a quick snack, a party or a fun meal. Ham, bacon, sausages, hot dogs, nuggets are all considered processed meat.
-<br><br>
-<b>One liners for&#8208;</b><br>
-<b>Fresh Category:</b> When it comes to your health, the best meals are cooked using fresh meat. Meat has never tasted so tender, juicier and better before.
-<br><br>
-<b>Frozen Category:</b> Satisfy your craving with our wide range of frozen meat products anywhere and anytime. They will taste better than ever with absolute freshness guaranteed.
-<br><br>
-<b>Processed Category: </b>Whether you are planning a small get together or a major bash, our processed meat category products can help you create the right menu. From starters to mains, prepare anything within no time.
-<br>		    		
+<br>
 		    		</p>
 		    		</div>
 		    	</div>
