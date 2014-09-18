@@ -18,6 +18,8 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -46,6 +48,24 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 	private static final long serialVersionUID = 1L;
 
 	private String comment;
+	 //original key - "TCg9WT" and original salt - "k1rj3ntq"
+	private static final String SALT = "OmM6jqjz";
+	private static final String  MERCHANT_KEY = "VPcm4L";
+	private static final String PIPE = "|";
+	
+	enum TransactionStatus{
+		SUCCESS("success"), FAILURE("failure"), PENDING("pending");
+		
+		private final String status;
+		
+		TransactionStatus(final String status){
+			this.status = status;
+		}
+		
+		public String toString(){
+			return status;
+		}
+	};
 
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
@@ -93,7 +113,12 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 			if (checkoutOrder == null) {
 				return "Checkout";
 			}
-
+			
+			System.out.println("status:"+request.getParameter("status")+", unmapped status:" + request.getParameter("unmappedstatus"));
+			
+			//set the transaction id as tracking number for the reference
+			checkoutOrder.setTrackingNumber(request.getParameter("txnid"));
+			
 			// Set the comment
 			String escapedComment = escapeFormInput(getComment());
 			OrderStatusHistoryIf osh = new OrderStatusHistory();
@@ -104,23 +129,34 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 					.getIdForUserUpdatingOrder(checkoutOrder));
 			checkoutOrder.setStatusTrail(oshArray);
 
-			// Uncomment this for Canada Post - it sets the packaging details
-			// checkoutOrder.setCustom4(checkoutOrder.getShippingQuote().getCustom4());
-
 			// To set the delivery time - morning/evening
-			// For now it is set to "m" by default. It will be changed later.
-			// String deliverySlot = request.getParameter("deliverySlot"); //
-			// should get the user selected value from UI
-			String deliverySlot = "m"; // should be removed when even evening
-										// slot will be started
+			// For now it is set to "m" by default. 
+			//It should be removed when evening slot will be started and should be changed to the value selected by a user
+			String deliverySlot = "m"; 
 			checkoutOrder.setCustom1(deliverySlot);
 
 			// To set the delivery date for order
-			// For now it's tomorrow's date by default
+			// For now its tomorrow's date by default
 			Calendar c = new GregorianCalendar();
 			c.add(Calendar.DATE, 1);
 			checkoutOrder.setCustom2(new SimpleDateFormat("yyyy-MM-dd")
 					.format(c.getTime()));
+			
+			/* sets  the status of a transaction as per the internal database of PayU. PayU’s system has several intermediate
+			status which are used for tracking various activities internal to the system*/
+			checkoutOrder.setCustom3(request.getParameter("unmappedstatus"));
+			
+			if(!isTransactionTamperProof(request, checkoutOrder) || request.getParameter("status").equals(TransactionStatus.FAILURE.toString())
+					|| request.getParameter("status").equals(TransactionStatus.PENDING.toString())){
+				checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS);
+
+				kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payment declined");
+				// Save the order
+				int orderId = kkAppEng.getOrderMgr().saveOrder(
+				/* sendEmail */false, null);
+
+				return "TransactionFailed";
+			}
 
 			/*
 			 * Check to see whether the order total is set to 0. Don't bother
@@ -311,6 +347,57 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 		// options.setCreateInvoice(true);
 
 		return options;
+	}
+
+	/**
+	 * Calculates the hash depending on the value of algorithm type
+	 * @param type
+	 * @param str
+	 * @return hash value of the string
+	 */
+	public String hashCal(String type,String str){
+		byte[] hashseq=str.getBytes();
+		StringBuffer hexString = new StringBuffer();
+		try{
+			MessageDigest algorithm = MessageDigest.getInstance(type);
+			algorithm.reset();
+			algorithm.update(hashseq);
+			byte messageDigest[] = algorithm.digest();
+	
+			for (int i=0;i<messageDigest.length;i++) {
+				String hex=Integer.toHexString(0xFF & messageDigest[i]);
+				if(hex.length()==1) hexString.append("0");
+				hexString.append(hex);
+			}
+			
+		}catch(NoSuchAlgorithmException nsae){
+			System.out.println(nsae.getMessage());
+			nsae.printStackTrace();
+		}
+		return hexString.toString();
+	}
+	
+	
+	/**
+	 * Verifies the hash returned by PayU in the response. This is to make sure that the transaction hasn’t been tampered with.
+	 * @param request
+	 * @param checkoutOrder
+	 * @return true/false
+	 */
+	public Boolean isTransactionTamperProof(HttpServletRequest request, OrderIf checkoutOrder){
+//		sha512(SALT|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key)
+		String hash = request.getParameter("hash");
+		StringBuffer hashString = new StringBuffer();
+		hashString = hashString.append(SALT).append(PIPE).append(request.getParameter("status")).append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("")
+				.append(PIPE).append("").append(PIPE).append("").append(PIPE).append(request.getParameter("udf1")).append(PIPE)
+				.append(request.getParameter("email")).append(PIPE).append(request.getParameter("firstname")).append(PIPE)
+				.append(request.getParameter("productinfo")).append(PIPE).append(request.getParameter("amount")).append(PIPE)
+				.append(request.getParameter("txnid")).append(PIPE).append(request.getParameter("key"));
+		String calculatedHash = hashCal("SHA-512", hashString.toString());
+		System.out.println("hashstring:"+hashString);
+		System.out.println("hash:"+hash+" : calculated hash:"+ calculatedHash);
+		System.out.println(hash.equals(calculatedHash));
+		return hash.equals(calculatedHash);
 	}
 
 	/**

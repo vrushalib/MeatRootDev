@@ -72,11 +72,13 @@ var validationRules = {
 		},
 		telephoneNumber : {
 			required : true,
+			digits : true,
 			minlength : 10,
 			maxlength : 32
 		},
 		telephoneNumber1 : {
 			required : false,
+			digits : true,
 			minlength : 10,
 			maxlength : 32
 		},

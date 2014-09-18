@@ -419,6 +419,10 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
             if (method != null && method.equalsIgnoreCase("POST"))
             {
                 String token = (xsrfToken != null) ? xsrfToken : request.getParameter("xsrf_token");
+                if( token == null && request.getParameter("udf1") != null){
+                	token = request.getParameter("udf1").trim();
+                	System.out.println("udf1:"+token);
+                }
                 if (token == null || !token.equals(kkAppEng.getXsrfToken()))
                 {
                     log.warn("Possible XSRF attack for customer with id = " + custId);

@@ -25,6 +25,8 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
+<%@ page import="java.util.Random" %>
+<%@ page import="java.security.MessageDigest, java.security.NoSuchAlgorithmException" %>
 
 
 <script type="text/javascript">	
@@ -317,6 +319,11 @@ $(function() {
 	
 });
 
+function updateHashValue(){
+	
+	return true;
+}
+
 </script>
 
   	    	<div id="error-dialog" title="<kk:msg  key="one.page.checkout.problem.title"/>" class="content-area rounded-corners">
@@ -356,11 +363,87 @@ $(function() {
 					</div>
 		    	</div>
 		    </div>
+		    
+<%!
+public boolean empty(String s)
+	{
+		if(s== null || s.trim().equals(""))
+			return true;
+		else
+			return false;
+	}
+%>
+<%!
+	public String hashCal(String type,String str){
+		byte[] hashseq=str.getBytes();
+		StringBuffer hexString = new StringBuffer();
+		try{
+		MessageDigest algorithm = MessageDigest.getInstance(type);
+		algorithm.reset();
+		algorithm.update(hashseq);
+		byte messageDigest[] = algorithm.digest();
+            
+		
+
+		for (int i=0;i<messageDigest.length;i++) {
+			String hex=Integer.toHexString(0xFF & messageDigest[i]);
+			if(hex.length()==1) hexString.append("0");
+			hexString.append(hex);
+		}
+			
+		}catch(NoSuchAlgorithmException nsae){ }
+		
+		return hexString.toString();
 
 
+	}
+%>
+
+
+<%!
+/* Creates a string for product description to send to the payment gateway- productName_quantity_pricePerUnit (separated by comma)*/
+	public String getProductsForPayment( com.konakart.appif.OrderProductIf [] orderProducts){
+		StringBuffer prods = new StringBuffer();
+		for(int i = 0; i < orderProducts.length; i++){
+			prods.append(orderProducts[i].getName() + "_" + orderProducts[i].getQuantity() + "_" + orderProducts[i].getPrice());
+			prods.append(",");
+		}
+		return prods.substring(0, prods.length()-1); // to remove last comma	
+	}
+%>
+
+
+			<%  
+						String merchant_key=  "VPcm4L";  //original key - "TCg9WT"
+						String salt= "OmM6jqjz";  //original salt - "k1rj3ntq"
+						String base_url = "https://test.payu.in";
+						String action1 = base_url.concat("/_payment");
+						int error=0;
+						String hashString="";
+						String drop_category = "EMI,COD";
+						String amount = order.getTotalIncTax().toString();
+						String firstname = "pooja";//order.getDeliveryName();
+						String email = cust.getEmailAddr();
+						String phone = order.getDeliveryTelephone();
+						String productinfo = getProductsForPayment(order.getOrderProducts());
+						String surl = "http://localhost:8080/konakart/CheckoutConfirmationSubmit.action";
+						String furl = "http://localhost:8080/konakart/AdvancedSearch.action"; 
+						String txnid = "";
+						String udf1 = kkEng.getXsrfToken();
+						String udf2 = "";
+						String hash = "";
+						
+						Random rand = new Random();
+						String rndm = Integer.toString(rand.nextInt())+(System.currentTimeMillis() / 1000L);
+						txnid=hashCal("SHA-256",rndm).substring(0,20);
+						
+						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
+						hash = hashCal("SHA-512",hashString);
+						System.out.println("hashstring:"+hashString+" hash:"+hash);
+				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-		    		<form action="CheckoutConfirmationSubmit.action" id="form1" method="post" class="form-section">
+		    		<form action="<%=action1%>" id="form1" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
 		    				<div id="delivery-address" class="order-confirmation-area">
@@ -415,7 +498,7 @@ $(function() {
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<div id="payment-method" class="order-confirmation-area-content-select">
+									<%-- <div id="payment-method" class="order-confirmation-area-content-select">
 										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
 										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
 											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
@@ -433,7 +516,7 @@ $(function() {
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
 										</select>
-									</div>
+									</div>--%>
 								<%-- 	<div id="promotion-codes">
 										<div id="promotion-codes-container">
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>
@@ -633,10 +716,25 @@ $(function() {
 		    						</table>
 	    						<% } %>
 							</div>
-						</div>			    				
+						</div>			
+						
+						<input type="hidden" value="<%=merchant_key%>" name="key"/>
+						<input type="hidden" value="<%=salt%>" name="salt"/>
+						<input id="hash" type="hidden" value="<%=hash%>" name="hash"/>
+						<input type="hidden" value="<%=amount%>" name="amount"/>
+						<input type="hidden" value="<%=firstname%>" name="firstname"/>
+						<input type="hidden" value="<%=email%>" name="email"/>
+						<input type="hidden" value="<%=phone%>" name="phone"/>
+						<input type="hidden" value="<%=productinfo%>" name="productinfo"/>
+						<input type="hidden" value="<%=surl%>" name="surl"/>
+						<input type="hidden" value="<%=furl%>" name="furl"/>
+						<input type="hidden" value="<%=txnid%>" name="txnid"/> 
+						<input type="hidden" value="<%=drop_category%>" name="drop_category"/>
+						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="udf1"/>
+						
 						<div id="confirm-order-button-container">	
 							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners">
-								<span><kk:msg  key="common.confirmorder"/></span>
+								<span><kk:msg  key="common.pay"/></span>
 							</a>
 						</div>
 					</form>			    	

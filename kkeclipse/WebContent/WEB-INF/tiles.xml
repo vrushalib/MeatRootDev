@@ -215,6 +215,14 @@
 		<put-attribute name="defName" value="catalog.checkoutfinished.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutFinishedBody.jsp"/>
 	</definition>
+	<definition name="catalog.transaction.cancel.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.transaction.cancel.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/TransactionCancelledBody.jsp"/>
+	</definition>
+	<definition name="catalog.transaction.fail.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.transaction.fail.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/TransactionFailedBody.jsp"/>
+	</definition>
 	<definition name="catalog.checkoutfinishedawaitbanktransfer.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.checkoutfinishedawaitbanktransfer.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutAwaitBankTransferFinishedBody.jsp"/>

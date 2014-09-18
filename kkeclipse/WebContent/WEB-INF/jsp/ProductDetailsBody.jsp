@@ -87,7 +87,7 @@
 	    						</tbody>
 	    					</table>	
 							<% } else { %>
-								<p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>
+								<%-- <p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>--%>
 							<%}%>												
 	    			</div>    			
  	    			<div id="product-reviews">

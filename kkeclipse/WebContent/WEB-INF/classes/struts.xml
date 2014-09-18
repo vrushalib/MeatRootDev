@@ -173,6 +173,8 @@
 			<result name="Checkout" type="chain">Checkout</result>
 			<result name="CheckoutExternalPayment" type="tiles">catalog.external.payment.page</result>
 			<result name="CheckoutExternalPaymentFrame" type="tiles">catalog.external.payment.frame.page</result>
+			<result name="TransactionCancelled" type="tiles">catalog.transaction.cancel.page</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
 			<result name="CheckoutServerPayment" type="chain">CheckoutServerPayment</result>
 			<result name="WorldPayXMLRedirect" type="chain">WorldPayXMLRedirect</result>
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
@@ -190,6 +192,12 @@
 			<result name="success" type="tiles">catalog.checkoutfinished.page</result>
 		</action>
 		<action name="CheckoutFinishedSubmit" class="com.konakart.actions.CheckoutFinishedSubmitAction">
+			<result name="success" type="chain">MyAccount</result>
+		</action>
+		<action name="TransactionCancelled" class="com.konakart.actions.TransactionCancelledAction">
+			<result name="success" type="chain">MyAccount</result>
+		</action>
+		<action name="TransactionFailed" class="com.konakart.actions.TransactionFailedAction">
 			<result name="success" type="chain">MyAccount</result>
 		</action>
 		<action name="CheckoutPaymentError" class="com.konakart.actions.CheckoutPaymentErrorAction">
