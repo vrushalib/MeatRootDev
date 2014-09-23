@@ -49,8 +49,8 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 
 	private String comment;
 	 //original key - "TCg9WT" and original salt - "k1rj3ntq"
-	private static final String SALT = "OmM6jqjz";
-	private static final String  MERCHANT_KEY = "VPcm4L";
+	private static final String SALT = "k1rj3ntq";
+	private static final String  MERCHANT_KEY = "TCg9WT";
 	private static final String PIPE = "|";
 	
 	enum TransactionStatus{
@@ -145,6 +145,9 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 			/* sets  the status of a transaction as per the internal database of PayU. PayU’s system has several intermediate
 			status which are used for tracking various activities internal to the system*/
 			checkoutOrder.setCustom3(request.getParameter("unmappedstatus"));
+			
+			/*sets unique reference number created for each transaction at PayU’s end */
+			checkoutOrder.setCustom4(request.getParameter("mihpayid"));
 			
 			if(!isTransactionTamperProof(request, checkoutOrder) || request.getParameter("status").equals(TransactionStatus.FAILURE.toString())
 					|| request.getParameter("status").equals(TransactionStatus.PENDING.toString())){
@@ -392,11 +395,10 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 				.append(PIPE).append("").append(PIPE).append("").append(PIPE).append(request.getParameter("udf1")).append(PIPE)
 				.append(request.getParameter("email")).append(PIPE).append(request.getParameter("firstname")).append(PIPE)
 				.append(request.getParameter("productinfo")).append(PIPE).append(request.getParameter("amount")).append(PIPE)
-				.append(request.getParameter("txnid")).append(PIPE).append(request.getParameter("key"));
+				.append(request.getParameter("txnid")).append(PIPE).append(MERCHANT_KEY);
 		String calculatedHash = hashCal("SHA-512", hashString.toString());
 		System.out.println("hashstring:"+hashString);
 		System.out.println("hash:"+hash+" : calculated hash:"+ calculatedHash);
-		System.out.println(hash.equals(calculatedHash));
 		return hash.equals(calculatedHash);
 	}
 

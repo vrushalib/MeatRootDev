@@ -29,6 +29,7 @@
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<div class="notification-header">
+								    Order Number is <%=order.getId() %>.<br>
 									<kk:msg  key="checkout.finished.orderprocessedlong"/>.
 								</div>
 							</div>

@@ -414,20 +414,20 @@ public boolean empty(String s)
 
 
 			<%  
-						String merchant_key=  "VPcm4L";  //original key - "TCg9WT"
-						String salt= "OmM6jqjz";  //original salt - "k1rj3ntq"
-						String base_url = "https://test.payu.in";
+						String merchant_key=  "TCg9WT";  //original key - "TCg9WT"
+						String salt= "k1rj3ntq";  //original salt - "k1rj3ntq"
+						String base_url = "https://secure.payu.in";
 						String action1 = base_url.concat("/_payment");
 						int error=0;
 						String hashString="";
 						String drop_category = "EMI,COD";
 						String amount = order.getTotalIncTax().toString();
-						String firstname = "pooja";//order.getDeliveryName();
+						String firstname = order.getDeliveryName();
 						String email = cust.getEmailAddr();
 						String phone = order.getDeliveryTelephone();
 						String productinfo = getProductsForPayment(order.getOrderProducts());
-						String surl = "http://localhost:8080/konakart/CheckoutConfirmationSubmit.action";
-						String furl = "http://localhost:8080/konakart/AdvancedSearch.action"; 
+						String surl = "http://meatroot.com/CheckoutConfirmationSubmit.action";
+						String furl = "http://meatroot.com/CheckoutConfirmationSubmit.action"; 
 						String txnid = "";
 						String udf1 = kkEng.getXsrfToken();
 						String udf2 = "";

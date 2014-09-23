@@ -91,7 +91,7 @@
 	 	<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
 		<a href="http://www.facebook.com" target="_blank" class="facebook-grey social-icon"></a>
 		<a href="http://www.pinterest.com" target="_blank" class="pinterest-grey social-icon"></a>
-		<a href="https://plus.google.com" target="_blank" class="google-grey social-icon"></a>
+		<a href="https://plus.google.com/100100965031894922635"  rel="publisher" target="_blank" class="google-grey social-icon"></a>
    	</div>
 </div>
 </div>

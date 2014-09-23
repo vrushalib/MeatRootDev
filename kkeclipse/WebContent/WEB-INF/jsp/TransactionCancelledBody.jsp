@@ -12,6 +12,7 @@
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<div class="notification-header">
+									<kk:msg  key="checkout.transaction.cancelled"/>. &nbsp;Your Order number is <%=order.getId() %>.<br>
 									<kk:msg  key="checkout.transaction.cancelled.long"/>.
 								</div>
 							</div>
