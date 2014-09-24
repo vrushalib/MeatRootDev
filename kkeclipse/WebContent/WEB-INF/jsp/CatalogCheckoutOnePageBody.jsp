@@ -438,7 +438,7 @@ public boolean empty(String s)
 						txnid=hashCal("SHA-256",rndm).substring(0,20);
 						
 						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
-						hash = hashCal("SHA-512",hashString);
+						System.out.println(hash = hashCal("SHA-512",hashString));
 						System.out.println("hashstring:"+hashString+" hash:"+hash);
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
@@ -733,7 +733,7 @@ public boolean empty(String s)
 						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="udf1"/>
 						
 						<div id="confirm-order-button-container">	
-							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners">
+							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
 								<span><kk:msg  key="common.pay"/></span>
 							</a>
 						</div>

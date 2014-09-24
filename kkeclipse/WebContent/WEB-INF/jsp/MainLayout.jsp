@@ -16,8 +16,10 @@
 // Lesser General Public License for more details.
 //
 --%>
+
 <%@include file="Taglibs.jsp" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -58,7 +60,7 @@
     <% } else { %>
 		<html>
 			<head>
-				<title>MeatRoot</title>
+				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
 				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
 				<meta name="description" content="<%=kkEng.getMetaDescription()%>" />

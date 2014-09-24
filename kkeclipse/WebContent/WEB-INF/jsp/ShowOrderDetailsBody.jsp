@@ -47,12 +47,13 @@
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<div id="payment-method-view" class="order-confirmation-area-content-select">
+								<%-- 	<div id="payment-method-view" class="order-confirmation-area-content-select">
 										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
 										<p><%=order.getPaymentMethod()%></p>
-									</div>
+									</div>--%>
 								</div>		    				
 			    			</div>
+			    			<br>
 			    			<%if (order.getOrderShipments() != null && order.getOrderShipments().length > 0){ %>
 				    			<div id="shipments" class="order-confirmation-area">
 				    				<div class="heading-container">
