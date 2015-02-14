@@ -72,6 +72,7 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		try {
 			int custId;
+			int paymentType = PaymentDetails.BROWSER_PAYMENT_GATEWAY; // Default payment method is to pay online
 
 			KKAppEng kkAppEng = this.getKKAppEng(request, response);
 
@@ -142,24 +143,6 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 			checkoutOrder.setCustom2(new SimpleDateFormat("yyyy-MM-dd")
 					.format(c.getTime()));
 			
-			/* sets  the status of a transaction as per the internal database of PayU. PayU’s system has several intermediate
-			status which are used for tracking various activities internal to the system*/
-			checkoutOrder.setCustom3(request.getParameter("unmappedstatus"));
-			
-			/*sets unique reference number created for each transaction at PayU’s end */
-			checkoutOrder.setCustom4(request.getParameter("mihpayid"));
-			
-			if(!isTransactionTamperProof(request, checkoutOrder) || request.getParameter("status").equals(TransactionStatus.FAILURE.toString())
-					|| request.getParameter("status").equals(TransactionStatus.PENDING.toString())){
-				checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS);
-
-				kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payment declined");
-				// Save the order
-				int orderId = kkAppEng.getOrderMgr().saveOrder(
-				/* sendEmail */false, null);
-
-				return "TransactionFailed";
-			}
 
 			/*
 			 * Check to see whether the order total is set to 0. Don't bother
@@ -184,10 +167,44 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 
 				return "CheckoutFinished";
 			}
-
-			int paymentType = kkAppEng.getOrderMgr().getPaymentType();
-			if (paymentType == PaymentDetails.BROWSER_PAYMENT_GATEWAY
-					|| paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY) {
+			String payment = request.getParameter("payment");
+			if(payment != null && !payment.isEmpty()){
+				paymentType = Integer.parseInt(payment);//kkAppEng.getOrderMgr().getPaymentType();
+			}
+			System.out.println("payment type:"+paymentType);
+			
+			//Currently only PayU is type of BROWSER_PAYMENT_GATEWAY
+			if (paymentType == PaymentDetails.BROWSER_PAYMENT_GATEWAY){
+				
+				//Status - failure and pending should be treated as failed transactions only (as per payu's integration doc)
+				if(request.getParameter("status").equals(TransactionStatus.FAILURE.toString())
+					|| request.getParameter("status").equals(TransactionStatus.PENDING.toString()) || !isTransactionTamperProof(request, checkoutOrder)){
+					checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS);
+					kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payment declined");
+					// Save the order
+					int orderId = kkAppEng.getOrderMgr().saveOrder(	/* sendEmail */false, null);
+					return "TransactionFailed";
+				}
+				
+				/* sets  the status of a transaction as per the internal database of PayU. PayU’s system has several intermediate
+				status which are used for tracking various activities internal to the system*/
+				checkoutOrder.setCustom3(request.getParameter("unmappedstatus"));
+				
+				/*sets unique reference number created for each transaction at PayU’s end */
+				checkoutOrder.setCustom4(request.getParameter("mihpayid"));
+				
+				// Set the order status
+				checkoutOrder
+						.setStatus(com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS);
+				kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payu");
+				int orderId = kkAppEng.getOrderMgr().saveOrder(	/* sendEmail */true, getEmailOptions(kkAppEng));
+				// Update the inventory
+				kkAppEng.getOrderMgr().updateInventory(orderId);
+				// If we received no exceptions, delete the basket
+				kkAppEng.getBasketMgr().emptyBasket();
+				return "CheckoutFinished";
+			}
+			   if(paymentType == PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY) {
 				/*
 				 * This payment gateway is a type where the customer enters the
 				 * credit card details on a browser window belonging to the
@@ -391,14 +408,14 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 //		sha512(SALT|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key)
 		String hash = request.getParameter("hash");
 		StringBuffer hashString = new StringBuffer();
-		hashString = hashString.append(SALT).append(PIPE).append(request.getParameter("status")).append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("").append(PIPE).append("")
-				.append(PIPE).append("").append(PIPE).append("").append(PIPE).append(request.getParameter("udf1")).append(PIPE)
+		hashString = hashString.append(SALT).append(PIPE).append(request.getParameter("status")).append(PIPE).append(PIPE).append(PIPE).append(PIPE)
+				.append(PIPE).append(PIPE).append(PIPE).append(PIPE).append(PIPE).append(PIPE).append(request.getParameter("udf1")).append(PIPE)
 				.append(request.getParameter("email")).append(PIPE).append(request.getParameter("firstname")).append(PIPE)
 				.append(request.getParameter("productinfo")).append(PIPE).append(request.getParameter("amount")).append(PIPE)
 				.append(request.getParameter("txnid")).append(PIPE).append(MERCHANT_KEY);
 		String calculatedHash = hashCal("SHA-512", hashString.toString());
 		System.out.println("hashstring:"+hashString);
-		System.out.println("hash:"+hash+" : calculated hash:"+ calculatedHash);
+		System.out.println("hash:"+hash+" \ncalculated hash:"+ calculatedHash);
 		return hash.equals(calculatedHash);
 	}
 

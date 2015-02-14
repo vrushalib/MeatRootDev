@@ -26,11 +26,10 @@
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
 <%@ page import="java.util.Random" %>
-<%@ page import="java.security.MessageDigest, java.security.NoSuchAlgorithmException" %>
+<%@ page import="java.security.MessageDigest, java.security.NoSuchAlgorithmException, com.konakart.app.PaymentDetails" %>
 
 
 <script type="text/javascript">	
-
 
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
@@ -118,6 +117,7 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 			$('#continue-button').show();
 		}
 	}
+	
 };
 
 function getOrderTotalRow(ot) {	
@@ -195,10 +195,17 @@ function shippingRefresh(storeId) {
 }
 
 function paymentRefresh() {	
-	var paymentDetails = document.getElementById("paymentDetails");
+	/*var paymentDetails = document.getElementById("paymentDetails");
 	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
-	setLoading();
+	setLoading();*/
+	
+		var selectedPaymentMode = $("#paymentDetails").val();
+		if(selectedPaymentMode == '1'){//cod
+		    $('#form1').attr('action', 'CheckoutConfirmationSubmit.action');
+		}else{
+			$('#form1').attr('action', 'https://secure.payu.in/_payment');
+		}
 }
 
 function couponCodeRefresh() {	
@@ -319,11 +326,6 @@ $(function() {
 	
 });
 
-function updateHashValue(){
-	
-	return true;
-}
-
 </script>
 
   	    	<div id="error-dialog" title="<kk:msg  key="one.page.checkout.problem.title"/>" class="content-area rounded-corners">
@@ -369,8 +371,7 @@ public boolean empty(String s)
 	{
 		if(s== null || s.trim().equals(""))
 			return true;
-		else
-			return false;
+		return false;
 	}
 %>
 <%!
@@ -382,8 +383,6 @@ public boolean empty(String s)
 		algorithm.reset();
 		algorithm.update(hashseq);
 		byte messageDigest[] = algorithm.digest();
-            
-		
 
 		for (int i=0;i<messageDigest.length;i++) {
 			String hex=Integer.toHexString(0xFF & messageDigest[i]);
@@ -391,31 +390,31 @@ public boolean empty(String s)
 			hexString.append(hex);
 		}
 			
-		}catch(NoSuchAlgorithmException nsae){ }
-		
+		}catch(NoSuchAlgorithmException nsae){
+			System.out.println("No such algorithm as "+type+" exists");
+		}
 		return hexString.toString();
-
-
 	}
 %>
 
 
 <%!
-/* Creates a string for product description to send to the payment gateway- productName_quantity_pricePerUnit (separated by comma)*/
+/* Creates a string for product description to send to the payment gateway- productName_quantity_pricePerUnit (separated by space)*/
 	public String getProductsForPayment( com.konakart.appif.OrderProductIf [] orderProducts){
 		StringBuffer prods = new StringBuffer();
 		for(int i = 0; i < orderProducts.length; i++){
 			prods.append(orderProducts[i].getName() + "_" + orderProducts[i].getQuantity() + "_" + orderProducts[i].getPrice());
-			prods.append(",");
+			prods.append(" ");
 		}
-		return prods.substring(0, prods.length()-1); // to remove last comma	
+	//	return prods.substring(0, prods.length()-1); // to remove last comma	
+	return prods.toString().trim();
 	}
 %>
 
 
 			<%  
-						String merchant_key=  "TCg9WT";  //original key - "TCg9WT"
-						String salt= "k1rj3ntq";  //original salt - "k1rj3ntq"
+						String merchant_key= "TCg9WT";
+						String salt= "k1rj3ntq";
 						String base_url = "https://secure.payu.in";
 						String action1 = base_url.concat("/_payment");
 						int error=0;
@@ -438,7 +437,7 @@ public boolean empty(String s)
 						txnid=hashCal("SHA-256",rndm).substring(0,20);
 						
 						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
-						System.out.println(hash = hashCal("SHA-512",hashString));
+						hash = hashCal("SHA-512",hashString);
 						System.out.println("hashstring:"+hashString+" hash:"+hash);
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
@@ -498,25 +497,26 @@ public boolean empty(String s)
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<%-- <div id="payment-method" class="order-confirmation-area-content-select">
+								     <div id="payment-method" class="order-confirmation-area-content-select">
 										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
 										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
-											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
-												<s:set scope="request" var="payment"  value="payment"/> 						
-												<% String payment = ((String)request.getAttribute("payment"));%> 
+											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>
+											<%-- 	<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> --%>
 												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
 													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
-													<%if (payment.equals(pd.getCode())){ %>
-														<option  value="<%=pd.getCode()%>" selected="selected"><%=pd.getDescription()%></option>
+													<%if ("cod".equals(pd.getCode())){ %>
+														<% order.getPaymentDetails().setPaymentType(PaymentDetails.COD);//COD %>
+														<option  value="<%=pd.getPaymentType()%>" ><%=pd.getDescription()%></option>
 													<% } else { %>
-														<option  value="<%=pd.getCode()%>"><%=pd.getDescription()%></option>
+														<option  value="<%=pd.getPaymentType()%>" selected="selected"><%=pd.getDescription()%></option>
 													<% } %>
 												<% } %>										
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
-										</select>
-									</div>--%>
+										</select> 
+									</div>
 								<%-- 	<div id="promotion-codes">
 										<div id="promotion-codes-container">
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>

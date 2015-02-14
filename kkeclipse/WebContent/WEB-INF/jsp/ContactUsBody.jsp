@@ -26,7 +26,7 @@
 		    		<p align="justify">
 		    			Your comments, suggestions and concerns are very important to us. We welcome any
 suggestions you have that will help us provide better service to our customers.
-<br>Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9642658111.<br>
+<br>Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9765197365.<br>
 <br>
 Mail us:
 <br>Mohini Apartments,

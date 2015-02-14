@@ -47,7 +47,7 @@ $(function() {
 <div id="top-bar-container">
   	<div id="top-bar">
   	    <div id="area-message">
-           Currently we deliver in Aundh, Baner, Hinjewadi and Wakad.
+		Free Home Delivery All Across Pune!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Next Day Delivery between 7-10am! &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Order Placement/Inquiry : +91-9765197365
         </div>
   		<div id="options">
 	  		<div id="language-selector" class="top-bar-menu-item">

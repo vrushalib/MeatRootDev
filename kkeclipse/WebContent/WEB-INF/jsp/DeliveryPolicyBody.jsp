@@ -6,8 +6,7 @@
 	    		<div class="content-area rounded-corners">
 		    		<div id="delivery-policy">
 		    		<p align="justify">
-		    			As per our delivery policy, MeatRoot does not deliver on the same day that the order has been placed. One has to order till 6:00 p.m. on the previous day to get it delivered the next day morning between 7:00am - 9:00am. 
-		    			Each delivery will be charged Rs. 30. MeatRoot delivers on all seven days.
+		    			MeatRoot provides FREE home delivery. As per our delivery policy, we do not deliver on the same day that the order has been placed. MeatRoot delivers on all seven days.
 		    			<br><br>Delivery will be failed in case of following: 
    <br>&#8208; Wrong Address
    <br>&#8208; Locked Premise or blocked entry

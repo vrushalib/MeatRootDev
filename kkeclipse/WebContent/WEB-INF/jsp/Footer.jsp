@@ -40,7 +40,8 @@
    	</div>
 
     <% com.konakart.appif.ProductIf[] prods = kkEng.getProductMgr().getCustomProducts1(); %>
-    <% if(prods != null && prods.length > 0){ %>
+    <% if(prods != null && prods.length > 0){ 
+        System.out.println("No of special prods: "+prods.length);%>
    	<div id="product-links" class="footer-area narrow">
 	<h3 class="title">Popular Products</h3>
 		<%for (int i = 0; i < prods.length; i++) {%>
@@ -84,12 +85,12 @@
                 	<li ><img src="<%=kkEng.getImageBase()%>/icons/visa2.jpg" alt="Visa card" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/masterCard2.jpg" alt="Master Card" /></li>
                     <li><img src="<%=kkEng.getImageBase()%>/icons/netBanking2.jpg" alt="" /></li>
-                    <li><img src="<%=kkEng.getImageBase()%>/icons/cardOnDel2.jpg" alt="" /></li>
-                <%--      <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>--%>
+                 <%--   <li><img src="<%=kkEng.getImageBase()%>/icons/cardOnDel2.jpg" alt="" /></li>--%>
+                      <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>
                 </ul><br/>
  		<b><kk:msg  key="footer.connect"/>:&nbsp;&nbsp;</b>
 	 	<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
-		<a href="http://www.facebook.com" target="_blank" class="facebook-grey social-icon"></a>
+		<a href="https://www.facebook.com/MeatRootOnline" target="_blank" class="facebook-grey social-icon"></a>
 		<a href="http://www.pinterest.com" target="_blank" class="pinterest-grey social-icon"></a>
 		<a href="https://plus.google.com/100100965031894922635"  rel="publisher" target="_blank" class="google-grey social-icon"></a>
    	</div>

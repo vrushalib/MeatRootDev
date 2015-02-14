@@ -65,7 +65,7 @@ There is no minimum order.<br/><br/>
 Unfortunately we can't cater orders the same day. One has to order till 6:00pm on the previous
 day to get it delivered on the next day.<br/><br/>
 <b>10: Are there any delivery charges?</b><br/><br/>
-Yes. Each delivery will be charged Rs.30/12<br/><br/>
+No. MeatRoot provides free home delivery.<br/><br/>
 <b>11: When do you deliver?</b><br/><br/>
 We deliver on all days. Order today and get it tomorrow.<br/><br/>
 <b>12: Where do you deliver?</b><br/><br/>
@@ -96,7 +96,7 @@ factors like traffic and so on. Please contact MeatRoot to find out where your o
 <b>21: My transaction failed but money was deducted from my account. What do I do?</b><br/><br/>
 Your money is safe and will be refunded. Do not worry.<br/><br/>
 <b>22: I have a question that is not listed above. Who can I speak to?</b><br/><br/>
-You can call us on +91&#8208;9642658111 or visit the Contact Us page. We will
+You can call us on +91&#8208;9765197365 or visit the Contact Us page. We will
 do our best to get back to you in 24 hours.<br/><br/>
 <!-- <b>23: Are there any flexible delivery slots?</b><br/><br/>
 Yes. User gets to select from two slots, morning and evening. It works better when it comes to
