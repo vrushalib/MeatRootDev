@@ -64,7 +64,6 @@
    		<a href ="AboutUs.action"><kk:msg  key="footer.about.us"/></a><br />
    		<a href ="PlacingOrder.action"><kk:msg  key="footer.placing.order"/></a><br />
 		<a href ="Payment.action"><kk:msg  key="footer.payment"/></a><br />
-	<!--  	<a href ="DeliveryDetails.action"><kk:msg  key="footer.delivery.details"/></a><br />-->
 		<a href ="OrderTracking.action"><kk:msg  key="footer.order.tracking"/></a><br />
 		<a href ="ContentChanges.action"><kk:msg  key="footer.content.changes"/></a><br />
    		<a href ="DeliveryPolicy.action"><kk:msg  key="footer.delivery.policy"/></a><br />

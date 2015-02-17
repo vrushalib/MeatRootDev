@@ -34,6 +34,12 @@
 
   ga('create', 'UA-55023986-1', 'auto');
   ga('send', 'pageview');
+  
+  (function() {
+      var a = document.createElement('script');a.type = 'text/javascript'; a.async = true;
+      a.src=('https:'==document.location.protocol?'https://':'http://cdn.')+'chuknu.sokrati.com/15047/tracker.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
+           })();
 
 </script>
 
