@@ -425,10 +425,10 @@ public boolean empty(String s)
 						String email = cust.getEmailAddr();
 						String phone = order.getDeliveryTelephone();
 						String productinfo = getProductsForPayment(order.getOrderProducts());
-						String surl = "http://meatroot.com/CheckoutConfirmationSubmit.action";
-						String furl = "http://meatroot.com/CheckoutConfirmationSubmit.action"; 
+						String surl = "http://meatroot.com/PayuResponse.action";
+						String furl = "http://meatroot.com/PayuResponse.action"; 
 						String txnid = "";
-						String udf1 = kkEng.getXsrfToken();
+						String udf1 = kkEng.getSessionId();
 						String udf2 = "";
 						String hash = "";
 						
@@ -439,10 +439,11 @@ public boolean empty(String s)
 						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
 						hash = hashCal("SHA-512",hashString);
 						System.out.println("hashstring:"+hashString+" hash:"+hash);
+						System.out.println("\n\nsessionid:"+ kkEng.getSessionId());
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-		    		<form action="<%=action1%>" id="form1" method="post" class="form-section">
+		    		<form id="form1" action="<%=action1 %>" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
 		    				<div id="delivery-address" class="order-confirmation-area">
@@ -730,12 +731,12 @@ public boolean empty(String s)
 						<input type="hidden" value="<%=furl%>" name="furl"/>
 						<input type="hidden" value="<%=txnid%>" name="txnid"/> 
 						<input type="hidden" value="<%=drop_category%>" name="drop_category"/>
-						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="udf1"/>
+						<input type="hidden" value="<%=udf1%>" name="udf1"/>
 						
 						<div id="confirm-order-button-container">	
-							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
+						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
 								<span><kk:msg  key="common.pay"/></span>
-							</a>
+							</a> 
 						</div>
 					</form>			    	
 	    		</div>

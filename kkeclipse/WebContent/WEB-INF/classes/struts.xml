@@ -180,6 +180,13 @@
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
 			<result name="GlobalCollect"  type="chain">GlobalCollect</result>
 		</action>	
+		<action name="PayuResponse" class="com.konakart.actions.PayuResponseAction">
+		 	<result name="redirect" type="chain">${action}</result>
+			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
+			<result name="Checkout" type="chain">Checkout</result>
+			<result name="LoginSubmitError"  type="tiles">catalog.login.page</result>
+		</action>
 		<action name="CheckoutNewDeliveryAddr" class="com.konakart.actions.CheckoutAction" method="newDeliveryAddr">
 			<result name="success" type="tiles">catalog.onepagecheckout.page</result>
 			<result name="ShowCartItems" type="chain">ShowCartItems</result>
