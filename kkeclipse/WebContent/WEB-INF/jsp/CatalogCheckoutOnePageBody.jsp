@@ -439,7 +439,6 @@ public boolean empty(String s)
 						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
 						hash = hashCal("SHA-512",hashString);
 						System.out.println("hashstring:"+hashString+" hash:"+hash);
-						System.out.println("\n\nsessionid:"+ kkEng.getSessionId());
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">

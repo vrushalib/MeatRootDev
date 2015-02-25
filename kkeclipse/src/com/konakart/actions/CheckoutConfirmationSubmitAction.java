@@ -231,7 +231,7 @@ public class CheckoutConfirmationSubmitAction extends BaseAction
                  * Cash On Delivery. The order is saved with a pending status and the inventory is
                  * updated.
                  */
-
+            	System.out.println("User selected cash on delivery");
                 // Set the order status
                 checkoutOrder.setStatus(com.konakart.bl.OrderMgr.PENDING_STATUS);
 

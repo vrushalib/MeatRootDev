@@ -64,13 +64,15 @@ public class PayuResponseAction extends BaseAction
             try
             {
                 kkAppEng.getEng().checkSession(sessionId);
+                System.out.println("Session id exists and it is valid");
             } catch (KKException e){
-                System.out.println("The SessionId from PayU Callback is not valid: "+ sessionId);
+                System.out.println("The SessionId from PayU Callback is not valid or it has timed out: "+ sessionId);
                 return KKLOGIN;
             }
 
             // Log in the user
             kkAppEng.getCustomerMgr().loginBySession(sessionId);
+            System.out.println("User logged in");
            
          // Check that order is there and valid
          			OrderIf checkoutOrder = kkAppEng.getOrderMgr().getCheckoutOrder();
@@ -78,6 +80,8 @@ public class PayuResponseAction extends BaseAction
          				return "Checkout";
          			}
             
+         	System.out.println("status:"+request.getParameter("status")+", unmapped status:" + request.getParameter("unmappedstatus"));
+         			
           //Status - failure and pending should be treated as failed transactions only (as per payu's integration doc)
 			if(request.getParameter("status").equals(TransactionStatus.FAILURE.toString())
 				|| request.getParameter("status").equals(TransactionStatus.PENDING.toString()) || 
@@ -90,8 +94,6 @@ public class PayuResponseAction extends BaseAction
 				kkAppEng.getBasketMgr().emptyBasket();
 				return "TransactionFailed";
 			}
-			
-			System.out.println("status:"+request.getParameter("status")+", unmapped status:" + request.getParameter("unmappedstatus"));
 			
 			//set the transaction id as tracking number for the reference
 			checkoutOrder.setTrackingNumber(request.getParameter("txnid"));
