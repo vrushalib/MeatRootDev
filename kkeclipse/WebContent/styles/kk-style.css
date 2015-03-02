@@ -442,6 +442,8 @@ li.ui-menu-item a.ui-state-focus {
 	margin: 0px 0;
 	margin-bottom: 20px;
 	overflow: hidden;
+	width: 100%;
+	display: flex;
 }
 
 #main-menu .last-child {
@@ -459,6 +461,9 @@ li.ui-menu-item a.ui-state-focus {
 	color: #FFFFFF;
 	font-size: 16px;
 	text-decoration: none;
+	flex-grow: 1;
+	display : block;
+	border-right: 1px solid #b5b38a;
 }
 
 #main-menu a:hover {

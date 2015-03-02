@@ -28,20 +28,27 @@
 	<h3 class="title">Popular Categories</h3>	
    	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
 		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
-		<%String menuClass; %>
-		<%if (i == catMgr.getCats().length-1){ %>
-			<% menuClass = "menu-item rounded-corners last-child"; %>
-		<% } else { %>
-			<% menuClass = "menu-item rounded-corners"; %>
+		<%String menuClass = "menu-item rounded-corners"; %>
+		<%if(cat.getChildren() != null && cat.getChildren().length > 0){ //If a category has a subcategory
+   			for(int j = 0; j < cat.getChildren().length ; j++){
+   			 	com.konakart.appif.CategoryIf subCat = cat.getChildren()[j]; 
+	   			if (i == catMgr.getCats().length-1 && j == cat.getChildren().length-1){ 
+					 menuClass = "menu-item rounded-corners last-child"; 
+			    }%>
+			    <a href='<%="SelectCat.action?catId="+subCat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=subCat.getName()%></a><br />
+   		    <%}
+   		  }else{ %>
+			<% if (i == catMgr.getCats().length-1){ %>
+				<% menuClass = "menu-item rounded-corners last-child"; %>
+			<% } %>
+			<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
 		<% } %>
-		<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
 	<% } %>				
 		
    	</div>
 
     <% com.konakart.appif.ProductIf[] prods = kkEng.getProductMgr().getCustomProducts1(); %>
-    <% if(prods != null && prods.length > 0){ 
-        System.out.println("No of special prods: "+prods.length);%>
+    <% if(prods != null && prods.length > 0){ %>
    	<div id="product-links" class="footer-area narrow">
 	<h3 class="title">Popular Products</h3>
 		<%for (int i = 0; i < prods.length; i++) {%>
