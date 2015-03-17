@@ -180,7 +180,7 @@
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
 			<result name="GlobalCollect"  type="chain">GlobalCollect</result>
 		</action>	
-		<action name="PayuResponse" class="com.konakart.actions.PayuResponseAction">
+		<action name="PayuResponse" class="com.konakart.actions.PayuAction">
 		 	<result name="redirect" type="chain">${action}</result>
 			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
 			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>

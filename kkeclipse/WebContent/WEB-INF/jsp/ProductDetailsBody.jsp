@@ -43,6 +43,29 @@
 	<%String ratingDecStr = (prod.getRating()==null)?"0":(prod.getRating().setScale(1, java.math.BigDecimal.ROUND_HALF_UP)).toPlainString();  %>
 	<%com.konakart.appif.ReviewSearchIf search = revMgr.getRevSearch();%>
 	
+	<script type="text/javascript">
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=cust.getFirstName()%>",
+		"cust_email" : "<%=cust.getEmailAddr()%>",
+	    "cust_phone" : "<%=cust.getTelephoneNumber()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "view_prodid" : <%=prod.getId()%>,
+	    "view_prodnames" : "<%=prod.getName()%>",
+	    "view_skus" : null,
+	    "view_prodprices" : <%=prod.getPriceIncTax()%>,
+	    "view_pagetype" : null,
+	    "view_prodcurrency" : null,
+	    "view_prodcategory" : <%=prod.getCategoryId()%>,
+	    "view_prodsubcategory" : null,
+	    "view_prodavailability" : null,
+	    "event" : "viewproduct" 
+};
+</script>
+	
+	
    		<h1 id="page-title"><%=prod.getName()%></h1>
     	<div id="product-area" class="rounded-corners">
     		<div id="product-column-left">

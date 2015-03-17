@@ -22,6 +22,32 @@
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <% com.konakart.appif.OrderIf order = orderMgr.getCheckoutOrder();%>
 
+<script type="text/javascript">
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=order.getCustomerName()%>",
+		"cust_email" : "<%=order.getCustomerEmail()%>",
+	    "cust_phone" : "<%=order.getCustomerTelephone()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "sale_pagetype" : null,
+	    "sale_prodnames" : "<%=order.getOrderProducts()%>",
+	    "sale_skus" : null,
+	    "sale_currency" : "<%=order.getCurrency().getTitle()%>",
+	    "sale_deliverymethod" : null,
+	    "sale_prodqtys" : "<%=order.getNumProducts()%>",
+	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
+	    "sale_coupon" : null,
+	    "sale_orderid" : "<%=order.getOrderNumber()%>",
+	    "sale_ordervalue" : "<%=order.getTotalIncTax()%>",
+	    "sale_orderqtys" : null,
+	    "sale_shippingcharges" : null,
+	    "sale_taxes" : null,
+	    "event" : "success" 
+}
+</script>
+
  				<h1 id="page-title"><kk:msg  key="checkout.finished.orderprocessed"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="checkout-finished">
@@ -30,7 +56,7 @@
 							<div class="form-section">
 								<div class="notification-header">
 								    Order Number is <%=order.getId() %>.<br>
-									<kk:msg  key="checkout.finished.orderprocessedlong"/>.
+									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1() == "m")%> 7am - 10:30am <%else %> 1pm - 4pm. Thank you for shopping with us.
 								</div>
 							</div>
 							<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>

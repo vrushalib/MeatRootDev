@@ -16,6 +16,7 @@
 // Lesser General Public License for more details.
 //
 --%>
+<%@page import="java.util.Locale"%>
 <%@include file="Taglibs.jsp" %>
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
@@ -25,11 +26,31 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
-<%@ page import="java.util.Random" %>
-<%@ page import="java.security.MessageDigest, java.security.NoSuchAlgorithmException, com.konakart.app.PaymentDetails" %>
-
+<%@ page import="java.util.Random, java.security.MessageDigest, java.security.NoSuchAlgorithmException, java.util.Date, java.sql.Time, java.util.Calendar,
+                 java.util.GregorianCalendar, java.text.SimpleDateFormat" %>
+<%@ page import="com.konakart.app.PaymentDetails, 
+                 com.konakart.app.SSOToken, com.konakart.appif.KKEngIf, com.konakart.appif.SSOTokenIf" %>
 
 <script type="text/javascript">	
+
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=order.getCustomerName()%>",
+		"cust_email" : "<%=order.getCustomerEmail()%>",
+	    "cust_phone" : "<%=order.getCustomerTelephone()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "sale_pagetype" : null,
+	    "sale_prodnames" : "<%=order.getOrderProducts()%>",
+	    "sale_skus" : null,
+	    "sale_currency" : "<%=order.getCurrency().getTitle()%>",
+	    "sale_deliverymethod" : null,
+	    "sale_prodqtys" : "<%=order.getNumProducts()%>",
+	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
+	    "sale_coupon" : null,
+	    "event" : "checkout" 
+}
 
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
@@ -119,6 +140,11 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	}
 	
 };
+
+function preProcessForm(form, continueBtn){
+/*	$('#'+form).append('<input type="hidden" name="udf2" value="comment added" /> ');*/
+	formValidate(form, continueBtn);
+}
 
 function getOrderTotalRow(ot) {	
 	var rowClass = "costs-and-promotions";
@@ -251,8 +277,6 @@ function openErrorDialog() {
 function closeErrorDialog() {
 	$("#error-dialog").dialog('close');
 }
-
-
 
 $(function() {
 	
@@ -411,6 +435,139 @@ public boolean empty(String s)
 	}
 %>
 
+<%!
+/*
+ * Create a session here which will be used by the IPN callback
+ */
+ String getUuid(com.konakart.appif.OrderIf checkoutOrder, com.konakart.al.KKAppEng kkEngine ){
+	SSOTokenIf ssoToken = new SSOToken();
+	String uuid = null;
+	try{
+	String sessionId = kkEngine.getSessionId();
+	if (sessionId == null)
+	{
+	    System.out.println("Unable to get session id for the logged in user");
+	}
+	ssoToken.setSessionId(sessionId);
+	/*
+	 * Save the SSOToken with a valid sessionId 
+	 */
+	uuid = kkEngine.getEng().saveSSOToken(ssoToken);
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+	return uuid;
+}
+%>
+
+<%!
+public void addDeliverySlotAndDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
+	String MORNING = "m";
+	String AFTERNOON = "a";
+	String deliverySlot = null;
+	String deliveryDay = null;
+	Date today = new Date();
+	Time now = new Time(today.getTime());
+
+	Calendar cal = Calendar.getInstance();
+	cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
+	cal.set(Calendar.MINUTE, 00);
+	cal.set(Calendar.SECOND, 00);
+	Time twelveAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
+	Time sixAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
+	cal.set(Calendar.MINUTE, 30);
+	Time eightThirtyPm = new Time(cal.getTime().getTime());
+
+		if (now.after(twelveAm) && now.before(sixAm)) {
+			deliverySlot = AFTERNOON;
+			deliveryDay = getDateToday();
+		} else if (now.before(eightThirtyPm)) {
+			deliverySlot = MORNING;
+			deliveryDay = getDateTomorrow();
+		} else {
+			deliverySlot = AFTERNOON;
+			deliveryDay = getDateTomorrow();
+		}
+	System.out.println("Delivery slot:" + deliverySlot + "  Delivery Day: "
+			+ deliveryDay);
+	checkoutOrder.setCustom1(deliverySlot);
+	checkoutOrder.setCustom2(deliveryDay);
+	checkoutOrder.setCustom3(getOrderMessage(deliverySlot, deliveryDay));
+}
+
+public String getOrderMessage(String slot, String day){
+	if( slot.equalsIgnoreCase("a"))
+		slot = "1pm - 4pm";
+	else
+		slot = "7am - 10:30am";
+	String message =  "Your order will be delivered on <b>"+ day +" </b> between <b>" + slot + "</b>."; 
+	return message;
+}
+
+public String getOrderMessageForZorabian(String day){
+	String message =  "Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery slot for Zorabian Fresh is <b>"+ 
+			           day +"</b> between <b>7am to 10.30am</b>. For earlier delivery slot please check for alternative options.";
+	return message;
+}
+
+public void addDeliverySlotAndDeliveryDateForZorabian(com.konakart.appif.OrderIf checkoutOrder) {
+	System.out.println("Order contains zorabian product(s)");
+	Date today = new Date();
+	Time now = new Time(today.getTime());
+
+	Calendar cal = Calendar.getInstance();
+	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
+	cal.set(Calendar.MINUTE, 00);
+	cal.set(Calendar.SECOND, 00);
+	Time sixAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 19); // 7 PM
+	Time sevenPm = new Time(cal.getTime().getTime());
+
+	checkoutOrder.setCustom1("m");//morning
+	if (now.after(sevenPm)) {
+		checkoutOrder.setCustom2( getDateAfterTomorrow());
+		checkoutOrder.setCustom3(getOrderMessageForZorabian(getDateAfterTomorrow()));
+	} else{
+		checkoutOrder.setCustom2( getDateTomorrow());
+		checkoutOrder.setCustom3(getOrderMessage("m", getDateTomorrow()));
+	}
+}
+
+public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
+	boolean flag = false;
+	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
+	for (com.konakart.appif.OrderProductIf prod : products) {
+		if (prod.getProduct().getManufacturerName()
+				.equalsIgnoreCase("zorabian")) {
+			flag = true;
+		}
+	}
+	return flag;
+}
+
+public String getDateToday() {
+	return new SimpleDateFormat("MMM dd, yyyy").format(new Date());
+}
+
+public String getDateTomorrow() {
+	Calendar c = new GregorianCalendar();
+	c.add(Calendar.DATE, 1);
+	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
+}
+
+public String getDateAfterTomorrow() {
+	Calendar c = new GregorianCalendar();
+	c.add(Calendar.DATE, 2);
+	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
+}
+
+%>
 
 			<%  
 						String merchant_key= "TCg9WT";
@@ -428,20 +585,30 @@ public boolean empty(String s)
 						String surl = "http://meatroot.com/PayuResponse.action";
 						String furl = "http://meatroot.com/PayuResponse.action"; 
 						String txnid = "";
-						String udf1 = kkEng.getSessionId();
-						String udf2 = "";
-						String hash = "";
+						String udf1 = getUuid(order, kkEng);//kkEng.getSessionId();
+						System.out.println("uuid: "+udf1);
+						if(orderContainsZorabianProduct(order)){
+							addDeliverySlotAndDeliveryDateForZorabian(order);
+						}else {
+							addDeliverySlotAndDeliveryDate(order);
+						}
+						String udf2 = order.getCustom1();
+						String udf3 = order.getCustom2();
+						System.out.println("delivery slot: "+ udf2 + " delivery date : "+ udf3);
+						String deliveryMessage = order.getCustom3();
 						
+						String hash = "";
 						Random rand = new Random();
 						String rndm = Integer.toString(rand.nextInt())+(System.currentTimeMillis() / 1000L);
 						txnid=hashCal("SHA-256",rndm).substring(0,20);
 						
-						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|||||||||"+salt;
+						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|"+udf3+"||||||||"+salt;
 						hash = hashCal("SHA-512",hashString);
 						System.out.println("hashstring:"+hashString+" hash:"+hash);
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
+	    		    <div id = "deliveryMessage" style="font-size: 13.5px"> <%=deliveryMessage %></div><br>
 		    		<form id="form1" action="<%=action1 %>" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
@@ -498,7 +665,7 @@ public boolean empty(String s)
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
 								     <div id="payment-method" class="order-confirmation-area-content-select">
-										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
+										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
 										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
 											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>
 											<%-- 	<s:set scope="request" var="payment"  value="payment"/> 						
@@ -731,9 +898,11 @@ public boolean empty(String s)
 						<input type="hidden" value="<%=txnid%>" name="txnid"/> 
 						<input type="hidden" value="<%=drop_category%>" name="drop_category"/>
 						<input type="hidden" value="<%=udf1%>" name="udf1"/>
+						<input type="hidden" value="<%=udf2%>" name="udf2"/>
+						<input type="hidden" value="<%=udf3%>" name="udf3"/>
 						
 						<div id="confirm-order-button-container">	
-						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
+						<a onclick="javascript:preProcessForm('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
 								<span><kk:msg  key="common.pay"/></span>
 							</a> 
 						</div>

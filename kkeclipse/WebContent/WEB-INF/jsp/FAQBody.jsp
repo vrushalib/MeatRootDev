@@ -73,8 +73,7 @@ We currently deliver only in Aundh, Baner, Hinjewadi and Wakad area.<br/><br/>
 <b>13: Are the prices inclusive of tax?</b><br/><br/>
 Yes, the stated prices are inclusive of tax.<br/><br/>
 <b>14: Can I pay by cash?</b><br/><br/>
-Cash on delivery is not yet available but we are working on it to provide you all the possible
-flexible payment options.<br/><br/>
+Yes, we do provide Cash on Delivery payment option.<br/><br/>
 <b>15: What payment types do you accept?</b><br/><br/>
 We accept credit and debit cards (VISA / Mastercard/ Maestro/diners).<br/><br/>
 <b>16: How will I know MeatRoot has confirmed my order?</b><br/><br/>
