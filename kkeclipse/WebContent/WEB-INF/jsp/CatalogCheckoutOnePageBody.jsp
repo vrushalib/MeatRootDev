@@ -493,25 +493,24 @@ public void addDeliverySlotAndDeliveryDate(com.konakart.appif.OrderIf checkoutOr
 			deliverySlot = AFTERNOON;
 			deliveryDay = getDateTomorrow();
 		}
-	System.out.println("Delivery slot:" + deliverySlot + "  Delivery Day: "
-			+ deliveryDay);
 	checkoutOrder.setCustom1(deliverySlot);
 	checkoutOrder.setCustom2(deliveryDay);
-	checkoutOrder.setCustom3(getOrderMessage(deliverySlot, deliveryDay));
+	checkoutOrder.setCustom3("false");
 }
 
-public String getOrderMessage(String slot, String day){
-	if( slot.equalsIgnoreCase("a"))
-		slot = "1pm - 4pm";
-	else
-		slot = "7am - 10:30am";
-	String message =  "Your order will be delivered on <b>"+ day +" </b> between <b>" + slot + "</b>."; 
-	return message;
-}
-
-public String getOrderMessageForZorabian(String day){
-	String message =  "Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery slot for Zorabian Fresh is <b>"+ 
-			           day +"</b> between <b>7am to 10.30am</b>. For earlier delivery slot please check for alternative options.";
+public String getOrderMessage(String slot, String day, Boolean zorabianAfterSeven){
+	String message = "";
+	if(zorabianAfterSeven){ 
+		message =  "Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery slot for Zorabian Fresh is <b>"+ 
+		           day +"</b> between <b>7am to 10.30am</b>. For earlier delivery slot please check for alternative options.";
+	}else{
+		if( slot.equalsIgnoreCase("a"))
+			slot = "1pm - 4pm";
+		else
+			slot = "7am - 10:30am";
+		    message =  "Your order will be delivered on <b>"+ day +" </b> between <b>" + slot + "</b>."; 
+	}	
+	System.out.println(message);
 	return message;
 }
 
@@ -532,10 +531,10 @@ public void addDeliverySlotAndDeliveryDateForZorabian(com.konakart.appif.OrderIf
 	checkoutOrder.setCustom1("m");//morning
 	if (now.after(sevenPm)) {
 		checkoutOrder.setCustom2( getDateAfterTomorrow());
-		checkoutOrder.setCustom3(getOrderMessageForZorabian(getDateAfterTomorrow()));
+		checkoutOrder.setCustom3("true");
 	} else{
 		checkoutOrder.setCustom2( getDateTomorrow());
-		checkoutOrder.setCustom3(getOrderMessage("m", getDateTomorrow()));
+		checkoutOrder.setCustom3("false");
 	}
 }
 
@@ -544,7 +543,7 @@ public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutO
 	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
 	for (com.konakart.appif.OrderProductIf prod : products) {
 		if (prod.getProduct().getManufacturerName()
-				.equalsIgnoreCase("zorabian")) {
+				.toLowerCase().contains("zorabian")) {
 			flag = true;
 		}
 	}
@@ -595,7 +594,7 @@ public String getDateAfterTomorrow() {
 						String udf2 = order.getCustom1();
 						String udf3 = order.getCustom2();
 						System.out.println("delivery slot: "+ udf2 + " delivery date : "+ udf3);
-						String deliveryMessage = order.getCustom3();
+						String deliveryMessage = getOrderMessage(order.getCustom1(), order.getCustom2(), Boolean.valueOf(order.getCustom3()));
 						
 						String hash = "";
 						Random rand = new Random();
