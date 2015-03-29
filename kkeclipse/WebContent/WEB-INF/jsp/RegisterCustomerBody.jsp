@@ -163,10 +163,12 @@
 										<label><kk:msg  key="register.customer.body.postcode"/></label>
 									<%--	<input type="text" value="<s:property value="postcode" />" id="postcode" name="postcode" />--%>
 										<select id="postcode" name="postcode" >
+										<option style="display:none" value="">Select post code</option>
 										<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
 									    <% if( codes != null && codes.length != 0) { %>
+									    	<% java.util.Arrays.sort(codes); %>
 										    <% for(int i = 0; i < codes.length; i++){ %>
-										    	   <option  value="<%=codes[i]%>" selected="selected" ><%=codes[i]%></option>
+										    	   <option  value="<%=codes[i]%>"  ><%=codes[i]%></option>
 										    <% } %>
 										<% } %>
 									    </select>
