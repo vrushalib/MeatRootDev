@@ -161,16 +161,20 @@
 									</div>
 									<div class="form-input">
 										<label><kk:msg  key="register.customer.body.postcode"/></label>
-									<%--	<input type="text" value="<s:property value="postcode" />" id="postcode" name="postcode" />--%>
 										<select id="postcode" name="postcode" >
-										<option style="display:none" value="">Select post code</option>
-										<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
-									    <% if( codes != null && codes.length != 0) { %>
-									    	<% java.util.Arrays.sort(codes); %>
-										    <% for(int i = 0; i < codes.length; i++){ %>
-										    	   <option  value="<%=codes[i]%>"  ><%=codes[i]%></option>
-										    <% } %>
-										<% } %>
+										 	<s:if test="%{postcode != null && postcode != ''}">
+												<option value="<s:property value="postcode"/>" selected><s:property value="postcode" /></option>
+											</s:if>
+											<s:else>
+												<option style="display:none" value="">Select post code</option> 
+											</s:else>
+											<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
+										    <% if( codes != null && codes.length != 0) { %>
+										    	<% java.util.Arrays.sort(codes); %>
+											    <% for(int i = 0; i < codes.length; i++){ %>
+											    	   <option  value="<%=codes[i]%>"  ><%=codes[i]%></option>
+											    <% } %>
+											<% } %>
 									    </select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
