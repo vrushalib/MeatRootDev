@@ -316,6 +316,14 @@
 			<result name="Checkout" type="json"></result>-->
 			<result name="success" type="json"></result>
 		</action>
+		<action name="BulkEditCartSubmit" class="com.konakart.actions.BulkEditCartAction">
+			<!-- <interceptor-ref name="json"> -->
+         	   <!-- <param name="enableSMD">true</param> -->
+        	<!-- </interceptor-ref> -->
+			<!--  <result name="ShowCart" type="json"></result>
+			<result name="Checkout" type="json"></result>-->
+			<result name="success" type="json"></result>
+		</action>
 		<action name="EditCustomer" class="com.konakart.actions.EditCustomerAction">
 			<result name="success" type="tiles">catalog.editcustomer.page</result>
 		</action>

@@ -40,6 +40,8 @@ public class EditCartSubmitAction extends BaseAction
     private String giftCertCode;
 
     private String rewardPoints;
+    
+    protected static final String SUCCESS = "success";
 
     public String execute()
     {
@@ -76,217 +78,9 @@ public class EditCartSubmitAction extends BaseAction
             String id = request.getParameter("id");
             String qtyStr = request.getParameter("qty");
 
-            if (action != null && id != null)
-            {
-
-                int basketId;
-                try
-                {
-                    basketId = Integer.parseInt(id);
-                } catch (Exception e1)
-                {
-                    return "ShowCart";
-                }
-
-                /*
-                 * We need to find the Basket object corresponding to the id passed in as a
-                 * parameter and we remove it or update it if required.
-                 */
-                if (kkAppEng.getCustomerMgr().getCurrentCustomer() != null
-                        && kkAppEng.getCustomerMgr().getCurrentCustomer().getBasketItems() != null)
-                {
-                    for (int j = 0; j < kkAppEng.getCustomerMgr().getCurrentCustomer()
-                            .getBasketItems().length; j++)
-                    {
-                        BasketIf b = kkAppEng.getCustomerMgr().getCurrentCustomer()
-                                .getBasketItems()[j];
-                        if (b.getId() == basketId)
-                        {
-                            if (action.equals("r"))
-                            {
-                                // remove the basket item
-                                kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */false);
-
-                                // insert an event
-                                insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
-                                        b.getProductId());
-                            } else if (action.equals("p"))
-                            {
-                                int numCanAdd = 0;
-                                if (b.getProduct() == null)
-                                {
-                                    numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
-                                            b.getProductId(), b.getOpts());
-                                } else
-                                {
-                                    numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
-                                            b.getProduct(), b.getOpts());
-                                }
-                                if (numCanAdd > 0)
-                                {
-                                    b.setQuantity(b.getQuantity() + 1);
-                                    kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
-                                } else
-                                {
-                                    // Add a message to say quota has been reached
-                                    addActionError(kkAppEng.getMsg("common.quota.reached",
-                                            new String[]
-                                            { String.valueOf(kkAppEng.getQuotaMgr()
-                                                    .getQuotaForProduct(b.getProductId(),
-                                                            b.getOpts())) }));
-                                }
-
-                            } else if (action.equals("m"))
-                            {
-                                b.setQuantity(b.getQuantity() - 1);
-                                // update the basket item quantity
-                                if (b.getQuantity() == 0)
-                                {
-                                    // remove the basket item
-                                    kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
-                                    false);
-
-                                    // insert an event
-                                    insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
-                                            b.getProductId());
-                                } else
-                                {
-                                    kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
-                                }
-                            } else if (action.equals("q"))
-                            {
-                                int quantity = 0;
-                                if (qtyStr != null)
-                                {
-                                    try
-                                    {
-                                        quantity = Integer.parseInt(qtyStr);
-                                    } catch (Exception e)
-                                    {
-                                        return "ShowCart";
-                                    }
-                                } else
-                                {
-                                    return "ShowCart";
-                                }
-
-                                if (quantity == 0)
-                                {
-                                    // remove the basket item
-                                    kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
-                                    false);
-
-                                    // insert an event
-                                    insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
-                                            b.getProductId());
-                                } else if (quantity > b.getQuantity())
-                                {
-                                    int numCanAdd = 0;
-                                    if (b.getProduct() == null)
-                                    {
-                                        numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
-                                                b.getProductId(), b.getOpts());
-                                    } else
-                                    {
-                                        numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
-                                                b.getProduct(), b.getOpts());
-                                    }
-                                    if (numCanAdd >= quantity)
-                                    {
-                                        b.setQuantity(quantity);
-                                        kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
-                                    } else if (numCanAdd > 0)
-                                    {
-                                        b.setQuantity(numCanAdd);
-                                        kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
-                                        // Add a message to say quota has been reached
-                                        addActionError(kkAppEng.getMsg("common.quota.reached",
-                                                new String[]
-                                                { String.valueOf(kkAppEng.getQuotaMgr()
-                                                        .getQuotaForProduct(b.getProductId(),
-                                                                b.getOpts())) }));
-                                    } else
-                                    {
-                                        // Add a message to say quota has been reached
-                                        addActionError(kkAppEng.getMsg("common.quota.reached",
-                                                new String[]
-                                                { String.valueOf(kkAppEng.getQuotaMgr()
-                                                        .getQuotaForProduct(b.getProductId(),
-                                                                b.getOpts())) }));
-                                    }
-                                } else if (quantity < b.getQuantity())
-                                {
-                                    b.setQuantity(quantity);
-                                    // update the basket item quantity
-                                    if (b.getQuantity() == 0)
-                                    {
-                                        // remove the basket item
-                                        kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
-                                        false);
-
-                                        // insert an event
-                                        insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
-                                                b.getProductId());
-                                    } else
-                                    {
-                                        kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            } else
-            {
-                /*
-                 * Set the coupon code in the order manager
-                 */
-                if (getCouponCode() == null || getCouponCode().length() == 0)
-                {
-                    kkAppEng.getOrderMgr().setCouponCode(null);
-                } else
-                {
-                    kkAppEng.getOrderMgr().setCouponCode(getCouponCode());
-                }
-
-                /*
-                 * Set the gift certificate code in the order manager
-                 */
-                if (getGiftCertCode() == null || getGiftCertCode().length() == 0)
-                {
-                    kkAppEng.getOrderMgr().setGiftCertCode(null);
-                } else
-                {
-                    kkAppEng.getOrderMgr().setGiftCertCode(getGiftCertCode());
-                }
-
-                /*
-                 * Set the reward points in the order manager. If someone tries to use more points
-                 * than those available, then use the points available
-                 */
-                kkAppEng.getOrderMgr().setRewardPoints(0);
-                if (kkAppEng.getRewardPointMgr().isEnabled())
-                {
-                    int pointsAvailable = kkAppEng.getRewardPointMgr().pointsAvailable();
-                    if (getRewardPoints() != null && getRewardPoints().length() > 0
-                            && pointsAvailable > 0)
-                    {
-                        try
-                        {
-                            int points = Integer.parseInt(getRewardPoints());
-                            if (points > pointsAvailable)
-                            {
-                                kkAppEng.getOrderMgr().setRewardPoints(pointsAvailable);
-                            } else if (points >= 0)
-                            {
-                                kkAppEng.getOrderMgr().setRewardPoints(points);
-                            }
-                        } catch (Exception e)
-                        {
-                        }
-                    }
-                }
+            String result = performEditOperation(action, id, qtyStr, kkAppEng);
+            if(!result.equals(SUCCESS)) {
+            	return result;
             }
 
             // Update the basket data
@@ -303,6 +97,223 @@ public class EditCartSubmitAction extends BaseAction
         {
             return super.handleException(request, e);
         }
+    }
+    
+    protected String performEditOperation(String action, String id, String qtyStr, KKAppEng kkAppEng) throws Exception {
+    	    	
+			if (action != null && id != null)
+			{
+
+			    int basketId;
+			    try
+			    {
+			        basketId = Integer.parseInt(id);
+			    } catch (Exception e1)
+			    {
+			        return "ShowCart";
+			    }
+
+			    /*
+			     * We need to find the Basket object corresponding to the id passed in as a
+			     * parameter and we remove it or update it if required.
+			     */
+			    if (kkAppEng.getCustomerMgr().getCurrentCustomer() != null
+			            && kkAppEng.getCustomerMgr().getCurrentCustomer().getBasketItems() != null)
+			    {
+			        for (int j = 0; j < kkAppEng.getCustomerMgr().getCurrentCustomer()
+			                .getBasketItems().length; j++)
+			        {
+			            BasketIf b = kkAppEng.getCustomerMgr().getCurrentCustomer()
+			                    .getBasketItems()[j];
+			            if (b.getId() == basketId)
+			            {
+			                if (action.equals("r"))
+			                {
+			                    // remove the basket item
+			                    kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */false);
+
+			                    // insert an event
+			                    insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
+			                            b.getProductId());
+			                } else if (action.equals("p"))
+			                {
+			                    int numCanAdd = 0;
+			                    if (b.getProduct() == null)
+			                    {
+			                        numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
+			                                b.getProductId(), b.getOpts());
+			                    } else
+			                    {
+			                        numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
+			                                b.getProduct(), b.getOpts());
+			                    }
+			                    if (numCanAdd > 0)
+			                    {
+			                        b.setQuantity(b.getQuantity() + 1);
+			                        kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
+			                    } else
+			                    {
+			                        // Add a message to say quota has been reached
+			                        addActionError(kkAppEng.getMsg("common.quota.reached",
+			                                new String[]
+			                                { String.valueOf(kkAppEng.getQuotaMgr()
+			                                        .getQuotaForProduct(b.getProductId(),
+			                                                b.getOpts())) }));
+			                    }
+
+			                } else if (action.equals("m"))
+			                {
+			                    b.setQuantity(b.getQuantity() - 1);
+			                    // update the basket item quantity
+			                    if (b.getQuantity() == 0)
+			                    {
+			                        // remove the basket item
+			                        kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
+			                        false);
+
+			                        // insert an event
+			                        insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
+			                                b.getProductId());
+			                    } else
+			                    {
+			                        kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
+			                    }
+			                } else if (action.equals("q"))
+			                {
+			                    int quantity = 0;
+			                    if (qtyStr != null)
+			                    {
+			                        try
+			                        {
+			                            quantity = Integer.parseInt(qtyStr);
+			                        } catch (Exception e)
+			                        {
+			                            return "ShowCart";
+			                        }
+			                    } else
+			                    {
+			                        return "ShowCart";
+			                    }
+
+			                    if (quantity == 0)
+			                    {
+			                        // remove the basket item
+			                        kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
+			                        false);
+
+			                        // insert an event
+			                        insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
+			                                b.getProductId());
+			                    } else if (quantity > b.getQuantity())
+			                    {
+			                        int numCanAdd = 0;
+			                        if (b.getProduct() == null)
+			                        {
+			                            numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
+			                                    b.getProductId(), b.getOpts());
+			                        } else
+			                        {
+			                            numCanAdd = kkAppEng.getQuotaMgr().getQuotaForProduct(
+			                                    b.getProduct(), b.getOpts());
+			                        }
+			                        if (numCanAdd >= quantity)
+			                        {
+			                            b.setQuantity(quantity);
+			                            kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
+			                        } else if (numCanAdd > 0)
+			                        {
+			                            b.setQuantity(numCanAdd);
+			                            kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
+			                            // Add a message to say quota has been reached
+			                            addActionError(kkAppEng.getMsg("common.quota.reached",
+			                                    new String[]
+			                                    { String.valueOf(kkAppEng.getQuotaMgr()
+			                                            .getQuotaForProduct(b.getProductId(),
+			                                                    b.getOpts())) }));
+			                        } else
+			                        {
+			                            // Add a message to say quota has been reached
+			                            addActionError(kkAppEng.getMsg("common.quota.reached",
+			                                    new String[]
+			                                    { String.valueOf(kkAppEng.getQuotaMgr()
+			                                            .getQuotaForProduct(b.getProductId(),
+			                                                    b.getOpts())) }));
+			                        }
+			                    } else if (quantity < b.getQuantity())
+			                    {
+			                        b.setQuantity(quantity);
+			                        // update the basket item quantity
+			                        if (b.getQuantity() == 0)
+			                        {
+			                            // remove the basket item
+			                            kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */
+			                            false);
+
+			                            // insert an event
+			                            insertCustomerEvent(kkAppEng, ACTION_REMOVE_FROM_CART,
+			                                    b.getProductId());
+			                        } else
+			                        {
+			                            kkAppEng.getBasketMgr().updateBasket(b, /* refresh */false);
+			                        }
+			                    }
+			                }
+			                break;
+			            }
+			        }
+			    }
+			} else
+			{
+			    /*
+			     * Set the coupon code in the order manager
+			     */
+			    if (getCouponCode() == null || getCouponCode().length() == 0)
+			    {
+			        kkAppEng.getOrderMgr().setCouponCode(null);
+			    } else
+			    {
+			        kkAppEng.getOrderMgr().setCouponCode(getCouponCode());
+			    }
+
+			    /*
+			     * Set the gift certificate code in the order manager
+			     */
+			    if (getGiftCertCode() == null || getGiftCertCode().length() == 0)
+			    {
+			        kkAppEng.getOrderMgr().setGiftCertCode(null);
+			    } else
+			    {
+			        kkAppEng.getOrderMgr().setGiftCertCode(getGiftCertCode());
+			    }
+
+			    /*
+			     * Set the reward points in the order manager. If someone tries to use more points
+			     * than those available, then use the points available
+			     */
+			    kkAppEng.getOrderMgr().setRewardPoints(0);
+			    if (kkAppEng.getRewardPointMgr().isEnabled())
+			    {
+			        int pointsAvailable = kkAppEng.getRewardPointMgr().pointsAvailable();
+			        if (getRewardPoints() != null && getRewardPoints().length() > 0
+			                && pointsAvailable > 0)
+			        {
+			            try
+			            {
+			                int points = Integer.parseInt(getRewardPoints());
+			                if (points > pointsAvailable)
+			                {
+			                    kkAppEng.getOrderMgr().setRewardPoints(pointsAvailable);
+			                } else if (points >= 0)
+			                {
+			                    kkAppEng.getOrderMgr().setRewardPoints(points);
+			                }
+			            } catch (Exception e)
+			            {
+			            }
+			        }
+			    }
+			}
+			return SUCCESS;
     }
 
     /**
