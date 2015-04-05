@@ -1,3 +1,7 @@
+	var updateCartRequestJSON = {};
+	var isRemoveClicked = false;
+	var isCartUpdated = false;
+
 /*
  * Sends an AJAX request to a struts action
  */
@@ -236,7 +240,7 @@ $(function() {
 	/*
 	 * Hover effects for Sliding Cart 
 	 */
-	var cartHover=0;
+	var cartHover=0;	
 	$("#shopping-cart").hover(
 			function() {
 				// in
@@ -260,6 +264,7 @@ $(function() {
 				// out
 				cartHover=0;
 				hideCart("#shopping-cart");
+				updateCartDetails();
 			});
 	
 	/*
@@ -395,7 +400,6 @@ $(function() {
 					$("#error_message").show();
 				}
 			});
-
 });
 
 var suggestedAreaCallback = function(result, textStatus, jqXHR) {
@@ -571,6 +575,9 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	}
 
 	var txt;
+	var itemsJSON = { 
+		    cartItems : []
+	};
 	/*
 	 * Update cart slide-out with new basket items
 	 */		
@@ -578,33 +585,96 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 		txt = '<div id="shopping-cart-items">';
 		for ( var i = 0; i < result.items.length; i++) {
 			var item = result.items[i];
+			var cartItemData = {};
 			txt += '<div class="shopping-cart-item">';
-			txt += '<a href="'+ getURL("SelectProd.action", new Array("prodId",item.prodId)) +'"><img src="'+item.prodImgSrc+'" border="0" alt="'+item.prodName+'" title="'+item.prodName+'"></a>';
-			txt += '<a href="'+ getURL("SelectProd.action", new Array("prodId",item.prodId)) +'" class="shopping-cart-item-title">'+item.prodName+'</a>';
+			//txt += '<a href="'+ getURL("SelectProd.action", new Array("prodId",item.prodId)) +'"><img src="'+item.prodImgSrc+'" border="0" alt="'+item.prodName+'" title="'+item.prodName+'"></a>';
+			txt += '<table><tr><td class="shopping-cart" width="80%"><a href="'+ getURL("SelectProd.action", new Array("prodId",item.prodId)) +'" class="shopping-cart-item-title">'+item.prodName+'</a>';
 			txt += getProdOptionText(item.opts, /*isWishList*/false);
-			txt += '<div class="shopping-cart-item-price">';
-			txt += item.formattedPrice;
-			txt += ' '+result.quantityMsg+': '+item.quantity;
+			txt += '<br/>'+'<div class="shopping-cart-item-price">';
+			txt += item.formattedPrice + '</div></td>';
+			txt += '<td class="cart-quantity" width="5%">'+item.quantity+'</td>';
+			txt += '<td width="5%"><a id="quantity-minus"><img src="images/icons/minus_icon.png" border="0" height="15px" width="15px" alt="Minus" title="Substract"></a></td>';
+			txt += '<td width="5%"><a id="quantity-plus"><img src="images/icons/plus_icon.png" border="0" height="15px" width="15px" alt="Add" title="Add"></a></td>';
+			txt += '<td width="5%"><a id="remove-item-from-cart"><img src="images/icons/remove_icon.png" border="0" height="15px" width="15px" alt="Remove" title="Remove"></a></td>';
+			txt += '</tr></table>';
 			txt += '</div>';
-			txt += '</div>';
+			
+			cartItemData = createItemJSON(item);
+			itemsJSON.cartItems.push(cartItemData);
 		}
 		txt += '</div>';
 		txt += '<div id="subtotal-and-checkout">';
 		txt += '<div class="subtotal">';
-		txt += '<div class="subtotal-label">'+result.subtotalMsg+'</div>';
-		txt += '<div class="subtotal-amount">'+result.basketTotal+'</div>';
+		txt += result.subtotalMsg+': '+result.basketTotal+'</div><br/>';
 		txt += '<div id="shopping-cart-checkout-button" class="button small-rounded-corners">'+result.checkoutMsg+'</div>';
-		txt += '</div>';
-		txt += '</div>';
+		txt += '</div>';		
 	} else {
 		txt = result.emptyCartMsg;
 	}
+	updateCartRequestJSON = itemsJSON;
+	
 	$("#shopping-cart-contents").html(txt);
 	
 	/*
 	 * Set event code on checkout button
 	 */
 	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+
+	/*
+	 * To handle "-" click from shopping cart
+	 */
+	$("#quantity-minus").click(function() {
+		if (item != null && item != undefined) {
+			if (item.quantity != 1) {
+				var updatedQty = item.quantity - 1;
+				updateQuantity(item.prodId, updatedQty);
+			}
+		}
+	});
+
+	/*
+	 * To handle "+" click from shopping cart
+	 */
+	$("#quantity-plus").click(function() {
+		if (item != null && item != undefined) {
+			var updatedQty = item.quantity + 1;
+			updateQuantity(item.prodId, updatedQty);
+		}
+	});
+	
+	/*
+	 * To remove item from shopping cart
+	 */
+	$("#remove-item-from-cart").click(function() {
+		var itemToRemoveIndex = null;
+		var itemToRemoveObj = null;
+		
+		if (item != null && item != undefined) {
+			// ToDo: to be optimized
+			if ((updateCartRequestJSON != null && updateCartRequestJSON != undefined) 
+					&& (updateCartRequestJSON.cartItems != null && updateCartRequestJSON.cartItems != undefined)) {
+								
+				if (updateCartRequestJSON.cartItems.length > 0) {
+					//itemsLabel:
+					for (var i = 0; i < updateCartRequestJSON.cartItems.length; i++) {	
+						$.each(updateCartRequestJSON.cartItems[i], function(key, value) {
+							if(key == "prodId" && value == item.prodId) {
+								itemToRemoveIndex = i;
+								itemToRemoveObj = updateCartRequestJSON.cartItems[i];
+							}
+						});
+					}
+				
+					itemToRemoveObj["action"] = "r";
+					updateCartRequestJSON.cartItems.splice(itemToRemoveIndex, 1,
+							itemToRemoveObj);
+					isRemoveClicked = true;
+					
+					updateCartDetails();
+				}
+			}
+		}
+	});
 	
 	/*
 	 * Update cart summary with new basket data
@@ -626,6 +696,85 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	 */
 	showCart("#shopping-cart");
 	window.setTimeout("hideCart('#shopping-cart')", 2000);
+};
+
+/*
+ * To create JSON object for each shopping cart item
+ */
+var createItemJSON = function(item) {
+	var objCartItem = {};
+	objCartItem["prodId"] = item.prodId;
+	//objCartItem["id"] = item.id;
+	objCartItem["quantity"] = item.quantity;
+	objCartItem["action"] = "q";
+	
+	return objCartItem;
+};
+
+/*
+ * To update item quantity from shopping cart
+ */
+var updateQuantity = function(itemProdId, updatedItemQty) {
+
+	var itemToUpdateIndex = null;
+	var itemToUpdateObj = null;
+
+	// ToDo: to be optimized
+	if ((updateCartRequestJSON != null && updateCartRequestJSON != undefined)
+			&& (updateCartRequestJSON.cartItems != null && updateCartRequestJSON.cartItems != undefined)) {
+		if (updateCartRequestJSON.cartItems.length > 0) {
+			//itemsLabel:
+			for (var i = 0; i < updateCartRequestJSON.cartItems.length; i++) {
+
+				$.each(updateCartRequestJSON.cartItems[i], function(key, value) {
+					if (key == "prodId" && value == itemProdId) {
+						itemToUpdateIndex = i;
+						itemToUpdateObj = updateCartRequestJSON.cartItems[i];
+						// break itemsLabel;
+					}
+				});
+			}
+
+			itemToUpdateObj["quantity"] = updatedItemQty;
+			updateCartRequestJSON.cartItems.splice(itemToUpdateIndex, 1,
+					itemToUpdateObj);
+			isCartUpdated = true;
+		}
+	}
+};
+
+/*
+ * To send cart data to backend
+ */
+var updateCartDetails = function() {
+	if (isRemoveClicked || isCartUpdated) {
+		console.log("Make server call - " + JSON.stringify(updateCartRequestJSON));
+		var url = "http://localhost:8080/konakart/BulkEditCartSubmit.action";
+		$.ajax({
+			type : 'POST',
+			contentType : "application/json",
+			url : url,
+			data : JSON.stringify(updateCartRequestJSON),
+			success : function(res) {
+				console.log("Cart Response" + res);
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				var errorMsg = "JSON API call to the URL " + url
+						+ " wasn't successful.";
+				if (textStatus != null && textStatus != '') {
+					errorMsg += "\nStatus:\t" + textStatus;
+				}
+				if (errorThrown != null && errorThrown != '') {
+					errorMsg += "\nError:\t" + errorThrown;
+				}
+				alert(errorMsg);
+			},
+			dataType : 'json'
+		});
+		
+		isRemoveClicked = false;
+		isCartUpdated = false;
+	}
 };
 
 /*

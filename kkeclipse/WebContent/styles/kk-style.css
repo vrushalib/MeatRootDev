@@ -88,9 +88,9 @@ table thead th {
 
 table td {
 	line-height: 15px;
-	padding: 4px 0;
+	/* padding: 4px 0; */
 	vertical-align: top;
-	width: 50%;
+	/* width: 50%; */
 }
 
 table .odd {
@@ -442,8 +442,6 @@ li.ui-menu-item a.ui-state-focus {
 	margin: 0px 0;
 	margin-bottom: 20px;
 	overflow: hidden;
-	width: 100%;
-	display: flex;
 }
 
 #main-menu .last-child {
@@ -461,9 +459,6 @@ li.ui-menu-item a.ui-state-focus {
 	color: #FFFFFF;
 	font-size: 16px;
 	text-decoration: none;
-	flex-grow: 1;
-	display : block;
-	border-right: 1px solid #b5b38a;
 }
 
 #main-menu a:hover {
@@ -1262,7 +1257,7 @@ ul,li {
 }
 
 .slide-out-contents {
-	background-color: #fff;
+	background-color: #e6e6e6;
 	behavior: url('script/pie/PIE.htc');
 	-moz-border-radius: 10px 0 10px 10px;
 	-webkit-border-radius: 10px 0 10px 10px;
@@ -1274,7 +1269,7 @@ ul,li {
 	position: absolute;
 	z-index: -1;
 	top: 23px;
-	width: 250px;
+	width: 463.97px;
 }
 
 #shopping-cart-contents {
@@ -1286,7 +1281,7 @@ ul,li {
 }
 
 #wish-list-items,#shopping-cart-items {
-	border-bottom: 1px #cfcfcf solid;
+	/* border-bottom: 1px #1e2125 solid; */
 	padding-bottom: 5px;
 	overflow-y: auto;
 	max-height: 500px;
@@ -1297,24 +1292,33 @@ ul,li {
 	display: table;
 	height: 1%; /* For IE 7 */
 	*display: block; /* For IE 7 */
-	width: 240px;
+	width: 100%;
+	border-bottom: 0.5px #1e2125 solid;
+}
+
+.cart-quantity {
+	padding-top: 10px;
+	text-align: center;
+	width: 5%;
 }
 
 .shopping-cart-item img {
 	float: left;
-	height: 60px;
-	margin: 7px 15px 5px 15px;
-	width: 60px;
+	height: 20px;
+	margin-top: 10px;
+	width: 20px;
 }
 
 .shopping-cart-item-title {
 	color: #000;
 	display: inline-block;
-	font-weight: bold;
+	font-family: Myriad Pro;
+	font-weight: semibold;
+	font-size: 10pt;
 	margin-top: 5px;
 	overflow: hidden;
 	text-decoration: none;
-	width: 150px;
+	width: auto;
 }
 
 .shopping-cart-item-title:hover {
@@ -1322,8 +1326,11 @@ ul,li {
 }
 
 .shopping-cart-item-price {
-	margin-left: 90px;
+	/*margin-left: 90px;*/
 	position: relative;
+	font-family: Myriad Pro;
+	font-weight: regular;
+	font-size: 10pt;
 }
 
 .shopping-cart-item-option {
@@ -1333,16 +1340,17 @@ ul,li {
 
 .subtotal {
 	color: #333;
-	font-size: 12px;
+	font-family: Myriad Pro;
+	font-size: 10pt;
 	font-weight: bold;
-	padding: 10px 0 5px 0;
+	padding: 5px 0 5px 0;
 }
 
 .subtotal-label {
 	float: left;
 	padding-top: 5px;
 	text-transform: uppercase;
-	width: 90px;
+	width: 60px;
 }
 
 .subtotal-amount {
@@ -1351,8 +1359,12 @@ ul,li {
 }
 
 #shopping-cart-checkout-button {
-	float: right;
-	font-weight: normal;
+	padding-top: 10px;
+	text-align: center;
+	font-weight: bold;
+	background-color: #ae1d22;
+	height: 15px;
+	width: 94%;
 }
 
 .slide-out-shadow {
