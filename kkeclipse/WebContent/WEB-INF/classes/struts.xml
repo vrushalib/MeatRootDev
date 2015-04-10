@@ -180,7 +180,7 @@
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
 			<result name="GlobalCollect"  type="chain">GlobalCollect</result>
 		</action>	
-		<action name="PayuResponse" class="com.konakart.actions.PayuAction">
+		<action name="PayuResponse" class="com.konakart.actions.ipn.PayuAction">
 		 	<result name="redirect" type="chain">${action}</result>
 			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
 			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
@@ -243,7 +243,8 @@
 			<result name="success" type="tiles">catalog.registercustomer.page</result>
 		</action>
 		<action name="CustomerRegistrationSubmit" class="com.konakart.actions.CustomerRegistrationSubmitAction">
-			<result name="success" type="chain">CatalogAfterLogin</result>		
+			<result name="success" type="chain">CatalogAfterLogin</result>	
+			<result name="ShowCartItems" type="chain">ShowCartItems</result>	
 			<result name="Checkout" type="chain">Checkout</result>		
 			<result name="ApplicationError" type="chain">CustomerRegistration</result>	
 			<result name="ChangedCountryForce" type="chain">

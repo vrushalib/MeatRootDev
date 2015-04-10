@@ -1,27 +1,25 @@
 package com.konakart.actions.ipn;
 
-import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.actions.gateways.BaseGatewayAction;
 import com.konakart.al.KKAppEng;
 import com.konakart.app.EmailOptions;
+import com.konakart.app.IpnHistory;
 import com.konakart.app.KKException;
-import com.konakart.app.OrderStatusHistory;
+import com.konakart.app.OrderUpdate;
 import com.konakart.appif.EmailOptionsIf;
-import com.konakart.appif.OrderIf;
-import com.konakart.appif.OrderProductIf;
-import com.konakart.appif.OrderStatusHistoryIf;
+import com.konakart.appif.IpnHistoryIf;
+import com.konakart.appif.OrderUpdateIf;
 import com.konakart.appif.SSOTokenIf;
 
 /**
@@ -29,20 +27,38 @@ import com.konakart.appif.SSOTokenIf;
  */
 public class PayuAction extends BaseGatewayAction {
 	private static final long serialVersionUID = 1L;
+	
+	protected Log log = LogFactory.getLog(PayuAction.class);
 
 	private static final String CUSTOM = "udf1";
 	private String comment;
-	// original key - "TCg9WT" and original salt - "k1rj3ntq" - test : Merchant
-	// key : VPcm4L, Salt : OmM6jqjz
+	// original key - "TCg9WT" and original salt - "k1rj3ntq" 
+	// Test key : VPcm4L, Salt : OmM6jqjz
 	private static final String SALT = "k1rj3ntq";
 	private static final String MERCHANT_KEY = "TCg9WT";
+	
+	//Used for payu sandbox
+	private static final String TEST_SALT = "OmM6jqjz";
+	private static final String MERCHANT_TEST_KEY = "VPcm4L";
 	private static final String PIPE = "|";
+	private static final String code = "payu";
+    private static final int RET4 = -4;
+    private static final String RET4_DESC = "There has been an unexpected exception. Please look at the log.";
 
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String sessionId = null;
 		KKAppEng kkAppEng = null;
+		String paymentStatus = null;
+		String txnId = null;
+		
+		 // Create these outside of try / catch since they are needed in the case of a general
+        // exception
+        IpnHistoryIf ipnHistory = new IpnHistory();
+        ipnHistory.setOrderId(-1);
+        ipnHistory.setModuleCode(code);
+
 
 		try {
 			if (request == null) {
@@ -62,21 +78,23 @@ public class PayuAction extends BaseGatewayAction {
 			// Get an instance of the KonaKart engine
 			kkAppEng = this.getKKAppEng(request, response);
 			SSOTokenIf token = kkAppEng.getEng().getSSOToken(uuid, /* deleteToken */
-			true);
+			false);
 			if (token == null) {
 				throw new Exception(
 						"The SSOToken from the PayPal callback is null");
 			}
 			sessionId = token.getSessionId();
-		/*	try {
+			try {
 				// Get the order id from custom1
 				int orderId = Integer.parseInt(token.getCustom1());
+				System.out.println("order id in response:"+orderId);
+				ipnHistory.setOrderId(orderId);
 			} catch (Exception e) {
 				throw new Exception("The SSOToken does not contain an order id");
-			}*/
+			}
 
 			/*
-			 * Use the session of the logged in user to initialise kkAppEng
+			 * Use the session of the logged in user to initialize kkAppEng
 			 */
 			try {
 				kkAppEng.getEng().checkSession(sessionId);
@@ -90,217 +108,90 @@ public class PayuAction extends BaseGatewayAction {
 			// Log in the user
 			kkAppEng.getCustomerMgr().loginBySession(sessionId);
 			System.out.println("User logged in");
+			
+			 // Process the parameters sent in the callback
+            StringBuffer sb = new StringBuffer();
+            Enumeration<?> en = request.getParameterNames();
+            while (en.hasMoreElements())
+            {
+                String paramName = (String) en.nextElement();
+                String paramValue = request.getParameter(paramName);
+                if (sb.length() > 0)
+                {
+                    sb.append("\n");
+                }
+                sb.append(paramName);
+                sb.append(" = ");
+                sb.append(paramValue);
 
-			// Check that order is there and valid
-			OrderIf checkoutOrder = kkAppEng.getOrderMgr().getCheckoutOrder();
-			if (checkoutOrder == null) {
-				return "Checkout";
-			}
+                // Capture important variables so that we can determine whether the transaction
+                // was successful or not
+                if (paramName != null)
+                {
+                    if (paramName.equalsIgnoreCase("status"))
+                    {
+                        paymentStatus = paramValue;
+                    } else if (paramName.equalsIgnoreCase("txnid"))
+                    {
+                        txnId = paramValue;
+                    }
+                }
+            }
 
-			System.out.println("status:" + request.getParameter("status")
-					+ ", unmapped status:"
-					+ request.getParameter("unmappedstatus"));
+            if (log.isDebugEnabled())
+            {
+                log.debug("PayPal CallBack data:");
+                log.debug(sb.toString());
+            }
 
-			// Status - failure and pending should be treated as failed
-			// transactions only (as per payu's integration doc)
-			String status = request.getParameter("status");
-			if (status.equals(TransactionStatus.FAILURE.toString())
-					|| status.equals(TransactionStatus.PENDING.toString())
-					|| !isTransactionTamperProof(request, checkoutOrder)) {
-				addFailedTransactionDetailsToOrder(kkAppEng, checkoutOrder);
-				return "TransactionFailed";
-			}
+            // Fill more details of the IPN history class
+            ipnHistory.setGatewayResult(paymentStatus);
+            ipnHistory.setGatewayFullResponse(sb.toString());
+            ipnHistory.setGatewayTransactionId(txnId);
+            ipnHistory.setGatewayCaptureId(request.getParameter("mihpayid"));
 
-			addComment(kkAppEng, checkoutOrder);
-			addDeliverySlotAndDeliveryDate(request, checkoutOrder);
-			/*
-			 * Check to see whether the order total is set to 0. Don't bother
-			 * with a payment gateway if it is.
-			 */
-			if (isOrderTotalZero(kkAppEng, checkoutOrder)) {
-				System.out.println("Order total is set to 0");
-				return "CheckoutFinished";
-			}
+            // If successful, we update the inventory as well as changing the state of the
+            // order.
+            OrderUpdateIf updateOrder = new OrderUpdate();
+            updateOrder.setUpdatedById(kkAppEng.getActiveCustId());
+            
+            if(paymentStatus.equals(TransactionStatus.SUCCESS.toString()) && isTransactionTamperProof(request)){
+	            int orderId = ipnHistory.getOrderId();
+	            kkAppEng.getEng().updateOrder(sessionId, orderId,com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS, 
+	            		/*sendEmail*/true, comment, updateOrder);
+	             // If the order payment was approved we update the inventory
+	            kkAppEng.getEng().updateInventory(sessionId, orderId);
+	            kkAppEng.getEng().sendOrderConfirmationEmail1(sessionId, orderId, /* langIdForOrder */ -1, getEmailOptions(kkAppEng));
+	            kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
+	            return "CheckoutFinished";
+            }
+            System.out.println("Payu status:"+paymentStatus+"  Payu Unmapped status:"+ request.getParameter("unmappedstatus"));
+            //Transaction failed. Update order status.
+            kkAppEng.getEng().updateOrder(sessionId, ipnHistory.getOrderId(),
+                    com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS, /*sendEmail*/ false, comment,
+                    updateOrder);
+            kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
+			return "TransactionFailed";
 
-			addPayuTransactionDetails(checkoutOrder, request);
-			kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payu");
-			int orderId = kkAppEng.getOrderMgr().saveOrder(
-			/* sendEmail */true, getEmailOptions(kkAppEng));
-			// Update the inventory
-			kkAppEng.getOrderMgr().updateInventory(orderId);
-			// If we received no exceptions, delete the basket
-			kkAppEng.getBasketMgr().emptyBasket();
-
-			return "CheckoutFinished";
 		} catch (Exception e) {
-			e.printStackTrace();
-			return KKLOGIN;
-		}
-
-	}
-
-	public void addFailedTransactionDetailsToOrder(KKAppEng kkAppEng,
-			OrderIf checkoutOrder) throws Exception {
-		try {
-			checkoutOrder
-					.setStatus(com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS);
-			kkAppEng.getOrderMgr().addPaymentDetailsToOrder("payment declined");
-			// Save the order
-			kkAppEng.getOrderMgr().saveOrder(
-			/* sendEmail */false, null);
-			// delete the basket
-			kkAppEng.getBasketMgr().emptyBasket();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e.getMessage());
-		}
-	}
-
-	public boolean isOrderTotalZero(KKAppEng kkAppEng, OrderIf checkoutOrder)
-			throws Exception {
-		BigDecimal orderTotal = checkoutOrder.getTotalIncTax();
-		try {
-			if (orderTotal != null
-					&& orderTotal.compareTo(java.math.BigDecimal.ZERO) == 0) {
-				// Set the order status
-				checkoutOrder
-						.setStatus(com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS);
-
-				// Save the order
-				int orderId = kkAppEng.getOrderMgr().saveOrder(
-				/* sendEmail */true, getEmailOptions(kkAppEng));
-
-				// Update the inventory
-				kkAppEng.getOrderMgr().updateInventory(orderId);
-
-				// If we received no exceptions, delete the basket
-				kkAppEng.getBasketMgr().emptyBasket();
-
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e.getMessage());
-		}
-
-		return false;
-	}
-
-	public void addPayuTransactionDetails(OrderIf checkoutOrder,
-			HttpServletRequest request) {
-		// set the transaction id as tracking number for the reference
-		checkoutOrder.setTrackingNumber(request.getParameter("txnid"));
-
-		/*
-		 * sets the status of a transaction as per the internal database of
-		 * PayU. PayU’s system has several intermediate status which are used
-		 * for tracking various activities internal to the system
-		 */
-		checkoutOrder.setCustom3(request.getParameter("unmappedstatus"));
-
-		/*
-		 * sets unique reference number created for each transaction at PayU’s
-		 * end
-		 */
-		checkoutOrder.setCustom4(request.getParameter("mihpayid"));
-
-		// Set the order status
-		checkoutOrder
-				.setStatus(com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS);
-	}
-
-	/**
-	 * To set the delivery time - morning/afternoon and delivery date today / tomorrow- depending on the time at which order is placed
-	 * special case for zorabian products
-	 * @param checkoutOrder
-	 */
-	public void addDeliverySlotAndDeliveryDate(HttpServletRequest request, OrderIf checkoutOrder) {
-		/*String deliverySlot = null;
-		String deliveryDay = null;
-		Date today = new Date();
-		Time now = new Time(today.getTime());
-
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
-		cal.set(Calendar.MINUTE, 00);
-		cal.set(Calendar.SECOND, 00);
-		Time twelveAm = new Time(cal.getTime().getTime());
-
-		cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
-		Time sixAm = new Time(cal.getTime().getTime());
-
-		cal.set(Calendar.HOUR_OF_DAY, 19); // 7 PM
-		Time sevenPm = new Time(cal.getTime().getTime());
-
-		cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
-		cal.set(Calendar.MINUTE, 30);
-		Time eightThirtyPm = new Time(cal.getTime().getTime());
-
-		if (orderContainsZorabianProduct(checkoutOrder)) {
-			System.out.println("Order contains zorabian product(s)");
-			deliverySlot = MORNING;
-			if (now.after(sevenPm)) {
-				deliveryDay = getDateAfterTomorrow();
-			} else if (now.before(sixAm)) {
-				deliveryDay = getDateTomorrow();
-			}
-		} else {
-			if (now.after(twelveAm) && now.before(sixAm)) {
-				deliverySlot = AFTERNOON;
-				deliveryDay = getDateToday();
-			} else if (now.before(eightThirtyPm)) {
-				deliverySlot = MORNING;
-				deliveryDay = getDateTomorrow();
-			} else {
-				deliverySlot = AFTERNOON;
-				deliveryDay = getDateTomorrow();
-			}
-		}
-		System.out.println("Delivery slot:" + deliverySlot + "  Delivery Day: "
-				+ deliveryDay); */
-		checkoutOrder.setCustom1(request.getParameter("udf2"));
-		checkoutOrder.setCustom2(request.getParameter("udf3"));
-
-	}
-
-	public boolean orderContainsZorabianProduct(OrderIf checkoutOrder) {
-		boolean flag = false;
-		OrderProductIf[] products = checkoutOrder.getOrderProducts();
-		for (OrderProductIf prod : products) {
-			if (prod.getProduct().getManufacturerName()
-					.equalsIgnoreCase("zorabian")) {
-				flag = true;
-			}
-		}
-		return flag;
-	}
-
-	public String getDateToday() {
-		return new SimpleDateFormat("MMM dd, yyyy").format(new Date());
-	}
-
-	public String getDateTomorrow() {
-		Calendar c = new GregorianCalendar();
-		c.add(Calendar.DATE, 1);
-		return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
-	}
-
-	public String getDateAfterTomorrow() {
-		Calendar c = new GregorianCalendar();
-		c.add(Calendar.DATE, 2);
-		return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
-	}
-
-	public void addComment(KKAppEng kkAppEng, OrderIf checkoutOrder) {
-		// Set the comment
-		String escapedComment = escapeFormInput(getComment());
-		OrderStatusHistoryIf osh = new OrderStatusHistory();
-		osh.setComments(escapedComment);
-		OrderStatusHistoryIf[] oshArray = new OrderStatusHistoryIf[1];
-		oshArray[0] = osh;
-		osh.setUpdatedById(kkAppEng.getOrderMgr().getIdForUserUpdatingOrder(
-				checkoutOrder));
-		checkoutOrder.setStatusTrail(oshArray);
+		            try
+		            {
+		                if (sessionId != null)
+		                {
+		                    ipnHistory.setKonakartResultDescription(RET4_DESC);
+		                    ipnHistory.setKonakartResultId(RET4);
+		                    if (kkAppEng != null)
+		                    {
+		                        kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
+		                    }
+		                }
+		            } catch (KKException e1)
+		            {
+		                e1.printStackTrace();
+		            }
+		            e.printStackTrace();
+		            return KKLOGIN;
+		        } 
 	}
 
 	/**
@@ -365,12 +256,12 @@ public class PayuAction extends BaseGatewayAction {
 	 * @param checkoutOrder
 	 * @return true/false
 	 */
-	public Boolean isTransactionTamperProof(HttpServletRequest request,
-			OrderIf checkoutOrder) {
+	public Boolean isTransactionTamperProof(HttpServletRequest request) {
 		// sha512(SALT|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key)
 		String hash = request.getParameter("hash");
+		String key = request.getParameter("key");
 		StringBuffer hashString = new StringBuffer();
-		hashString = hashString.append(SALT).append(PIPE)
+		hashString = hashString.append(getSalt(key)).append(PIPE)
 				.append(request.getParameter("status")).append(PIPE)
 				.append(PIPE).append(PIPE).append(PIPE).append(PIPE)
 				.append(PIPE).append(PIPE).append(PIPE).append(request.getParameter("udf3"))
@@ -381,27 +272,25 @@ public class PayuAction extends BaseGatewayAction {
 				.append(request.getParameter("productinfo")).append(PIPE)
 				.append(request.getParameter("amount")).append(PIPE)
 				.append(request.getParameter("txnid")).append(PIPE)
-				.append(MERCHANT_KEY);
+				.append(key);
 		String calculatedHash = hashCal("SHA-512", hashString.toString());
 		System.out.println("hashstring:" + hashString);
 		System.out.println("hash:" + hash + " \ncalculated hash:"
 				+ calculatedHash);
 		return hash.equals(calculatedHash);
 	}
-
-	/**
-	 * @return the comment
-	 */
-	public String getComment() {
-		return comment;
-	}
-
-	/**
-	 * @param comment
-	 *            the comment to set
-	 */
-	public void setComment(String comment) {
-		this.comment = comment;
+	
+	private String getSalt(String key){
+		if(key == null || key.isEmpty()){
+			return null;
+		}
+		if(key.equals(MERCHANT_KEY)){
+			return SALT;
+		}
+		if(key.equals(MERCHANT_TEST_KEY)){
+			return TEST_SALT;
+		}
+		return null;
 	}
 
 }

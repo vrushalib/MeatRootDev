@@ -1,20 +1,3 @@
-//
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
-//
-// DS Data Systems and KonaKart and their respective logos, are 
-// trademarks of DS Data Systems UK Ltd. All rights reserved.
-//
-// The information in this document is free software; you can redistribute 
-// it and/or modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// 
-// This software is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-
 package com.konakartadmin.modules.payment.payu;
 
 import java.util.Date;
@@ -25,7 +8,7 @@ import com.konakartadmin.bl.KKAdminBase;
 import com.konakartadmin.modules.PaymentModule;
 
 /**
- * PayU
+ * PayU payment module
  * 
  */
 public class Payu extends PaymentModule
@@ -37,7 +20,7 @@ public class Payu extends PaymentModule
     {
         if (configKeyStub == null)
         {
-            setConfigKeyStub(super.getConfigKeyStub() + "PAYU");
+            setConfigKeyStub(super.getConfigKeyStub() + "_PAYU");
         }
         return configKeyStub;
     }
@@ -48,11 +31,11 @@ public class Payu extends PaymentModule
     }
 
     /**
-     * @return the implementation filename - for compatibility with osCommerce we use the php name
+     * @return the implementation filename
      */
     public String getImplementationFileName()
     {
-        return "payu.php";
+        return "Payu";
     }
 
     /**
@@ -70,7 +53,7 @@ public class Payu extends PaymentModule
     {
         if (configs == null)
         {
-            configs = new KKConfiguration[5];
+            configs = new KKConfiguration[7];
         }
 
         if (configs[0] != null && !Utils.isBlank(configs[0].getConfigurationKey()))
@@ -81,36 +64,85 @@ public class Payu extends PaymentModule
         Date now = KKAdminBase.getKonakartTimeStampDate();
 
         int i = 0;
-        configs[i++] = new KKConfiguration("Enable PayU Module",
-                "MODULE_PAYMENT_PAYU_STATUS", "True",
-                "Do you want to accept online payments using PayU?", 6, 1, "",
-                "tep_cfg_select_option(array('True', 'False'),", now);
-        configs[i++] = new KKConfiguration("Payment Zone", "MODULE_PAYMENT_PAYU_ZONE", "0",
-                "If a zone is selected, only enable this payment method for that zone.", 6, 2,
-                "tep_get_zone_class_title", "tep_cfg_pull_down_zone_classes(", now);
-        configs[i++] = new KKConfiguration("Set Order Status",
-                "MODULE_PAYMENT_PAYU_ORDER_STATUS_ID", "0",
-                "Set the status of orders made with this payment module to this value", 6, 0,
-                "tep_get_order_status_name", "tep_cfg_pull_down_order_statuses(", now);
-        configs[i++] = new KKConfiguration("Sort order of display",
-                "MODULE_PAYMENT_PAYU_SORT_ORDER", "0",
-                "Sort order of display. Lowest is displayed first.", 6, 0, "", "", now);
+        int groupId = 6;
 
-        // This last PAYU configuration is not used other than to provide an example of using the
-        // FileUpload configuration variable set_function
+        configs[i] = new KKConfiguration(
+        /* title */"PayU Status",
+        /* key */"MODULE_PAYMENT_PAYU_STATUS",
+        /* value */"true",
+        /* description */"If set to false, the Payu module will be unavailable",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Sort order of display",
+        /* key */"MODULE_PAYMENT_PAYU_SORT_ORDER",
+        /* value */"0",
+        /* description */"Sort Order of Payu module on the UI. Lowest is displayed first.",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Success URL",
+        /* key */"MODULE_PAYMENT_PAYU_SUCCESS_URL",
+        /* value */"http://meatroot.com/PayuResponse.action",
+        /* description */"URL used by PayU to callback Konakart in case of successful transaction",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Failure URL",
+        /* key */"MODULE_PAYMENT_PAYU_FAILURE_URL",
+        /* value */"http://meatroot.com/PayuResponse.action",
+        /* description */"URL used by PayU to callback Konakart in case of failed transaction",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
         
-        String miscFilename = null;
-        String osName = System.getProperty("os.name");
-        if (osName.startsWith("Win"))
-        {
-            miscFilename = "C:/Temp/payu_misc.properties";
-        } else
-        {
-            miscFilename = "/var/tmp/payu_misc.properties";
-        }
-        configs[i++] = new KKConfiguration("Miscellaneous Config File",
-                "MODULE_PAYMENT_PAYU_MISC_CONFIG_FILE", miscFilename,
-                "Miscellaneous Configuration File (not used).", 6, 6, "", "FileUpload", now);
+        configs[i] = new KKConfiguration(
+                /* title */"Cancel URL",
+                /* key */"MODULE_PAYMENT_PAYU_CANCEL_URL",
+                /* value */"http://meatroot.com/PayuResponse.action",
+                /* description */"URL used by PayU when a user cancels a transaction",
+                /* groupId */groupId,
+                /* sortO */i++,
+                /* useFun */"",
+                /* setFun */"",
+                /* dateAdd */now);
+        
+        configs[i] = new KKConfiguration(
+                /* title */"Drop categories",
+                /* key */"MODULE_PAYMENT_PAYU_DROP_CATEGORIES",
+                /* value */"EMI,COD",
+                /* description */"Option to disable the unwanted payment methods in payu",
+                /* groupId */groupId,
+                /* sortO */i++,
+                /* useFun */"",
+                /* setFun */"",
+                /* dateAdd */now);
+
+
+        configs[i] = new KKConfiguration(
+        /* title */"Test Mode",
+        /* key */"MODULE_PAYMENT_PAYU_TEST_MODE",
+        /* value */"true",
+        /* description */"Forces KonaKart to use the Test server of payu",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* dateAdd */now);
 
         return configs;
     }

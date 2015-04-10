@@ -243,7 +243,8 @@
 			<result name="success" type="tiles">catalog.registercustomer.page</result>
 		</action>
 		<action name="CustomerRegistrationSubmit" class="com.konakart.actions.CustomerRegistrationSubmitAction">
-			<result name="success" type="chain">CatalogAfterLogin</result>		
+			<result name="success" type="chain">CatalogAfterLogin</result>	
+			<result name="ShowCartItems" type="chain">ShowCartItems</result>	
 			<result name="Checkout" type="chain">Checkout</result>		
 			<result name="ApplicationError" type="chain">CustomerRegistration</result>	
 			<result name="ChangedCountryForce" type="chain">

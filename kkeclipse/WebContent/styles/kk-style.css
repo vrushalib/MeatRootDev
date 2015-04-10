@@ -993,6 +993,18 @@ display: table;
 	float: right;
 }
 
+.final-checkout-button {
+	background: #1a6baa; ;
+	width: 130px;
+	padding-left: 5px; 
+	padding-right: 5px; 
+	text-align: center;
+}
+
+.final-checkout-button:hover {
+	background: #1a6baa;;
+}
+
 .item-buttons-container {
 	height: 150px;
 	position: absolute;

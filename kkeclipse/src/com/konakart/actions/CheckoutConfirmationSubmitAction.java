@@ -18,6 +18,9 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -141,13 +144,18 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 				 * approved.
 				 */
 
+				System.out.println("User selected to pay online");
+				addDeliverySlotAndDeliveryDate(request, checkoutOrder);
+				
 				// Set the order status
 				checkoutOrder
 						.setStatus(com.konakart.bl.OrderMgr.WAITING_PAYMENT_STATUS);
-
+				checkoutOrder.setTrackingNumber(getTxnId());
+				checkoutOrder.setCustom4(kkAppEng.getSessionId());
+				
 				// Save the order
 				int orderId = kkAppEng.getOrderMgr().saveOrder(
-						/* sendEmail */true, getEmailOptions(kkAppEng));
+						/* sendEmail */false, getEmailOptions(kkAppEng));
 
 				// Get a fully populated PaymentDetails object and attach it to
 				// the order
@@ -278,7 +286,34 @@ public class CheckoutConfirmationSubmitAction extends BaseAction {
 		checkoutOrder.setCustom2(request.getParameter("udf3"));
 	}
 
+	private String getTxnId(){
+		Random rand = new Random();
+		String rndm = Integer.toString(rand.nextInt())+(System.currentTimeMillis() / 1000L);
+		return hashCal("SHA-256",rndm).substring(0,20);
+	}
+	
+	private String hashCal(String type,String str){
+		byte[] hashseq=str.getBytes();
+		StringBuffer hexString = new StringBuffer();
+		try{
+		MessageDigest algorithm = MessageDigest.getInstance(type);
+		algorithm.reset();
+		algorithm.update(hashseq);
+		byte messageDigest[] = algorithm.digest();
 
+		for (int i=0;i<messageDigest.length;i++) {
+			String hex=Integer.toHexString(0xFF & messageDigest[i]);
+			if(hex.length()==1) hexString.append("0");
+			hexString.append(hex);
+		}
+			
+		}catch(NoSuchAlgorithmException nsae){
+			System.out.println("No such algorithm as "+type+" exists");
+		}
+		return hexString.toString();
+	}
+
+	
 	/**
 	 * Instantiate an EmailOptions object. Edit this method if you have
 	 * installed Enterprise Extensions and want to attach an invoice to the

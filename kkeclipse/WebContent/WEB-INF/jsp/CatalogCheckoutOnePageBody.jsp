@@ -26,10 +26,9 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
-<%@ page import="java.util.Random, java.security.MessageDigest, java.security.NoSuchAlgorithmException, java.util.Date, java.sql.Time, java.util.Calendar,
+<%@ page import=" java.util.Date, java.sql.Time, java.util.Calendar,
                  java.util.GregorianCalendar, java.text.SimpleDateFormat" %>
-<%@ page import="com.konakart.app.PaymentDetails, 
-                 com.konakart.app.SSOToken, com.konakart.appif.KKEngIf, com.konakart.appif.SSOTokenIf" %>
+<%@ page import="com.konakart.app.PaymentDetails" %>
 
 <script type="text/javascript">	
 
@@ -141,8 +140,9 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	
 };
 
-function preProcessForm(form, continueBtn){
-/*	$('#'+form).append('<input type="hidden" name="udf2" value="comment added" /> ');*/
+function preprocessForm(form, continueBtn) {
+	/*$("#continue-button").css("background", "#a9a9a9");
+	$("#continue-button").css( "background-image", "url('../images/loader.gif')" );*/
 	formValidate(form, continueBtn);
 }
 
@@ -221,16 +221,16 @@ function shippingRefresh(storeId) {
 }
 
 function paymentRefresh() {	
-	/*var paymentDetails = document.getElementById("paymentDetails");
+	var paymentDetails = document.getElementById("paymentDetails");
 	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
-	setLoading();*/
-	
+	setLoading();
+
 		var selectedPaymentMode = $("#paymentDetails").val();
-		if(selectedPaymentMode == '1'){//cod
-		    $('#form1').attr('action', 'CheckoutConfirmationSubmit.action');
+		if(selectedPaymentMode == 'cod'){//cod
+		    $('#continue-button').text("Confirm Order");
 		}else{
-			$('#form1').attr('action', 'https://secure.payu.in/_payment');
+			$('#continue-button').text("Proceed to Payment");
 		}
 }
 
@@ -398,68 +398,6 @@ public boolean empty(String s)
 		return false;
 	}
 %>
-<%!
-	public String hashCal(String type,String str){
-		byte[] hashseq=str.getBytes();
-		StringBuffer hexString = new StringBuffer();
-		try{
-		MessageDigest algorithm = MessageDigest.getInstance(type);
-		algorithm.reset();
-		algorithm.update(hashseq);
-		byte messageDigest[] = algorithm.digest();
-
-		for (int i=0;i<messageDigest.length;i++) {
-			String hex=Integer.toHexString(0xFF & messageDigest[i]);
-			if(hex.length()==1) hexString.append("0");
-			hexString.append(hex);
-		}
-			
-		}catch(NoSuchAlgorithmException nsae){
-			System.out.println("No such algorithm as "+type+" exists");
-		}
-		return hexString.toString();
-	}
-%>
-
-
-<%!
-/* Creates a string for product description to send to the payment gateway- productName_quantity_pricePerUnit (separated by space)*/
-	public String getProductsForPayment( com.konakart.appif.OrderProductIf [] orderProducts){
-		StringBuffer prods = new StringBuffer();
-		for(int i = 0; i < orderProducts.length; i++){
-			prods.append(orderProducts[i].getName() + "_" + orderProducts[i].getQuantity() + "_" + orderProducts[i].getPrice());
-			prods.append(" ");
-		}
-	//	return prods.substring(0, prods.length()-1); // to remove last comma	
-	return prods.toString().trim();
-	}
-%>
-
-<%!
-/*
- * Create a session here which will be used by the IPN callback
- */
- String getUuid(com.konakart.appif.OrderIf checkoutOrder, com.konakart.al.KKAppEng kkEngine ){
-	SSOTokenIf ssoToken = new SSOToken();
-	String uuid = null;
-	try{
-	String sessionId = kkEngine.getSessionId();
-	if (sessionId == null)
-	{
-	    System.out.println("Unable to get session id for the logged in user");
-	}
-	ssoToken.setSessionId(sessionId);
-	/*
-	 * Save the SSOToken with a valid sessionId 
-	 */
-	uuid = kkEngine.getEng().saveSSOToken(ssoToken);
-	}
-	catch(Exception e){
-		e.printStackTrace();
-	}
-	return uuid;
-}
-%>
 
 <%!
 public void addDeliverySlotAndDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
@@ -569,23 +507,8 @@ public String getDateAfterTomorrow() {
 %>
 
 			<%  
-						String merchant_key= "TCg9WT";
-						String salt= "k1rj3ntq";
-						String base_url = "https://secure.payu.in";
-						String action1 = base_url.concat("/_payment");
+						String continueButtonText = ((String)request.getAttribute("payment")).equals("cod") ? "Checkout Order" : "Proceed to Payment";
 						int error=0;
-						String hashString="";
-						String drop_category = "EMI,COD";
-						String amount = order.getTotalIncTax().toString();
-						String firstname = order.getDeliveryName();
-						String email = cust.getEmailAddr();
-						String phone = order.getDeliveryTelephone();
-						String productinfo = getProductsForPayment(order.getOrderProducts());
-						String surl = "http://meatroot.com/PayuResponse.action";
-						String furl = "http://meatroot.com/PayuResponse.action"; 
-						String txnid = "";
-						String udf1 = getUuid(order, kkEng);//kkEng.getSessionId();
-						System.out.println("uuid: "+udf1);
 						if(orderContainsZorabianProduct(order)){
 							addDeliverySlotAndDeliveryDateForZorabian(order);
 						}else {
@@ -595,20 +518,11 @@ public String getDateAfterTomorrow() {
 						String udf3 = order.getCustom2();
 						System.out.println("delivery slot: "+ udf2 + " delivery date : "+ udf3);
 						String deliveryMessage = getOrderMessage(order.getCustom1(), order.getCustom2(), Boolean.valueOf(order.getCustom3()));
-						
-						String hash = "";
-						Random rand = new Random();
-						String rndm = Integer.toString(rand.nextInt())+(System.currentTimeMillis() / 1000L);
-						txnid=hashCal("SHA-256",rndm).substring(0,20);
-						
-						hashString = merchant_key+"|"+txnid+"|"+amount+"|"+productinfo+"|"+firstname+"|"+email+"|"+udf1+"|"+udf2+"|"+udf3+"||||||||"+salt;
-						hash = hashCal("SHA-512",hashString);
-						System.out.println("hashstring:"+hashString+" hash:"+hash);
 				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
 	    		    <div id = "deliveryMessage" style="font-size: 13.5px"> <%=deliveryMessage %></div><br>
-		    		<form id="form1" action="<%=action1 %>" method="post" class="form-section">
+		    		<form id="form1" action="CheckoutConfirmationSubmit.action" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
 		    				<div id="delivery-address" class="order-confirmation-area">
@@ -666,13 +580,28 @@ public String getDateAfterTomorrow() {
 								     <div id="payment-method" class="order-confirmation-area-content-select">
 										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
 										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
-											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>
-											<%-- 	<s:set scope="request" var="payment"  value="payment"/> 						
-												<% String payment = ((String)request.getAttribute("payment"));%> --%>
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+												<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
+												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
+													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
+													<%if (payment.equals(pd.getCode())){ %>
+														<option  value="<%=pd.getCode()%>" selected="selected"><%=pd.getDescription()%></option>
+													<% } else { %>
+														<option  value="<%=pd.getCode()%>"><%=pd.getDescription()%></option>
+													<% } %>
+												<% } %>										
+											<%} else {%>
+												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
+											<% } %>
+										
+									<%--		<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>
+											 	<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
 												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
 													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
 													<%if ("cod".equals(pd.getCode())){ %>
-														<% order.getPaymentDetails().setPaymentType(PaymentDetails.COD);//COD %>
+													 	<% order.getPaymentDetails().setPaymentType(PaymentDetails.COD); %>
 														<option  value="<%=pd.getPaymentType()%>" ><%=pd.getDescription()%></option>
 													<% } else { %>
 														<option  value="<%=pd.getPaymentType()%>" selected="selected"><%=pd.getDescription()%></option>
@@ -680,10 +609,10 @@ public String getDateAfterTomorrow() {
 												<% } %>										
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
-											<% } %>
+											<% } %>   --%>
 										</select> 
 									</div>
-								<%-- 	<div id="promotion-codes">
+								 	<%-- <div id="promotion-codes">
 										<div id="promotion-codes-container">
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>
 									    		<div class="promotion-codes-field">				
@@ -884,25 +813,12 @@ public String getDateAfterTomorrow() {
 							</div>
 						</div>			
 						
-						<input type="hidden" value="<%=merchant_key%>" name="key"/>
-						<input type="hidden" value="<%=salt%>" name="salt"/>
-						<input id="hash" type="hidden" value="<%=hash%>" name="hash"/>
-						<input type="hidden" value="<%=amount%>" name="amount"/>
-						<input type="hidden" value="<%=firstname%>" name="firstname"/>
-						<input type="hidden" value="<%=email%>" name="email"/>
-						<input type="hidden" value="<%=phone%>" name="phone"/>
-						<input type="hidden" value="<%=productinfo%>" name="productinfo"/>
-						<input type="hidden" value="<%=surl%>" name="surl"/>
-						<input type="hidden" value="<%=furl%>" name="furl"/>
-						<input type="hidden" value="<%=txnid%>" name="txnid"/> 
-						<input type="hidden" value="<%=drop_category%>" name="drop_category"/>
-						<input type="hidden" value="<%=udf1%>" name="udf1"/>
 						<input type="hidden" value="<%=udf2%>" name="udf2"/>
 						<input type="hidden" value="<%=udf3%>" name="udf3"/>
 						
 						<div id="confirm-order-button-container">	
-						<a onclick="javascript:preProcessForm('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners" style="background-color:#1a6baa; font-weight:bolder;">
-								<span><kk:msg  key="common.pay"/></span>
+						<a onclick="javascript:preprocessForm('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >
+								<%=continueButtonText %>
 							</a> 
 						</div>
 					</form>			    	
