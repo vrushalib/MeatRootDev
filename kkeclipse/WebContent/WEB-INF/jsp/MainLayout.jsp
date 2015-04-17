@@ -49,6 +49,7 @@
     <% } else { %>
 		<html>
 			<head>
+			    <meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
 				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
 				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />

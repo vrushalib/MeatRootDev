@@ -21,6 +21,8 @@ import com.konakart.appif.EmailOptionsIf;
 import com.konakart.appif.IpnHistoryIf;
 import com.konakart.appif.OrderUpdateIf;
 import com.konakart.appif.SSOTokenIf;
+import com.konakart.bl.OrderMgr;
+import com.opensymphony.xwork2.ActionSupport;
 
 /**
  * Gets called after returning from Payu
@@ -32,8 +34,6 @@ public class PayuAction extends BaseGatewayAction {
 
 	private static final String CUSTOM = "udf1";
 	private String comment;
-	// original key - "TCg9WT" and original salt - "k1rj3ntq" 
-	// Test key : VPcm4L, Salt : OmM6jqjz
 	private static final String SALT = "k1rj3ntq";
 	private static final String MERCHANT_KEY = "TCg9WT";
 	
@@ -43,7 +43,7 @@ public class PayuAction extends BaseGatewayAction {
 	private static final String PIPE = "|";
 	private static final String code = "payu";
     private static final int RET4 = -4;
-    private static final String RET4_DESC = "There has been an unexpected exception. Please look at the log.";
+    private static final String RET4_DESC = "There has been an unexpected exception. Please check logs.";
 
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
@@ -150,29 +150,32 @@ public class PayuAction extends BaseGatewayAction {
             ipnHistory.setGatewayTransactionId(txnId);
             ipnHistory.setGatewayCaptureId(request.getParameter("mihpayid"));
 
-            // If successful, we update the inventory as well as changing the state of the
+            // If successful, we update the inventory as well as the status of the
             // order.
             OrderUpdateIf updateOrder = new OrderUpdate();
             updateOrder.setUpdatedById(kkAppEng.getActiveCustId());
-            
-            if(paymentStatus.equals(TransactionStatus.SUCCESS.toString()) && isTransactionTamperProof(request)){
-	            int orderId = ipnHistory.getOrderId();
-	            kkAppEng.getEng().updateOrder(sessionId, orderId,com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS, 
-	            		/*sendEmail*/true, comment, updateOrder);
-	             // If the order payment was approved we update the inventory
-	            kkAppEng.getEng().updateInventory(sessionId, orderId);
-	            kkAppEng.getEng().sendOrderConfirmationEmail1(sessionId, orderId, /* langIdForOrder */ -1, getEmailOptions(kkAppEng));
+            int orderId = ipnHistory.getOrderId();
+            if(kkAppEng.getEng().getOrderStatus(sessionId, orderId) == OrderMgr.WAITING_PAYMENT_STATUS){
+	            if(paymentStatus.equals(TransactionStatus.SUCCESS.toString()) && isTransactionTamperProof(request)){
+		            kkAppEng.getEng().updateOrder(sessionId, orderId, OrderMgr.PAYMENT_RECEIVED_STATUS, 
+		            		/*sendEmail*/true, comment, updateOrder);
+		             // If the order payment was approved we update the inventory
+		            kkAppEng.getEng().updateInventory(sessionId, orderId);
+		            kkAppEng.getEng().sendOrderConfirmationEmail1(sessionId, orderId, /* langIdForOrder */ -1, getEmailOptions(kkAppEng));
+		            kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
+		            return "CheckoutFinished";
+	            }
+	            System.out.println("Payu status:"+paymentStatus+"  Payu Unmapped status:"+ request.getParameter("unmappedstatus"));
+	            //Transaction failed. Update order status.
+	            kkAppEng.getEng().updateOrder(sessionId, ipnHistory.getOrderId(),
+	                    com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS, /*sendEmail*/ false, comment,
+	                    updateOrder);
 	            kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
-	            return "CheckoutFinished";
+				return "TransactionFailed";
             }
-            System.out.println("Payu status:"+paymentStatus+"  Payu Unmapped status:"+ request.getParameter("unmappedstatus"));
-            //Transaction failed. Update order status.
-            kkAppEng.getEng().updateOrder(sessionId, ipnHistory.getOrderId(),
-                    com.konakart.bl.OrderMgr.PAYMENT_DECLINED_STATUS, /*sendEmail*/ false, comment,
-                    updateOrder);
+            System.out.println("Multiple callback from the gateway for order id:"+orderId);
             kkAppEng.getEng().saveIpnHistory(sessionId, ipnHistory);
-			return "TransactionFailed";
-
+            return ActionSupport.NONE;
 		} catch (Exception e) {
 		            try
 		            {
@@ -263,8 +266,10 @@ public class PayuAction extends BaseGatewayAction {
 		StringBuffer hashString = new StringBuffer();
 		hashString = hashString.append(getSalt(key)).append(PIPE)
 				.append(request.getParameter("status")).append(PIPE)
-				.append(PIPE).append(PIPE).append(PIPE).append(PIPE)
-				.append(PIPE).append(PIPE).append(PIPE).append(request.getParameter("udf3"))
+				.append(request.getParameter("udf10"))
+				.append(PIPE).append(request.getParameter("udf9")).append(PIPE).append(request.getParameter("udf8")).append(PIPE).append(request.getParameter("udf7")).append(PIPE).append(request.getParameter("udf6"))
+				.append(PIPE).append(request.getParameter("udf5")).append(PIPE).append(request.getParameter("udf4")).append(PIPE)
+				.append(request.getParameter("udf3"))
 				.append(PIPE).append(request.getParameter("udf2"))
 				.append(PIPE).append(request.getParameter("udf1")).append(PIPE)
 				.append(request.getParameter("email")).append(PIPE)

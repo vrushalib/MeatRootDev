@@ -277,7 +277,6 @@ public class Payu extends BasePaymentModule implements PaymentInterface
          * Create a session here which will be used by the IPN callback
          */
         SSOTokenIf ssoToken = new SSOToken();
-     //   String sessionId = getEng().login("poojabihani11@gmail.com", "princess");//new KKAppEng(getEng().getEngConf()).getSessionId();
         String sessionId = order.getCustom4();//sessionId
         System.out.println("sessionid in payu:"+sessionId);
         if (sessionId == null)

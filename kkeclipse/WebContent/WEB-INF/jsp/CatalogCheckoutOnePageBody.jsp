@@ -140,12 +140,6 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	
 };
 
-function preprocessForm(form, continueBtn) {
-	/*$("#continue-button").css("background", "#a9a9a9");
-	$("#continue-button").css( "background-image", "url('../images/loader.gif')" );*/
-	formValidate(form, continueBtn);
-}
-
 function getOrderTotalRow(ot) {	
 	var rowClass = "costs-and-promotions";
 	if (ot.className == "ot_total") rowClass = "shopping-cart-total";
@@ -817,7 +811,7 @@ public String getDateAfterTomorrow() {
 						<input type="hidden" value="<%=udf3%>" name="udf3"/>
 						
 						<div id="confirm-order-button-container">	
-						<a onclick="javascript:preprocessForm('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >
+						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >
 								<%=continueButtonText %>
 							</a> 
 						</div>
