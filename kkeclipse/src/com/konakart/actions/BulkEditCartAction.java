@@ -1,6 +1,8 @@
 package com.konakart.actions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +11,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.konakart.actions.objects.CartItem;
 import com.konakart.actions.objects.ExtendedBasketJson;
+import com.konakart.al.BasketMgr;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.json.BasketJson;
 import com.konakart.al.json.OptionJson;
@@ -99,28 +102,48 @@ public class BulkEditCartAction extends EditCartSubmitAction {
                 return null;
             }
 
-			System.out.println("items : " + this.cartItems);
+            BasketMgr basketMgrObj = kkAppEng.getBasketMgr();
+            basketMgrObj.getBasketItemsPerCustomer();
+            BasketIf custBasketItems[] = kkAppEng.getCustomerMgr().getCurrentCustomer().getBasketItems();
+            Map<Integer, Integer> itemsMap = createBasketItemsMap(custBasketItems);
+            // TODO : null check on itemsMap
+			if(itemsMap == null || itemsMap.size() != custBasketItems.length) {
+				//return "ShowCart";
+				throw new Exception();
+			}
+			
 			String result = null;
-			String action, id, qtyStr;
+			String action, id, qtyStr, prodId;
+			Integer idInt = 0;
 			
 			if(cartItems != null && !cartItems.isEmpty()) {
 				for(CartItem item : cartItems) {
 					action = item.getAction();
-					id = item.getId().toString();
+					//id = item.getId().toString();
+					prodId = item.getProdId().toString();
 					qtyStr = item.getQuantity().toString();
+					// get basket id from product id
+					idInt = itemsMap.get(item.getProdId());
+					if(idInt == null) {
+						// basket id not found for given product id
+						//return "ShowCart";
+						// TODO : error handling
+					}
+					id = idInt.toString();
+					
 					result = performEditOperation(action, id, qtyStr, kkAppEng);
 		            if(!result.equals(SUCCESS)) {
+		            	// TODO : How to take care when edit operation for one item is successful but is unsuccessful for another item.
 		            	return result;
 		            }
-
-		            // Update the basket data
-		            kkAppEng.getBasketMgr().getBasketItemsPerCustomer();
-
-		            kkAppEng.getNav().set(kkAppEng.getMsg("header.cart.contents"), request);
-
-		            
 				}
 			}
+
+            // Update the basket data
+            kkAppEng.getBasketMgr().getBasketItemsPerCustomer();
+
+            kkAppEng.getNav().set(kkAppEng.getMsg("header.cart.contents"), request);
+            
 			/*if (getGoToCheckout().equalsIgnoreCase("true"))
             {
                 return "Checkout";
@@ -205,6 +228,18 @@ public class BulkEditCartAction extends EditCartSubmitAction {
 
 	}
 
+
+	private Map<Integer, Integer> createBasketItemsMap(
+			BasketIf[] custBasketItems) {
+		if(custBasketItems == null || custBasketItems.length == 0) {
+			return null;
+		}
+		Map<Integer, Integer> basketMap = new HashMap<Integer, Integer>();
+		for(BasketIf b:custBasketItems) {
+			basketMap.put(b.getProductId(), b.getId());
+		}
+		return basketMap;
+	}
 
 	public int getProdId() {
 		return prodId;
