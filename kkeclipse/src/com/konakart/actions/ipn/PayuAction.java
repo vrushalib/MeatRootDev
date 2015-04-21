@@ -44,6 +44,8 @@ public class PayuAction extends BaseGatewayAction {
 	private static final String code = "payu";
     private static final int RET4 = -4;
     private static final String RET4_DESC = "There has been an unexpected exception. Please check logs.";
+    
+    private Integer orderId;
 
 	public String execute() {
 		HttpServletRequest request = ServletActionContext.getRequest();
@@ -72,7 +74,7 @@ public class PayuAction extends BaseGatewayAction {
 			System.out.println("uuid in payuaction: " + uuid);
 			if (uuid == null) {
 				throw new Exception(
-						"The callback from PayPal did not contain the 'custom' parameter.");
+						"The callback from PayU did not contain the 'custom' parameter.");
 			}
 
 			// Get an instance of the KonaKart engine
@@ -81,7 +83,7 @@ public class PayuAction extends BaseGatewayAction {
 			false);
 			if (token == null) {
 				throw new Exception(
-						"The SSOToken from the PayPal callback is null");
+						"The SSOToken from the PayU callback is null");
 			}
 			sessionId = token.getSessionId();
 			try {
@@ -101,7 +103,7 @@ public class PayuAction extends BaseGatewayAction {
 				System.out.println("Session is valid");
 			} catch (KKException e) {
 				throw new Exception(
-						"The SessionId from the SSOToken in the PayPal Callback is not valid: "
+						"The SessionId from the SSOToken in the PayU Callback is not valid: "
 								+ token.getSessionId());
 			}
 
@@ -140,10 +142,9 @@ public class PayuAction extends BaseGatewayAction {
 
             if (log.isDebugEnabled())
             {
-                log.debug("PayPal CallBack data:");
+                log.debug("PayU CallBack data:");
                 log.debug(sb.toString());
             }
-
             // Fill more details of the IPN history class
             ipnHistory.setGatewayResult(paymentStatus);
             ipnHistory.setGatewayFullResponse(sb.toString());
@@ -155,6 +156,9 @@ public class PayuAction extends BaseGatewayAction {
             OrderUpdateIf updateOrder = new OrderUpdate();
             updateOrder.setUpdatedById(kkAppEng.getActiveCustId());
             int orderId = ipnHistory.getOrderId();
+            setOrderId(orderId);
+            
+            //Check if order status is already updated or not. This is to avoid reprocessing order in case we receive multiple callbacks from Payu.
             if(kkAppEng.getEng().getOrderStatus(sessionId, orderId) == OrderMgr.WAITING_PAYMENT_STATUS){
 	            if(paymentStatus.equals(TransactionStatus.SUCCESS.toString()) && isTransactionTamperProof(request)){
 		            kkAppEng.getEng().updateOrder(sessionId, orderId, OrderMgr.PAYMENT_RECEIVED_STATUS, 
@@ -296,6 +300,20 @@ public class PayuAction extends BaseGatewayAction {
 			return TEST_SALT;
 		}
 		return null;
+	}
+
+	/**
+	 * @return the orderId
+	 */
+	public Integer getOrderId() {
+		return orderId;
+	}
+
+	/**
+	 * @param orderId the orderId to set
+	 */
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
 	}
 
 }

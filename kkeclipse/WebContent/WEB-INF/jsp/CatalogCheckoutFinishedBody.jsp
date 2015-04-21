@@ -20,33 +20,7 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
-<% com.konakart.appif.OrderIf order = orderMgr.getCheckoutOrder();%>
-
-<script type="text/javascript">
-//Variable used for Sokrati tracking
-var _sokParams = {
-		"cust_name" : "<%=order.getCustomerName()%>",
-		"cust_email" : "<%=order.getCustomerEmail()%>",
-	    "cust_phone" : "<%=order.getCustomerTelephone()%>",
-	    "cust_location" : null,
-	    "cust_fbid" : null,
-	    "cust_twhandle" : null,
-	    "sale_pagetype" : null,
-	    "sale_prodnames" : "<%=order.getOrderProducts()%>",
-	    "sale_skus" : null,
-	    "sale_currency" : "<%=order.getCurrency().getTitle()%>",
-	    "sale_deliverymethod" : null,
-	    "sale_prodqtys" : "<%=order.getNumProducts()%>",
-	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
-	    "sale_coupon" : null,
-	    "sale_orderid" : "<%=order.getOrderNumber()%>",
-	    "sale_ordervalue" : "<%=order.getTotalIncTax()%>",
-	    "sale_orderqtys" : null,
-	    "sale_shippingcharges" : null,
-	    "sale_taxes" : null,
-	    "event" : "success" 
-}
-</script>
+<% com.konakart.appif.OrderIf order = (com.konakart.appif.OrderIf)request.getAttribute("order");%>
 
  				<h1 id="page-title"><kk:msg  key="checkout.finished.orderprocessed"/></h1>			
 	    		<div class="content-area rounded-corners">

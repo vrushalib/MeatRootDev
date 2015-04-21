@@ -339,7 +339,7 @@ $(function() {
 	/*
 	 * Basket checkout button on fade in / out basket widget
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage);
 	
 	/*
 	 * Tooltips
@@ -604,7 +604,7 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	/*
 	 * Set event code on checkout button
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage); //Currently user should be redirected to edit cart page before heading to checkout
 	
 	/*
 	 * Update cart summary with new basket data
