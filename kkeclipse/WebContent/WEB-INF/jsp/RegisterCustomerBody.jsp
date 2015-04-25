@@ -138,7 +138,7 @@
 										<input type="hidden" name="streetAddress1"  value=""/>
 									<% } %>
 								 	<%if (kkEng.getConfigAsBoolean("ACCOUNT_SUBURB",false)) { %>
-										<div class="form-input">
+										<div class="form-input" >
 											<label><kk:msg  key="register.customer.body.suburb"/></label>
 											<input  type="text" value="<s:property value="suburb" />" id="suburb" name="suburb"/>
 											<span class="validation-msg"></span>
@@ -166,7 +166,7 @@
 												<option value="<s:property value="postcode"/>" selected><s:property value="postcode" /></option>
 											</s:if>
 											<s:else>
-												<option style="display:none" value="">Select post code</option> 
+												<option style="display:none" value="">Select PIN Code</option> 
 											</s:else>
 											<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
 										    <% if( codes != null && codes.length != 0) { %>
@@ -181,7 +181,7 @@
 									</div>
 									<%if (kkEng.getConfigAsBoolean("ACCOUNT_STATE",false)) { %>
 										<%if (zoneArray != null && zoneArray.length > 0){ %>	
-											<div class="form-input">
+											<div class="form-input" >
 												<label><kk:msg  key="register.customer.body.state"/></label>
 												<select id="state" name="state" class="state" >
 													<%--<option value="-1"><kk:msg  key="register.customer.body.select"/></option> --%>
@@ -262,7 +262,7 @@
 									<div class="form-section-divider"></div>
 									<div class="form-input">
 										<label><kk:msg  key="register.customer.body.newsletter"/></label>
-										<s:checkbox name="newsletterBool" theme="simple"/>
+										<s:checkbox name="newsletterBool" theme="simple" checked="true"/>
 									</div>
 								</div>
 							</div>
