@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<project
+	name="konakartSharedPatternSets"
+	basedir=".">
+
+	<!-- Define all the shared patternsets for konakart and konakartAdmin in here -->
+
+		<!-- Module Classes -->
+	
+	<patternset id="konakart_shipping_module_classes">
+		<include name="**/modules/shipping/**/*.class" />
+	</patternset>
+
+	<patternset id="konakart_other_module_classes">
+		<include name="**/modules/others/**/*.class" />
+		<exclude name="**/modules/others/uspsaddrval/*.class" />
+	</patternset>
+
+	<patternset id="konakart_ordertotal_module_classes">
+		<include name="**/modules/ordertotal/**/*.class" />
+	</patternset>
+
+	<patternset id="konakart_payment_module_classes">
+		<include name="**/modules/payment/**/*.class" />
+		<include name="**/konakart/actions/gateways/*.class" />
+		<include name="**/konakart/actions/ipn/*.class" />
+
+		<exclude name="**/modules/payment/moduleToExclude/*.class" />
+		<exclude name="**/konakart/actions/gateways/moduleToExclude*.class" />
+		<exclude name="**/konakart/actions/ipn/moduleToExclude*.class" />
+	</patternset>
+
+	<patternset id="konakart_module_classes">
+		<patternset refid="konakart_other_module_classes" />
+		<patternset refid="konakart_shipping_module_classes" />
+		<patternset refid="konakart_ordertotal_module_classes" />
+		<patternset refid="konakart_payment_module_classes" />
+	</patternset>
+
+	<patternset id="exclude_konakart_module_classes">
+		<invert refid="konakart_module_classes" />
+	</patternset>
+
+	<!-- Module Actions -->
+	
+	<patternset id="konakart_module_actions">
+		<include name="**/modules/payment/**/*Action.*" />
+		<include name="**/konakart/actions/gateways/*Action.*" />
+		<include name="**/konakart/actions/ipn/*Action.*" />
+	</patternset>
+
+	<patternset id="exclude_konakart_module_actions">
+		<invert refid="konakart_module_actions" />
+	</patternset>
+	
+	<!-- Module Sources -->
+	
+	<patternset id="konakart_other_module_sources">
+		<include name="**/modules/others/**/*" />
+		<exclude name="**/modules/others/uspsaddrval" />
+		<exclude name="**/modules/others/uspsaddrval/*" />
+	</patternset>
+
+	<patternset id="konakart_shipping_module_sources">
+		<include name="**/modules/shipping/**/*" />
+	</patternset>
+
+	<patternset id="konakart_ordertotal_module_sources">
+		<include name="**/modules/ordertotal/**/*" />
+	</patternset>
+
+	<patternset id="konakart_payment_module_sources">
+		<include name="**/modules/payment/**/*" />
+		<include name="**/konakart/actions/gateways/*" />
+		<include name="**/konakart/actions/ipn/*" />
+
+		<exclude name="**/modules/payment/moduleToExclude" />
+		<exclude name="**/modules/payment/moduleToExclude/*" />
+		<exclude name="**/konakart/actions/gateways/moduleToExclude*" />
+		<exclude name="**/konakart/actions/ipn/moduleToExclude*" />
+	</patternset>
+
+	<patternset id="konakart_module_sources">
+		<patternset refid="konakart_other_module_sources" />
+		<patternset refid="konakart_shipping_module_sources" />
+		<patternset refid="konakart_ordertotal_module_sources" />
+		<patternset refid="konakart_payment_module_sources" />
+	</patternset>
+
+	<patternset id="exclude_module_sources">
+		<exclude name="**/moduleToExclude*" />
+	</patternset>
+	
+	<patternset id="kkappeng_files">
+		<include name="**/interceptors/*" />
+		<include name="**/al/**/*" />
+		<include name="**/filter/*" />
+		<include name="**/servlet/*" />
+
+		<exclude name="**/*.properties" />
+		<exclude name="**/actions/*.*" />
+		<exclude name="**/actions/gateways/*.*" />
+		<exclude name="**/actions/ipn/*.*" />
+		<exclude name="**/al/KKAppEngCallouts.*" />
+    </patternset>
+
+	<patternset id="exclude_kkappeng_files">
+		<invert refid="kkappeng_files" />
+	</patternset>
+	
+	<patternset id="custom_utils">
+		<include name="**/util/PropertyFileNames*" />
+		<include name="**/util/Security*" />
+		<include name="**/util/TaxUtils*" />
+    </patternset>
+	
+	<patternset id="konakart_custom_jar">
+		<include name="**/al/KKAppEngCallouts.*" />
+		<include name="**/al/SPSManagerIf.*" />
+		<include name="**/bl/OrderIntegrationMgr*.*" />
+		<include name="**/bl/LoginIntegrationMgr.*" />
+		<include name="**/bl/ReorderMgr.*" />
+		<include name="**/blif/LDAPMgrIf.*" />
+		<include name="**/com/konakart/actions/SuggestedSearch.*" />
+		<include name="**/com/konakart/actions/*Action.*" />
+		<include name="**/com/konakart/actions/gateways/BaseGatewayAction.*" />
+		<include name="**/com/konakart/kktags/*.*" />
+		<include name="**/modules/payment/Base*.*" />
+		<include name="**/modules/payment/PaymentInfo*.*" />
+		<include name="**/modules/payment/PaymentInterface*.*" />
+		<include name="**/modules/payment/PaymentMgr*.*" />
+		<include name="**/modules/ordertotal/Base*.*" />
+		<include name="**/modules/ordertotal/OrderTotalInterface*.*" />
+		<include name="**/modules/ordertotal/OrderTotalMgr*.*" />
+		<include name="**/modules/others/AddrValidationInterface*.*" />
+		<include name="**/modules/shipping/Base*.*" />
+		<include name="**/modules/shipping/ShippingInfo*.*" />
+		<include name="**/modules/shipping/ShippingInterface*.*" />
+		<include name="**/modules/shipping/ShippingMgr*.*" />
+		<include name="**/modules/shipping/WeightCost*.*" />
+		<include name="**/modules/shipping/*.properties" />
+    </patternset>
+	
+	<patternset id="enterprise_konakart_customEE_files">
+		<include name="**/bl/LDAPMgr.*" />
+		<include name="**/bl/LDAPMgrCore.*" />
+		<include name="**/bl/VelocityContextMgr.*" />
+		<include name="**/actions/PunchOutCheckoutAction.*" />
+		<include name="**/actions/PunchOutEntryAction.*" />
+	</patternset>
+	
+	<patternset id="exclude_enterprise_konakart_customEE_files">
+		<invert refid="enterprise_konakart_customEE_files" />
+	</patternset>
+	
+	<patternset id="konakart_custom_jar_contents">
+		<patternset refid="konakart_custom_jar" />
+		<patternset refid="exclude_enterprise_konakart_customEE_files" />
+	</patternset>
+
+</project>

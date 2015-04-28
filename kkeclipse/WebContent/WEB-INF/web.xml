@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- KonaKart web.xml file. (c) 2013 DS Data Systems UK Ltd, All rights reserved. -->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_4.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	id="WebApp_KonaKart" version="2.4">
+
+	<display-name>KonaKart Store-Front Application</display-name>
+	<filter>
+    	<filter-name>CharacterEncodingFilter</filter-name>
+    	<filter-class>com.konakart.filter.CharacterEncodingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+    	<filter-name>CharacterEncodingFilter</filter-name>
+    	<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+	<listener>
+		<listener-class>org.apache.struts2.tiles.StrutsTilesListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>org.apache.tiles.impl.BasicTilesContainer.DEFINITIONS_CONFIG</param-name>
+		<param-value>/WEB-INF/tiles.xml</param-value> 
+		<!--  <param-value>/WEB-INF/tiles-m.xml</param-value>    --> 
+	</context-param>
+
+	<!-- JBoss
+	<context-param>
+		<param-name>resteasy.scan</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.scan.resources</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.scan.providers</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	End of JBoss -->
+	
+	<listener>
+		<listener-class>
+			org.apache.axis.transport.http.AxisHTTPSessionListener
+		</listener-class>
+	</listener>
+
+	<!-- Used to listen out for Shutdown messages and handle the Shutdown of threads -->
+	<listener>
+		<listener-class>
+			com.konakart.bl.KKServletContextListener
+		</listener-class>
+	</listener>
+	
+	<!-- Start a KKAppEngine -->
+	<servlet>
+		<description>KonaKart Client Engine Servlet</description>
+		<servlet-name>KonaKartAppEngineServlet</servlet-name>
+		<servlet-class>com.konakart.servlet.AppEngServlet</servlet-class>
+		<init-param>
+			<param-name>propertiesPath</param-name>
+			<param-value>konakart.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>appPropertiesPath</param-name>
+			<param-value>konakart_app.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>0</param-value>
+		</init-param>
+		<init-param>
+			<param-name>storeId</param-name>
+			<param-value>store1</param-value>
+		</init-param>
+		<init-param>
+			<param-name>customersShared</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>productsShared</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>categoriesShared</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>defaultStoreId</param-name>
+			<param-value>store1</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	
+	<!-- Servlet for Apache Message Queue
+
+	Uncomment this if you want to use the Apache MQ
+		
+	ApacheMQ Server parameters:
+		uri                 = The broker URI
+		mqEnabled           = Enable (true) or Disable (false) the Apache Message Queue
+		mqName              = A name for this Broker to make it unique
+		mqAdminUserName     = admin username
+		mqAdminUserPassword = admin password
+		mqUserUserName      = username
+		mqUserPassword      = password
+		mqKonaKartQStub     = users are authorised to use Queue Names starting with this prefix
+		mqStoreLimitMB      = disk space (in MB) reserved for persistent messages (using KahaDB)
+		mqTempLimitMB       = disk space (in MB) reserved for non-persistent messages
+		mqMemoryLimitMB     = JVM Memory (in MB) available for the broker
+			
+	-->
+	
+	<!-- Apache ActiveMQ 
+	<servlet>
+		<servlet-name>KonaKartMQServlet</servlet-name>
+		<servlet-class>
+			com.konakart.mq.KKMQServer
+		</servlet-class>
+		<init-param>
+			<param-name>uri</param-name>
+			<param-value>tcp://localhost:8791</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqName</param-name>
+			<param-value>KonaKart.Broker.1</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqAdminUserName</param-name>
+			<param-value>kkadmin</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqAdminUserPassword</param-name>
+			<param-value>princess</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqUserUserName</param-name>
+			<param-value>kkuser</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqUserPassword</param-name>
+			<param-value>prince</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqKonaKartQStub</param-name>
+			<param-value>KonaKart.</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqStoreLimitMB</param-name>
+			<param-value>1024</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqTempLimitMB</param-name>
+			<param-value>256</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqMemoryLimitMB</param-name>
+			<param-value>64</param-value>
+		</init-param>
+		<load-on-startup>20</load-on-startup>
+	</servlet>
+	End of Apache ActiveMQ -->
+
+	<!-- Servlet for JSON Engine
+
+	Uncomment the section below if you want to use the JSON Engine
+		
+	JSON Server parameters:
+		jsonEnabled         = Enable (true) or Disable (false) the JSON server
+		excludedInterfaces  = Comma separated list of KKEngIf interfaces that
+		                      are not allowed.  If not specified or left empty, 
+		                      no interfaces are excluded.
+		includedInterfaces  = Comma separated list of KKEngIf interfaces that
+		                      are allowed. If not specified or left empty, all
+		                      interfaces are allowed.
+	-->
+	
+	<!-- JSON Server
+	<servlet>
+		<servlet-name>KonaKart_JSON_Servlet</servlet-name>
+		<servlet-class>
+			com.konakart.json.KKJSONServer
+		</servlet-class>
+		<init-param>
+			<param-name>jsonEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<load-on-startup>30</load-on-startup>
+	</servlet>
+	End of JSON Server -->
+
+	<!-- Servlet for JSON Admin
+
+	Uncomment the section below if you want to use the JSON Admin Servlet
+
+	When sending these commands the password must match the one defined in the 
+	"password" servlet parameter below.
+	
+	Only enable the JSON Admin server if you need to and if you do, change the 
+	password.
+
+	JSON Admin commands:
+		?cmd=enableJSON&pwd=password
+		    Enables the JSON server
+		?cmd=disableJSON&pwd=password
+		    Disables the JSON server
+		?cmd=excludeInterfaces&pwd=password&Interfaces=Comma separated list of KKEngIf interfaces
+		    Sets the excludedInterfaces
+		?cmd=includeInterfaces&pwd=password&Interfaces=Comma separated list of KKEngIf interfaces
+		    Sets the includedInterfaces
+	-->
+	
+	<!-- JSON Admin
+	<servlet>
+		<servlet-name>KonaKart_JSON_Admin</servlet-name>
+		<servlet-class>
+			com.konakart.json.KKJSONServerAdmin
+		</servlet-class>
+		<init-param>
+			<param-name>password</param-name>
+			<param-value>jason</param-value>
+		</init-param>
+		<load-on-startup>29</load-on-startup>
+	</servlet>
+	End of JSON Admin -->
+
+	<!-- Servlet for RMI Server
+
+	Uncomment this if you want to use RMI
+		
+		RMI Server parameters:
+			port       = The port number where the RMI registry will listen
+			rmiEnabled = Enable (true) or Disable (false) the RMI interface
+	-->
+
+	<!-- RMI Server
+	<servlet>
+		<servlet-name>KonakartRMIServlet</servlet-name>
+		<servlet-class>
+			com.konakart.rmi.KKRMIServer
+		</servlet-class>
+		<init-param>
+			<param-name>port</param-name>
+			<param-value>8790</param-value>
+		</init-param>
+		<init-param>
+			<param-name>rmiEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>20</load-on-startup>
+	</servlet>
+	End of RMI Server -->
+
+	<servlet>
+		<servlet-name>AxisServlet</servlet-name>
+		<servlet-class>
+			org.apache.axis.transport.http.AxisServlet
+		</servlet-class>
+	</servlet>
+
+	<!-- Servlet Mapping -->
+
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/servlet/AxisServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>AxisServlet</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+
+	<!--
+	     Uncomment the section below if you want to use the JSON Engine
+	-->
+	<!-- JSON Server 
+	<servlet-mapping>
+		<servlet-name>KonaKart_JSON_Servlet</servlet-name>
+		<url-pattern>/konakartjson</url-pattern>
+	</servlet-mapping>
+	End of JSON Server -->
+	
+	<!--
+	     Uncomment the section below if you want to use the JSON Admin Servlet
+	-->
+	<!-- JSON Admin 
+	<servlet-mapping>
+		<servlet-name>KonaKart_JSON_Admin</servlet-name>
+		<url-pattern>/konakartjsonadmin</url-pattern>
+	</servlet-mapping>
+	End of JSON Admin -->
+
+	<!-- 
+		Currently the W3C haven't settled on a media type for WSDL;
+		http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
+		for now we go with the basic 'it's XML' response 
+	-->
+	<mime-mapping>
+		<extension>wsdl</extension>
+		<mime-type>text/xml</mime-type>
+	</mime-mapping>
+
+	<mime-mapping>
+		<extension>xsd</extension>
+		<mime-type>text/xml</mime-type>
+	</mime-mapping>
+
+	<mime-mapping>
+		<extension>html</extension>
+		<mime-type>text/html;charset=UTF-8</mime-type>
+	</mime-mapping>
+
+	<!-- Welcome File List -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

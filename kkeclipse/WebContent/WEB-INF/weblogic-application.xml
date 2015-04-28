@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<weblogic-application>
+<prefer-application-packages>
+	<package-name>org.apache.commons.lang.*</package-name>
+</prefer-application-packages>
+</weblogic-application>
