@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>	
+	
+		<!-- Main Layout -->
+	<definition name="main.layout" template="/WEB-INF/jsp/MainLayout.jsp">
+		<put-attribute name="pageClass" value="home"/>
+		<put-attribute name="contentClass" value="wide"/>
+		<put-attribute name="header1" value="/WEB-INF/jsp/TopBar.jsp"/>
+		<put-attribute name="header2" value="/WEB-INF/jsp/Search.jsp"/>
+		<put-attribute name="header3" value="/WEB-INF/jsp/Menu.jsp"/>
+		<put-attribute name="header4" value="/WEB-INF/jsp/Breadcrumbs.jsp"/>
+		<put-attribute name="left1" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body2" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body3" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body4" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body5" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="body6" value="/WEB-INF/jsp/Empty.jsp"/>
+		<put-attribute name="footer1" value="/WEB-INF/jsp/Footer.jsp"/>
+		<put-attribute name="footer2" value="/WEB-INF/jsp/Copyright.jsp"/>
+	</definition>
+	<!-- Catalog Main Page -->
+	<definition name="catalog.main.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.main.page"/>
+	    <put-attribute name="body1" value="/WEB-INF/jsp/BannersBody.jsp"/>
+		<put-attribute name="body2" value="/WEB-INF/jsp/NewProductsBody.jsp"/>
+		<put-attribute name="body3" value="/WEB-INF/jsp/FeaturedProductsBody.jsp"/>
+		<put-attribute name="body4" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
+	</definition>
+	<!-- Page shown for the detail of one product -->
+	<definition name="catalog.showprod.details.page.include" template="/WEB-INF/jsp/ProductDetailsBody.jsp">
+		<put-attribute name="pdInclude" value="/WEB-INF/jsp/ProductDetailsInclude.jsp"/>
+	</definition>	
+	<definition name="catalog.showprod.details.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showprod.details.page"/>
+		<put-attribute name="body1" value="catalog.showprod.details.page.include"/>
+		<put-attribute name="body2" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
+	</definition>	
+	<!-- Page shown when user wants to modify address book entries -->
+	<definition name="catalog.addressbook.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.addressbook.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AddressBookBody.jsp"/>
+	</definition>
+	<!-- Page shown when the cart tile is clicked to show all items -->
+	<definition name="catalog.showcartitems.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showcartitems.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditCartBody.jsp"/>
+	</definition>
+	<!-- Page shown when the wishlist tile is clicked to show all items -->
+	<definition name="catalog.showwishlistitems.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showwishlistitems.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditWishListBody.jsp"/>
+	</definition>
+	<!-- Page shown when adding an item to the gift registry -->
+	<definition name="catalog.showgiftregistries.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showgiftregistries.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShowGiftRegistriesBody.jsp"/>
+	</definition>
+	<!-- Page showing gift registry items that can be edited -->
+	<definition name="catalog.showgiftregistryitems.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showgiftregistryitems.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditGiftRegistryItemsBody.jsp"/>
+	</definition>
+	<!-- Page showing gift registry items that can be bought -->
+	<definition name="catalog.showgiftregistryitems.noedit.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showgiftregistryitems.noedit.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShowGiftRegistryItemsBody.jsp"/>
+	</definition>
+	<!-- Page showing reward point transactions -->
+	<definition name="catalog.showrewardpoints.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showrewardpoints.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShowRewardPointsBody.jsp"/>
+	</definition>
+	<!-- Page shown when a category is selected -->
+	<definition name="catalog.showcats.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showcats.page"/>
+		<put-attribute name="pageClass" value="category"/>
+		<put-attribute name="contentClass" value="narrow"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CategoryBannersBody.jsp"/>
+		<put-attribute name="body2" value="/WEB-INF/jsp/NewProductsBody.jsp"/>
+		<put-attribute name="left1" value="/WEB-INF/jsp/Facets.jsp"/>
+	</definition>
+	<!-- Page shown for a list of products -->
+	<definition name="catalog.showprods.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showprods.page"/>
+		<put-attribute name="contentClass" value="narrow"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ProductsBody.jsp"/>
+		<put-attribute name="left1" value="/WEB-INF/jsp/Facets.jsp"/>
+	</definition>
+	<!-- Page shown for a list of all orders for a customer -->
+	<definition name="catalog.showallorders.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showallorders.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShowAllOrdersBody.jsp"/>
+	</definition>
+	<!-- Page shown for order details -->
+	<definition name="catalog.showorder.details.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.showorder.details.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShowOrderDetailsBody.jsp"/>
+	</definition>
+	<!-- Page shown to write a review-->
+	<definition name="catalog.writereview.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.writereview.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/WriteReviewBody.jsp"/>
+	</definition>
+	<!-- Page shown to enter advanced search constraints -->
+	<definition name="catalog.advancedsearch.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.advancedsearch.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AdvancedSearchBody.jsp"/>
+	</definition>
+	<!-- Page shown to enter gift registry search constraints -->
+	<definition name="catalog.gift.registry.search.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.gift.registry.search.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/GiftRegistrySearchBody.jsp"/>
+	</definition>
+	<!-- Page shown to LogIn -->
+	<definition name="catalog.login.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.login.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/LogInBody.jsp"/>
+	</definition>
+	<!-- Page shown after logging out -->
+	<definition name="catalog.logout.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.logout.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/LogOutBody.jsp"/>
+	</definition>
+	<!-- Page shown after LogIng in -->
+	<definition name="catalog.afterlogin.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.afterlogin.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AfterLoginBody.jsp"/>
+	</definition>
+	<!-- Page shown if forgot password -->
+	<definition name="catalog.forgotpassword.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.forgotpassword.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ForgotPasswordBody.jsp"/>
+	</definition>
+	<!-- Page shown to register a customer -->
+	<definition name="catalog.registercustomer.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.registercustomer.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/RegisterCustomerBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit a customer -->
+	<definition name="catalog.editcustomer.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.editcustomer.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditCustomerBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit a customer's email -->
+	<definition name="catalog.editemail.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.editemail.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditEmailBody.jsp"/>
+	</definition>
+	<!-- Page shown to create a gift registry -->
+	<definition name="catalog.create.gift.registry.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.create.gift.registry.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CreateGiftRegistryBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit a gift registry -->
+	<definition name="catalog.edit.gift.registry.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.edit.gift.registry.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditGiftRegistryBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit an address -->
+	<definition name="catalog.editaddr.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.editaddr.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditAddrBody.jsp"/>
+	</definition>
+	<!-- Page shown to change a shipping address for a gift registry -->
+	<definition name="catalog.change.gift.registry.addr.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.change.gift.registry.addr.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ChangeGiftRegistryAddrBody.jsp"/>
+	</definition>
+	<!-- Page shown to delete an address -->
+	<definition name="catalog.deleteaddr.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.deleteaddr.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/DeleteAddrBody.jsp"/>
+	</definition>
+	<!-- Page shown to create a new address -->
+	<definition name="catalog.newaddr.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.newaddr.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/NewAddrBody.jsp"/>
+	</definition>
+	<!-- Page shown to change the password of a customer -->
+	<definition name="catalog.changepassword.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.changepassword.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ChangePasswordBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit the newsletter -->
+	<definition name="catalog.editnewsletter.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.editnewsletter.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditNewsletterBody.jsp"/>
+	</definition>
+	<!-- Page shown to edit the notified products -->
+	<definition name="catalog.EditNotifiedProducts.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.EditNotifiedProducts.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditNotifiedProductsBody.jsp"/>
+	</definition>
+	<!-- Checkout pages -->
+	<definition name="catalog.checkoutcreditcard.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.checkoutcreditcard.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutCreditCardBody.jsp"/>
+	</definition>
+	<definition name="catalog.external.payment.frame.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.external.payment.frame.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutExternalPaymentFrameBody.jsp"/>
+	</definition>
+	<definition name="catalog.external.payment.from.frame.page" template="/WEB-INF/jsp/PaymentFrameLayout.jsp">
+		<put-attribute name="defName" value="catalog.external.payment.from.frame.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutExternalPaymentBody.jsp"/>
+	</definition>
+	<definition name="catalog.onepagecheckout.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.onepagecheckout.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutOnePageBody.jsp"/>
+	</definition>
+	<definition name="catalog.checkoutfinished.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.checkoutfinished.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutFinishedBody.jsp"/>
+	</definition>
+	<definition name="catalog.checkoutfinishedawaitbanktransfer.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.checkoutfinishedawaitbanktransfer.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutAwaitBankTransferFinishedBody.jsp"/>
+	</definition>
+	<definition name="catalog.external.payment.error.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.external.payment.error.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CatalogCheckoutExternalPaymentError.jsp"/>
+	</definition>
+	<!-- Information pages -->
+	<definition name="catalog.aboutus.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.aboutus.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AboutUsBody.jsp"/>
+	</definition>
+	<definition name="catalog.shippingandhandling.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.shippingandhandling.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShippingAndHandlingBody.jsp"/>
+	</definition>
+	<definition name="catalog.returns.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.returns.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ReturnsBody.jsp"/>
+	</definition>
+	<definition name="catalog.internationalorders.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.internationalorders.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/InternationalOrdersBody.jsp"/>
+	</definition>
+	<definition name="catalog.privacypolicy.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.privacypolicy.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/PrivacyBody.jsp"/>
+	</definition>
+	<definition name="catalog.termsofuse.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.termsofuse.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/TermsOfUseBody.jsp"/>
+	</definition>
+	<definition name="catalog.help.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.help.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/HelpBody.jsp"/>
+	</definition>
+	<definition name="catalog.contactus.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.contactus.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ContactUsBody.jsp"/>
+	</definition>
+	<!-- Exception Page -->
+	<definition name="exception.summary.page" extends="main.layout">
+		<put-attribute name="defName" value="exception.summary.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ExceptionSummary.jsp"/>
+	</definition>
+	<!-- Unavailable Page -->
+	<definition name="unavailable.page" extends="main.layout">
+		<put-attribute name="defName" value="unavailable.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/Unavailable.jsp"/>
+	</definition>
+	<definition name="catalog.external.payment.page" template="/WEB-INF/jsp/CatalogCheckoutExternalPaymentBody.jsp"/>
+	<definition name="catalog.punchout.oci.xml.page" template="/WEB-INF/jsp/CatalogCheckoutPunchout_OCI_XML.jsp"/>
+	<definition name="catalog.punchout.oci.html.page" template="/WEB-INF/jsp/CatalogCheckoutPunchout_OCI_HTML.jsp"/>
+	<!-- Commidea Payment Gateway Pages -->
+	<definition name="catalog.commideacreditcard.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.commideacreditcard.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CommideaCreditCardBody.jsp"/>
+	</definition>
+	<definition name="catalog.commidea3dsecurecheck.page" template="/WEB-INF/jsp/Commidea3DSecureBody.jsp"/>
+	<!-- Paymetric Payment Gateway Pages -->
+	<definition name="catalog.paymetric.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.paymetric.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/PaymetricCreditCardBody.jsp"/>
+	</definition>
+	<!-- AuthorizeNet DPM Payment Gateway Pages -->
+	<definition name="catalog.authnetcreditcard.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.authnetcreditcard.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AuthNetCreditCardBody.jsp"/>
+	</definition>
+	
+</tiles-definitions>

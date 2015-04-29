@@ -1,0 +1,166 @@
+/*
+Carousel 
+*/
+
+.jcarousel-wrapper {
+    position: relative;
+}
+
+.jcarousel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.jcarousel ul {
+    width: 20000em;
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.jcarousel li {
+    float: left;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.jcarousel img {
+    display: block;
+    max-width: 100%;
+    height: auto !important;
+}
+
+.jcarousel-vertical {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    background-color: #ffffff;
+    height:300px;
+}
+
+.jcarousel-vertical ul {
+    width: 100%;
+    height: 20000em;
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.jcarousel-vertical li {
+    height: 90px;
+    margin: 0 0 0 0;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+.jcarousel-vertical img {
+    display: block;
+    max-width: 100%;
+    height: auto !important;
+}
+
+
+/* 
+Controls 
+*/
+
+.jcarousel-vertical-control-prev,
+.jcarousel-vertical-control-next,
+.jcarousel-control-prev,
+.jcarousel-control-next {
+    position: absolute;
+    top: 50%;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+.jcarousel-control-prev {
+    right: 30px;
+}
+
+.jcarousel-control-next {
+    right: 15px;
+}
+
+.jcarousel-vertical-control-prev {
+    right: 30px;
+    top: 0px;
+}
+
+.jcarousel-vertical-control-next {
+    right: 15px;
+    top: 0px;
+}
+
+.jcarousel-border-next,
+.jcarousel-border-prev {
+	height: 30px;
+	width: 30px;
+	border-left: 1px solid #e5e5e5;	
+}
+
+
+.jcarousel-border-next {
+	right: 0px;
+}
+
+.jcarousel-border-prev {
+	right: 30px;
+}
+
+/*
+ Control Images
+*/
+
+.next-items-up{
+	background: url('../images/arrow-up.png') center center no-repeat;
+}
+
+.next-items-up:hover{
+	background: url('../images/arrow-up-hover.png') center center no-repeat;
+}
+
+.next-items-up-inactive{
+	background: url('../images/arrow-up-inactive.png') center center no-repeat;
+}
+
+.prev-items-down{
+	background: url('../images/arrow-down.png') center center no-repeat;
+}
+
+.prev-items-down:hover{
+	background: url('../images/arrow-down-hover.png') center center no-repeat;
+}
+
+.prev-items-down-inactive{
+	background: url('../images/arrow-down-inactive.png') center center no-repeat;
+}
+
+.prev-items{
+	background: url('../images/arrow-left.png') center center no-repeat;
+}
+
+.prev-items:hover{
+	background: url('../images/arrow-left-hover.png') center center no-repeat;
+}
+
+.prev-items-inactive{
+	background: url('../images/arrow-left-inactive.png') center center no-repeat;
+}
+
+
+.next-items{
+	background: url('../images/arrow-right.png') center center no-repeat;
+}
+
+.next-items:hover{
+	background: url('../images/arrow-right-hover.png') center center no-repeat;
+}
+
+.next-items-inactive{
+	background: url('../images/arrow-right-inactive.png') center center no-repeat;
+}

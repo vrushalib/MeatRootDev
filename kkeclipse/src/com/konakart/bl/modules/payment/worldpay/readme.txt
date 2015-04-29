@@ -1,0 +1,3 @@
+WorldPay does not allow you to supply redirect URLS so that control is tranferred back to KonaKart once the transaction has been completed.
+
+In order to achieve this functionality you must supply two html pages (resultC.html and resultY.html) through the WorldPay admin app. resultC.html is shown if the transaction is cancelled, and resultY.html is shown if the transaction is successful. We supply examples of these pages which can be further customized for your own use.
