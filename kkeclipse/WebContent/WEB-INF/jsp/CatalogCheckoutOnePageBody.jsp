@@ -16,6 +16,7 @@
 // Lesser General Public License for more details.
 //
 --%>
+<%@page import="java.util.Locale"%>
 <%@include file="Taglibs.jsp" %>
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
@@ -25,10 +26,30 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
-
+<%@ page import=" java.util.Date, java.sql.Time, java.util.Calendar,
+                 java.util.GregorianCalendar, java.text.SimpleDateFormat" %>
+<%@ page import="com.konakart.app.PaymentDetails" %>
 
 <script type="text/javascript">	
 
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=order.getCustomerName()%>",
+		"cust_email" : "<%=order.getCustomerEmail()%>",
+	    "cust_phone" : "<%=order.getCustomerTelephone()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "sale_pagetype" : null,
+	    "sale_prodnames" : "<%=order.getOrderProducts()%>",
+	    "sale_skus" : null,
+	    "sale_currency" : "<%=order.getCurrency().getTitle()%>",
+	    "sale_deliverymethod" : null,
+	    "sale_prodqtys" : "<%=order.getNumProducts()%>",
+	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
+	    "sale_coupon" : null,
+	    "event" : "checkout" 
+}
 
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
@@ -116,6 +137,7 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 			$('#continue-button').show();
 		}
 	}
+	
 };
 
 function getOrderTotalRow(ot) {	
@@ -197,6 +219,13 @@ function paymentRefresh() {
 	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
 	setLoading();
+
+		var selectedPaymentMode = $("#paymentDetails").val();
+		if(selectedPaymentMode == 'cod'){//cod
+		    $('#continue-button').text("Confirm Order");
+		}else{
+			$('#continue-button').text("Proceed to Payment");
+		}
 }
 
 function couponCodeRefresh() {	
@@ -242,8 +271,6 @@ function openErrorDialog() {
 function closeErrorDialog() {
 	$("#error-dialog").dialog('close');
 }
-
-
 
 $(function() {
 	
@@ -356,11 +383,140 @@ $(function() {
 					</div>
 		    	</div>
 		    </div>
+		    
+<%!
+public boolean empty(String s)
+	{
+		if(s== null || s.trim().equals(""))
+			return true;
+		return false;
+	}
+%>
 
+<%!
+public void addDeliverySlotAndDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
+	String MORNING = "m";
+	String AFTERNOON = "a";
+	String deliverySlot = null;
+	String deliveryDay = null;
+	Date today = new Date();
+	Time now = new Time(today.getTime());
 
+	Calendar cal = Calendar.getInstance();
+	cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
+	cal.set(Calendar.MINUTE, 00);
+	cal.set(Calendar.SECOND, 00);
+	Time twelveAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
+	Time sixAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
+	cal.set(Calendar.MINUTE, 30);
+	Time eightThirtyPm = new Time(cal.getTime().getTime());
+
+		if (now.after(twelveAm) && now.before(sixAm)) {
+			deliverySlot = AFTERNOON;
+			deliveryDay = getDateToday();
+		} else if (now.before(eightThirtyPm)) {
+			deliverySlot = MORNING;
+			deliveryDay = getDateTomorrow();
+		} else {
+			deliverySlot = AFTERNOON;
+			deliveryDay = getDateTomorrow();
+		}
+	checkoutOrder.setCustom1(deliverySlot);
+	checkoutOrder.setCustom2(deliveryDay);
+	checkoutOrder.setCustom3("false");
+}
+
+public String getOrderMessage(String slot, String day, Boolean zorabianAfterSeven){
+	String message = "";
+	if(zorabianAfterSeven){ 
+		message =  "Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery slot for Zorabian Fresh is <b>"+ 
+		           day +"</b> between <b>7am to 10.30am</b>. For earlier delivery slot please check for alternative options.";
+	}else{
+		if( slot.equalsIgnoreCase("a"))
+			slot = "1pm - 4pm";
+		else
+			slot = "7am - 10:30am";
+		    message =  "Your order will be delivered on <b>"+ day +" </b> between <b>" + slot + "</b>."; 
+	}	
+	System.out.println(message);
+	return message;
+}
+
+public void addDeliverySlotAndDeliveryDateForZorabian(com.konakart.appif.OrderIf checkoutOrder) {
+	System.out.println("Order contains zorabian product(s)");
+	Date today = new Date();
+	Time now = new Time(today.getTime());
+
+	Calendar cal = Calendar.getInstance();
+	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
+	cal.set(Calendar.MINUTE, 00);
+	cal.set(Calendar.SECOND, 00);
+	Time sixAm = new Time(cal.getTime().getTime());
+
+	cal.set(Calendar.HOUR_OF_DAY, 19); // 7 PM
+	Time sevenPm = new Time(cal.getTime().getTime());
+
+	checkoutOrder.setCustom1("m");//morning
+	if (now.after(sevenPm)) {
+		checkoutOrder.setCustom2( getDateAfterTomorrow());
+		checkoutOrder.setCustom3("true");
+	} else{
+		checkoutOrder.setCustom2( getDateTomorrow());
+		checkoutOrder.setCustom3("false");
+	}
+}
+
+public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
+	boolean flag = false;
+	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
+	for (com.konakart.appif.OrderProductIf prod : products) {
+		if (prod.getProduct().getManufacturerName()
+				.toLowerCase().contains("zorabian")) {
+			flag = true;
+		}
+	}
+	return flag;
+}
+
+public String getDateToday() {
+	return new SimpleDateFormat("MMM dd, yyyy").format(new Date());
+}
+
+public String getDateTomorrow() {
+	Calendar c = new GregorianCalendar();
+	c.add(Calendar.DATE, 1);
+	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
+}
+
+public String getDateAfterTomorrow() {
+	Calendar c = new GregorianCalendar();
+	c.add(Calendar.DATE, 2);
+	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
+}
+
+%>
+
+			<%  
+						String continueButtonText = ((String)request.getAttribute("payment")).equals("cod") ? "Checkout Order" : "Proceed to Payment";
+						int error=0;
+						if(orderContainsZorabianProduct(order)){
+							addDeliverySlotAndDeliveryDateForZorabian(order);
+						}else {
+							addDeliverySlotAndDeliveryDate(order);
+						}
+						String udf2 = order.getCustom1();
+						String udf3 = order.getCustom2();
+						System.out.println("delivery slot: "+ udf2 + " delivery date : "+ udf3);
+						String deliveryMessage = getOrderMessage(order.getCustom1(), order.getCustom2(), Boolean.valueOf(order.getCustom3()));
+				%>
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-		    		<form action="CheckoutConfirmationSubmit.action" id="form1" method="post" class="form-section">
+	    		    <div id = "deliveryMessage" style="font-size: 13.5px"> <%=deliveryMessage %></div><br>
+		    		<form id="form1" action="CheckoutConfirmationSubmit.action" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
 		    				<div id="delivery-address" class="order-confirmation-area">
@@ -379,7 +535,7 @@ $(function() {
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 				    				<%if (!isMultivendor){ %>
-										<div id="shipping-info" class="order-confirmation-area-content-select">
+										<div id="shipping-info" class="order-confirmation-area-content-select" hidden="true">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<select name="shipping" onchange="javascript:shippingRefresh();" id="shippingQuotes">
 												<%if (orderMgr.getShippingQuotes() != null && orderMgr.getShippingQuotes().length > 0){ %>										
@@ -415,10 +571,10 @@ $(function() {
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<div id="payment-method" class="order-confirmation-area-content-select">
-										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
+								     <div id="payment-method" class="order-confirmation-area-content-select">
+										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
 										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
-											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
 												<% String payment = ((String)request.getAttribute("payment"));%> 
 												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
@@ -432,9 +588,25 @@ $(function() {
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
-										</select>
+										
+									<%--		<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>
+											 	<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
+												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
+													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
+													<%if ("cod".equals(pd.getCode())){ %>
+													 	<% order.getPaymentDetails().setPaymentType(PaymentDetails.COD); %>
+														<option  value="<%=pd.getPaymentType()%>" ><%=pd.getDescription()%></option>
+													<% } else { %>
+														<option  value="<%=pd.getPaymentType()%>" selected="selected"><%=pd.getDescription()%></option>
+													<% } %>
+												<% } %>										
+											<%} else {%>
+												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
+											<% } %>   --%>
+										</select> 
 									</div>
-									<div id="promotion-codes">
+								 	<%-- <div id="promotion-codes">
 										<div id="promotion-codes-container">
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>
 									    		<div class="promotion-codes-field">				
@@ -464,8 +636,8 @@ $(function() {
 												<% } %>
 											<% } %>
 										</div>
-		    						</div>
-								</div>		    				
+		    						</div>--%>    
+								</div>						
 			    			</div>
 			    			<div id="delivery-notes" class="order-confirmation-area">
 			    				<div class="heading-container">
@@ -622,10 +794,10 @@ $(function() {
 														<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
 														    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
 															<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
-														<%}else{%>
+														<%}  else{ %>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	
-															<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td>
-														<%}%>		    																		
+															<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td> 
+														<%}  %>		    																		
 													</tr>
 												<%}%>
 											<%}%>
@@ -633,14 +805,19 @@ $(function() {
 		    						</table>
 	    						<% } %>
 							</div>
-						</div>			    				
+						</div>			
+						
+						<input type="hidden" value="<%=udf2%>" name="udf2"/>
+						<input type="hidden" value="<%=udf3%>" name="udf3"/>
+						
 						<div id="confirm-order-button-container">	
-							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners">
-								<span><kk:msg  key="common.confirmorder"/></span>
-							</a>
+						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >
+								<%=continueButtonText %>
+							</a> 
 						</div>
 					</form>			    	
 	    		</div>
+
 
 
 

@@ -315,10 +315,10 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             }
 
             if (kkAppEng.getForwardAfterLogin() != null
-                    && kkAppEng.getForwardAfterLogin().equalsIgnoreCase("Checkout"))
+                    && kkAppEng.getForwardAfterLogin().equalsIgnoreCase("ShowCartItems"))
             {
                 kkAppEng.setForwardAfterLogin(null);
-                return "Checkout";
+                return "ShowCartItems";
             }
 
             return SUCCESS;

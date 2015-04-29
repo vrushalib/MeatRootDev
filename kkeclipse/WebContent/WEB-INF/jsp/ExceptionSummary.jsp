@@ -31,7 +31,8 @@
 							<s:if test="hasActionErrors()">							
 								<div class="exception-message">									
 							        <s:iterator value="actionErrors">  
-							            <kk:msg  key="exception.reference"/>&nbsp;&nbsp;<s:property escape="false"/>
+							        <%--     <kk:msg  key="exception.reference"/>&nbsp;&nbsp;<s:property escape="false"/> --%>
+							            <kk:msg  key="exception.message"/>
 							        </s:iterator>  
 								</div>
 							</s:if>	

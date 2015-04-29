@@ -20,7 +20,7 @@ function callAction(parmArray, callback, url) {
 	        
 			$.ajax({
 				type : 'POST',
-				timeout : '20000',
+				//timeout : '20000',
 				scriptCharset : "utf-8",
 				contentType : "application/json; charset=utf-8",
 				url : url,
@@ -55,7 +55,6 @@ function callAction(parmArray, callback, url) {
 			parms = parms + ',"xsrf_token":"'+ document.getElementById('kk_xsrf_token').value + '"';
 	        parms = parms + '}';
 		}
-		
 		$.ajax({
 			type : 'POST',
 			timeout : '20000',
@@ -63,6 +62,7 @@ function callAction(parmArray, callback, url) {
 			contentType : "application/json; charset=utf-8",
 			url : url,
 			data : parms,
+			dataType : 'json',
 			success : callback,
 			error : function(jqXHR, textStatus, errorThrown) {
 				var errorMsg = "JSON API call to the URL " + url
@@ -74,8 +74,7 @@ function callAction(parmArray, callback, url) {
 					errorMsg += "\nError:\t" + errorThrown;
 				}
 				alert(errorMsg);
-			},
-			dataType : 'json'
+			}
 		});
 	}
 }
@@ -304,10 +303,12 @@ $(function() {
 	$(".add-to-cart-button")
 	.click(
 			function() {
-				var prodId = (this.id).split('-')[1];				
-				var id = $("#prodQuantityId option:selected").text();				
 				
-				callAction(new Array("prodId",prodId,"dropDownId",id), 
+				var prodId = (this.id).split('-')[1];			
+				
+				 var id = $("#prodQuantityId_"+prodId).val();			
+				
+				callAction(new Array("prodId",prodId,"id",id), 
 						addToCartCallback,
 						"AddToCartFromProdId.action?id="+id);
 				
@@ -331,14 +332,14 @@ $(function() {
 					});
 	
 	/*
-	 * Subscribe to newslette
+	 * Subscribe to newsletter
 	 */
 	$("#newsletter-button").click(submitNewsletterForm);
 	
 	/*
 	 * Basket checkout button on fade in / out basket widget
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage);
 	
 	/*
 	 * Tooltips
@@ -356,8 +357,66 @@ $(function() {
 						"AgreeToCookies.action");
 				return false;
 			});
+	
+	/*
+	 * Add postcode suggested by user
+	 */
+	$('#go')
+	.click(
+			function(){
+				$("#pincode_area").hide();
+				$("#email_area").show();
+			});
+	
+	$("#back")
+	.click(
+			function(){
+				$("#message_area").hide();
+				$("#error_message").hide();
+				$("#success_message").hide();
+				$("#pincode_area").show();
+			});
+	
+	$("#done")
+	.click(
+			function(){
+				var pincode = $("#pincode").val().trim();
+				var emailId = $("#emailId").val().trim();
+				var valid = validate(pincode, emailId);
+				$("#email_area").hide();
+				$("#message_area").show();
+				if(valid){
+				callAction(new Array("pincode", pincode, "emailId", emailId), suggestedAreaCallback, "SuggestedArea.action");
+					$("#success_message").show();
+					$("#pincode").val("");
+					$("#emailId").val("");
+				}
+				else{
+					$("#error_message").show();
+				}
+			});
 
 });
+
+var suggestedAreaCallback = function(result, textStatus, jqXHR) {
+	$("#success_message").show();
+	$("#pincode").val("");
+	$("#emailId").val("");
+};
+
+
+function validate(pincode, emailId){
+	if(pincode == "" || emailId == ""){
+		return false;
+	}
+	var mailformat = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+	var pinformat = /^\d{6}$/;
+	if(mailformat.test(emailId) && pinformat.test(pincode)){
+		return true;
+	}
+	return false;
+	return true;
+}
 
 /*
  * Submits the sign up to newsletter form
@@ -545,7 +604,7 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	/*
 	 * Set event code on checkout button
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage); //Currently user should be redirected to edit cart page before heading to checkout
 	
 	/*
 	 * Update cart summary with new basket data

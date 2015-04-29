@@ -20,7 +20,7 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
-<% com.konakart.appif.OrderIf order = orderMgr.getCheckoutOrder();%>
+<% com.konakart.appif.OrderIf order = (com.konakart.appif.OrderIf)request.getAttribute("order");%>
 
  				<h1 id="page-title"><kk:msg  key="checkout.finished.orderprocessed"/></h1>			
 	    		<div class="content-area rounded-corners">
@@ -29,7 +29,8 @@
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<div class="notification-header">
-									<kk:msg  key="checkout.finished.orderprocessedlong"/>.
+								    Order Number is <%=order.getId() %>.<br>
+									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else %> 1pm - 4pm. Thank you for shopping with us.
 								</div>
 							</div>
 							<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>

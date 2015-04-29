@@ -16,8 +16,10 @@
 // Lesser General Public License for more details.
 //
 --%>
+
 <%@include file="Taglibs.jsp" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -47,7 +49,8 @@
     <% } else { %>
 		<html>
 			<head>
-				<title>MeatRoot</title>
+			    <meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
+				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
 				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
 				<meta name="description" content="<%=kkEng.getMetaDescription()%>" />
@@ -88,6 +91,27 @@
 				%>
 				<base href="<%=base%>"/>										
 				<!--- KonaKart v7.2.0.2.11093 -->
+				
+				<script type="text/javascript">
+				$(window).bind("load", function(){
+					$("#page-container").css("overflow","hidden");
+				});
+				
+				 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+					  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+					  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+					  ga('create', 'UA-55023986-1', 'auto');
+					  ga('send', 'pageview');
+					  
+					  (function() {
+					      var a = document.createElement('script');a.type = 'text/javascript'; a.async = true;
+					      a.src=('https:'==document.location.protocol?'https://':'http://cdn.')+'chuknu.sokrati.com/15047/tracker.js';
+					      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
+					           })();
+
+				</script>
 			</head>
 			<%if (defName != null) {%>
 				<body id="<%=defName%>">
@@ -131,7 +155,7 @@
 							<tiles:insertAttribute name="body3" />
 							<tiles:insertAttribute name="body4" />
 							<tiles:insertAttribute name="body5" />
-							<tiles:insertAttribute name="body6" />
+ 							<tiles:insertAttribute name="body6" /> 
 				    	</div>
 						<tiles:insertAttribute name="footer1" />
 		    		</div>

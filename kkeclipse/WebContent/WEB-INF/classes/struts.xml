@@ -73,6 +73,10 @@
   			</param>
   			</result>
 		</action>
+		<action name="SuggestedArea" class="com.konakart.actions.SuggestedArea">
+			<result type="json">
+  			</result>
+		</action>
 		<action name="OnePageRefresh" class="com.konakart.actions.CheckoutOnePageRefreshAction">
 			<result type="json">
   			</result>
@@ -108,6 +112,19 @@
 		<action name="AboutUs" class="com.konakart.actions.AboutUsAction">
 			<result name="success" type="tiles">catalog.aboutus.page</result>
 		</action>
+		
+		<action name="Help" class="com.konakart.actions.HelpAction">
+			<result name="success" type="tiles">catalog.help.page</result>
+		</action>
+		
+		<action name="TermsAndConditions" class="com.konakart.actions.TermsAndConditionsAction">
+			<result name="success" type="tiles">catalog.termsandconditions.page</result>
+		</action>
+		
+		<action name="PlacingOrder" class="com.konakart.actions.PlacingOrderAction">
+			<result name="success" type="tiles">catalog.placingorder.page</result>
+		</action>
+		
 		<action name="AddressBook" class="com.konakart.actions.AddressBookAction">
 			<result name="success" type="tiles">catalog.addressbook.page</result>
 		</action>
@@ -118,6 +135,11 @@
 		<action name="AdvancedSearch" class="com.konakart.actions.AdvancedSearchAction">
 			<result name="success" type="tiles">catalog.advancedsearch.page</result>
 		</action>	
+		
+		<action name="ContentChanges" class="com.konakart.actions.ContentChangesAction">
+			<result name="success" type="tiles">catalog.contentchanges.page</result>
+		</action>
+		
 		<action name="CatalogAfterLogin" class="com.konakart.actions.CatalogAfterLoginAction">
 			<result name="success" type="tiles">catalog.afterlogin.page</result>
 		</action>
@@ -151,11 +173,20 @@
 			<result name="Checkout" type="chain">Checkout</result>
 			<result name="CheckoutExternalPayment" type="tiles">catalog.external.payment.page</result>
 			<result name="CheckoutExternalPaymentFrame" type="tiles">catalog.external.payment.frame.page</result>
+			<result name="TransactionCancelled" type="tiles">catalog.transaction.cancel.page</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
 			<result name="CheckoutServerPayment" type="chain">CheckoutServerPayment</result>
 			<result name="WorldPayXMLRedirect" type="chain">WorldPayXMLRedirect</result>
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
 			<result name="GlobalCollect"  type="chain">GlobalCollect</result>
 		</action>	
+		<action name="PayuResponse" class="com.konakart.actions.ipn.PayuAction">
+		 	<result name="redirect" type="chain">${action}</result>
+			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
+			<result name="Checkout" type="chain">Checkout</result>
+			<result name="LoginSubmitError"  type="tiles">catalog.login.page</result>
+		</action>
 		<action name="CheckoutNewDeliveryAddr" class="com.konakart.actions.CheckoutAction" method="newDeliveryAddr">
 			<result name="success" type="tiles">catalog.onepagecheckout.page</result>
 			<result name="ShowCartItems" type="chain">ShowCartItems</result>
@@ -168,6 +199,12 @@
 			<result name="success" type="tiles">catalog.checkoutfinished.page</result>
 		</action>
 		<action name="CheckoutFinishedSubmit" class="com.konakart.actions.CheckoutFinishedSubmitAction">
+			<result name="success" type="chain">MyAccount</result>
+		</action>
+		<action name="TransactionCancelled" class="com.konakart.actions.TransactionCancelledAction">
+			<result name="success" type="chain">MyAccount</result>
+		</action>
+		<action name="TransactionFailed" class="com.konakart.actions.TransactionFailedAction">
 			<result name="success" type="chain">MyAccount</result>
 		</action>
 		<action name="CheckoutPaymentError" class="com.konakart.actions.CheckoutPaymentErrorAction">
@@ -206,7 +243,8 @@
 			<result name="success" type="tiles">catalog.registercustomer.page</result>
 		</action>
 		<action name="CustomerRegistrationSubmit" class="com.konakart.actions.CustomerRegistrationSubmitAction">
-			<result name="success" type="chain">CatalogAfterLogin</result>		
+			<result name="success" type="chain">CatalogAfterLogin</result>	
+			<result name="ShowCartItems" type="chain">ShowCartItems</result>	
 			<result name="Checkout" type="chain">Checkout</result>		
 			<result name="ApplicationError" type="chain">CustomerRegistration</result>	
 			<result name="ChangedCountryForce" type="chain">
@@ -257,6 +295,10 @@
 			  <param name="bufferSize">1024</param>
 			</result>
 		</action>
+		<action name="DeliveryArea" class="com.konakart.actions.DeliveryAreaAction">
+			<result name="success" type="tiles">catalog.deliveryarea.page</result>
+		</action>		
+		
 		<action name="EditAddr" class="com.konakart.actions.EditAddrAction">
 			<result name="success"  type="tiles">catalog.editaddr.page</result>
 		</action>
@@ -330,14 +372,15 @@
 		<action name="GiftRegistrySearch" class="com.konakart.actions.GiftRegistrySearchAction">
 			<result name="success" type="tiles">catalog.gift.registry.search.page</result>
 		</action>
-		<action name="Help" class="com.konakart.actions.HelpAction">
-			<result name="success" type="tiles">catalog.help.page</result>
+		<action name="FAQ" class="com.konakart.actions.FAQAction">
+			<result name="success" type="tiles">catalog.faq.page</result>
 		</action>
+		
 		<action name="InitFromToken" class="com.konakart.actions.InitFromTokenSubmitAction">
 			<result name="success" type="chain">Checkout</result>
 		</action>
-		<action name="InternationalOrders" class="com.konakart.actions.InternationalOrdersAction">
-			<result name="success" type="tiles">catalog.internationalorders.page</result>
+		<action name="OrderTracking" class="com.konakart.actions.OrderTrackingAction">
+			<result name="success" type="tiles">catalog.ordertracking.page</result>
 		</action>
 		<action name="LogIn" class="com.konakart.actions.LoginAction">
 			<result name="success"  type="tiles">catalog.login.page</result>
@@ -394,7 +437,16 @@
 		<action name="PreSelectProd" class="com.konakart.actions.ShowProductDetailsAction" method="preSelect">
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
-		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyNoticeAction">
+		<action name="CancellationPolicy" class="com.konakart.actions.CancellationPolicyAction">
+			<result name="success" type="tiles">catalog.cancellationpolicy.page</result>
+		</action>
+		<action name="DeliveryPolicy" class="com.konakart.actions.DeliveryPolicyAction">
+			<result name="success" type="tiles">catalog.deliverypolicy.page</result>
+		</action>
+		<action name="RefundPolicy" class="com.konakart.actions.RefundPolicyAction">
+			<result name="success" type="tiles">catalog.refundpolicy.page</result>
+		</action>
+		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyPolicyAction">
 			<result name="success" type="tiles">catalog.privacypolicy.page</result>
 		</action>
 		<action name="ProdPageSize" class="com.konakart.actions.ProdPageSizeAction">
@@ -423,8 +475,8 @@
 		<action name="ResetNotification" class="com.konakart.actions.ResetNotificationAction"> 
 			<result name="success"  type="tiles">catalog.showprod.details.page</result>
 		</action>
-		<action name="Returns" class="com.konakart.actions.ReturnsAction">
-			<result name="success" type="tiles">catalog.returns.page</result>
+		<action name="DeliveryDetails" class="com.konakart.actions.DeliveryDetailsAction">
+			<result name="success" type="tiles">catalog.deliverydetails.page</result>
 		</action>
 		<action name="RevPageSize" class="com.konakart.actions.RevPageSizeAction">
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
@@ -445,8 +497,8 @@
 		<action name="SelectProd" class="com.konakart.actions.ShowProductDetailsAction">
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
-		<action name="ShippingAndHandling" class="com.konakart.actions.ShippingAndHandlingAction">
-			<result name="success" type="tiles">catalog.shippingandhandling.page</result>
+		<action name="Payment" class="com.konakart.actions.PaymentAction">
+			<result name="success" type="tiles">catalog.payment.page</result>
 		</action>
 		<action name="ShowAllNewProds" class="com.konakart.actions.ShowAllNewProdsAction">
 			<result name="success" type="tiles">catalog.showprods.page</result>

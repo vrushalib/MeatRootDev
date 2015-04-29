@@ -41,17 +41,23 @@
 	});				
 </script>
 
-<div id="main-menu">
-	<%for (int i = 0; i <3; i++) {%>
-	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
-	<%String menuClass; %>
-	<%if (i == catMgr.getCats().length-1){ %>
-	<% menuClass = "menu-item rounded-corners last-child"; %>
-	<% } else { %>
-	<% menuClass = "menu-item rounded-corners"; %>
-	<% } %>
-	<a href='<%="SelectCat.action?catId="+cat.getId()%>'
-		class="<%=menuClass%>"
-		style="border-right: 1px solid #b5b38a;width:312px;"><%=cat.getName()%></a>
+
+
+<div id="main-menu" >
+	<% 	for (int i = 0; i < catMgr.getCats().length; i++) {%>
+	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
+    <% if(cat.getCustom1() == null){ //category is not invisible. custom1 value for invisible categories is "i".%>
+		<%String menuClass; %>
+		<%if (i == catMgr.getCats().length-1){ %>
+			<% menuClass = "menu-item rounded-corners last-child"; %>
+		<% } 
+		else { %>
+			<% menuClass = "menu-item rounded-corners"; %>
+		<% } %>
+		<a href='<%="SelectCat.action?catId="+cat.getId()%>'
+			class="<%=menuClass%>">
+			<%=cat.getName()%></a>
+		<% } %>
 	<% } %>
 </div>
+

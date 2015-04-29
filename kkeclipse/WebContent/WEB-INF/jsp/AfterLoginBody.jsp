@@ -110,14 +110,14 @@
 					    							<td><div class="label <%=statusClass%>"><%=order.getStatusText()%></div></td>
 					    							<td class="order-action"><a class="text-link" href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'><kk:msg  key="common.view"/></a></td>	
 					    							<td class="order-action"><a class="text-link" href='<%="RepeatOrder.action?orderId="+order.getId()%>'><kk:msg  key="common.repeat"/></a></td>	
-					    							<td class="order-action"><a class="text-link"><kk:msg  key="common.track"/></a></td>	
-													<%if (enableInvoice) {%>	
+					    							<%-- <td class="order-action"><a class="text-link"><kk:msg  key="common.track"/></a></td>	--%>
+													<%-- <%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
 															<td class="order-action"><a class="text-link" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 														<%} else {%>
 															<td class="order-action"><a class="text-link" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 														<%}%>
-													<% } %>
+													<% } %> --%>
 					    						</tr>
 				    						</tbody>
 				    						<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>

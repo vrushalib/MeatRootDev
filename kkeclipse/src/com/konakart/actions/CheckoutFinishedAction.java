@@ -39,6 +39,8 @@ public class CheckoutFinishedAction extends BaseAction
     private ArrayList<NotifiedProductItem> itemList = new ArrayList<NotifiedProductItem>();
 
     private boolean globalNotificationBool;
+    
+    private OrderIf order;
 
     public String execute()
     {
@@ -66,11 +68,21 @@ public class CheckoutFinishedAction extends BaseAction
                 setupResponseForSSLRedirect(response, redirForward);
                 return null;
             }
-
+            
+            OrderIf order = null;
+            if(request.getAttribute("orderId") != null){
+            	Integer orderId = (Integer)request.getAttribute("orderId");
+            	System.out.println("Order id after callback processing:"+orderId);
+		        kkAppEng.getOrderMgr().getOrder(orderId);
+		        order = kkAppEng.getOrderMgr().getSelectedOrder();
+            }else{
+            	System.out.println("No order id passed from callback processing / cash on delivery");
+            	order = kkAppEng.getOrderMgr().getCheckoutOrder();
+            }
             // Set events
-            OrderIf order = kkAppEng.getOrderMgr().getCheckoutOrder();
             if (order != null)
             {
+            	setOrder(order);
                 insertCustomerEvent(kkAppEng, ACTION_CONFIRM_ORDER, order.getId());
                 insertCustomerEvent(kkAppEng, ACTION_PAYMENT_METHOD_SELECTED,
                         order.getPaymentModuleCode());
@@ -91,7 +103,6 @@ public class CheckoutFinishedAction extends BaseAction
 
             kkAppEng.getNav().set(kkAppEng.getMsg("header.checkout"), request);
             kkAppEng.getNav().add(kkAppEng.getMsg("header.success"), request);
-            
             return SUCCESS;
 
         } catch (Exception e)
@@ -132,5 +143,19 @@ public class CheckoutFinishedAction extends BaseAction
     {
         this.globalNotificationBool = globalNotificationBool;
     }
+
+	/**
+	 * @return the order
+	 */
+	public OrderIf getOrder() {
+		return order;
+	}
+
+	/**
+	 * @param order the order to set
+	 */
+	public void setOrder(OrderIf order) {
+		this.order = order;
+	}
 
 }
