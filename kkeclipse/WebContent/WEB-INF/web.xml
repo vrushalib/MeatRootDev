@@ -114,6 +114,9 @@
 		mqUserUserName      = username
 		mqUserPassword      = password
 		mqKonaKartQStub     = users are authorised to use Queue Names starting with this prefix
+		mqStoreLimitMB      = disk space (in MB) reserved for persistent messages (using KahaDB)
+		mqTempLimitMB       = disk space (in MB) reserved for non-persistent messages
+		mqMemoryLimitMB     = JVM Memory (in MB) available for the broker
 			
 	-->
 	
@@ -154,6 +157,18 @@
 		<init-param>
 			<param-name>mqKonaKartQStub</param-name>
 			<param-value>KonaKart.</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqStoreLimitMB</param-name>
+			<param-value>1024</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqTempLimitMB</param-name>
+			<param-value>256</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqMemoryLimitMB</param-name>
+			<param-value>64</param-value>
 		</init-param>
 		<load-on-startup>20</load-on-startup>
 	</servlet>

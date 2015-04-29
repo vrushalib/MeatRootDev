@@ -14,8 +14,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
-// Original version contributed by Chris Derham (Atomus Ltd)
-//
 
 package com.konakart.bl.modules.payment.globalcollect;
 
@@ -23,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -100,6 +99,11 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
     private final static String MODULE_PAYMENT_GLOBALCOLLECT_STATUS = "MODULE_PAYMENT_GLOBALCOLLECT_STATUS";
 
     /**
+     * Custom Class
+     */
+    private final static String MODULE_PAYMENT_GLOBALCOLLECT_CUSTOM_CLASS = "MODULE_PAYMENT_GLOBALCOLLECT_CUSTOM_CLASS";
+
+    /**
      * The GlobalCollect Zone, if greater than zero, should reference a GeoZone. If the
      * DeliveryAddress of the order isn't within that GeoZone, then we throw an exception
      */
@@ -147,51 +151,6 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
      * Module Parameter - Time-based OrderId
      */
     public final static String MODULE_PAYMENT_GLOBALCOLLECT_TIME_ORDERID = "MODULE_PAYMENT_GLOBALCOLLECT_TIME_ORDERID";
-
-    /**
-     * Payment Parameter - Payment Amount
-     */
-    public static final String GLOBALCOLLECT_PAYMENT_AMOUNT = "amount";
-
-    /**
-     * Merchant Account
-     */
-    public static final String GLOBALCOLLECT_MERCHANT_ACCOUNT = "merchantID";
-
-    /**
-     * Merchant Reference
-     */
-    public static final String GLOBALCOLLECT_MERCHANT_REF = "MERCHANT_REF";
-
-    /**
-     * Returned Reference
-     */
-    public static final String GLOBALCOLLECT_RETURNED_REF = "REF";
-
-    /**
-     * Returned MAC
-     */
-    public static final String GLOBALCOLLECT_RETURNED_MAC = "RETURNEDMAC";
-
-    /**
-     * Returned FORMACTION
-     */
-    public static final String GLOBALCOLLECT_RETURNED_FORMACTION = "FORMACTION";
-
-    /**
-     * Card holder's name
-     */
-    public static final String GLOBALCOLLECT_CARDHOLDERS_NAME = "CARDHOLDERS_NAME";
-
-    /**
-     * Customer's email address
-     */
-    public static final String GLOBALCOLLECT_CUST_EMAIL = "CUSTOMER_EMAIL";
-
-    /**
-     * Shopper's Reference
-     */
-    public static final String GLOBALCOLLECT_CUST_REFERENCE = "CUST_REFERENCE";
 
     /**
      * Payment ProductId
@@ -259,64 +218,9 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
     public final static String GLOBALCOLLECT_BILLTO_EMAIL = "GLOBALCOLLECT_BILLTO_EMAIL";
 
     /**
-     * Ship To Company
+     * Card holder's name
      */
-    public final static String GLOBALCOLLECT_SHIPTO_COMP = "GLOBALCOLLECT_SHIPTO_COMP";
-
-    /**
-     * Order Id
-     */
-    public final static String GLOBALCOLLECT_ORDER_ID = "GLOBALCOLLECT_ORDER_ID";
-
-    /**
-     * Order Number
-     */
-    public final static String GLOBALCOLLECT_ORDER_NUMBER = "GLOBALCOLLECT_ORDER_NUMBER";
-
-    /**
-     * Ship To First Name
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_FNAME = "GLOBALCOLLECT_SHIPTO_FNAME";
-
-    /**
-     * Ship To Last Name
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_LNAME = "GLOBALCOLLECT_SHIPTO_LNAME";
-
-    /**
-     * Ship To Street 1
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_HOUSENUMBER = "GLOBALCOLLECT_SHIPTO_HOUSENUMBER";
-
-    /**
-     * Ship To Street 1
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_STREET1 = "GLOBALCOLLECT_SHIPTO_STREET1";
-
-    /**
-     * Ship To City
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_CITY = "GLOBALCOLLECT_SHIPTO_CITY";
-
-    /**
-     * Ship To State
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_STATE = "GLOBALCOLLECT_SHIPTO_STATE";
-
-    /**
-     * Ship To Postal Code
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_POSTCODE = "GLOBALCOLLECT_SHIPTO_POSTCODE";
-
-    /**
-     * Ship To Country
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_COUNTRY = "GLOBALCOLLECT_SHIPTO_COUNTRY";
-
-    /**
-     * Bill To CountryCode
-     */
-    public final static String GLOBALCOLLECT_SHIPTO_CTRY_CODE = "GLOBALCOLLECT_SHIPTO_CTRY_CODE";
+    public static final String GLOBALCOLLECT_CARDHOLDERS_NAME = "CARDHOLDERS_NAME";
 
     /**
      * Credit Card Type
@@ -347,6 +251,111 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
      * Credit Card Owner
      */
     public final static String GLOBALCOLLECT_CARD_OWNER = "GLOBALCOLLECT_CARD_OWNER";
+
+    /**
+     * Customer's email address
+     */
+    public static final String GLOBALCOLLECT_CUST_EMAIL = "CUSTOMER_EMAIL";
+
+    /**
+     * Shopper's Reference
+     */
+    public static final String GLOBALCOLLECT_CUST_REFERENCE = "CUST_REFERENCE";
+
+    /**
+     * Merchant Account
+     */
+    public static final String GLOBALCOLLECT_MERCHANT_ACCOUNT = "merchantID";
+
+    /**
+     * Merchant Reference
+     */
+    public static final String GLOBALCOLLECT_MERCHANT_REF = "MERCHANT_REF";
+
+    /**
+     * Installments
+     */
+    public static final String GLOBALCOLLECT_NUMBEROFINSTALLMENTS = "NUMBEROFINSTALLMENTS";
+
+    /**
+     * Order Id
+     */
+    public final static String GLOBALCOLLECT_ORDER_ID = "GLOBALCOLLECT_ORDER_ID";
+
+    /**
+     * Order Number
+     */
+    public final static String GLOBALCOLLECT_ORDER_NUMBER = "GLOBALCOLLECT_ORDER_NUMBER";
+
+    /**
+     * Payment Parameter - Payment Amount
+     */
+    public static final String GLOBALCOLLECT_PAYMENT_AMOUNT = "amount";
+
+    /**
+     * Returned Reference
+     */
+    public static final String GLOBALCOLLECT_RETURNED_REF = "REF";
+
+    /**
+     * Returned MAC
+     */
+    public static final String GLOBALCOLLECT_RETURNED_MAC = "RETURNEDMAC";
+
+    /**
+     * Returned FORMACTION
+     */
+    public static final String GLOBALCOLLECT_RETURNED_FORMACTION = "FORMACTION";
+
+    /**
+     * Ship To First Name
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_FNAME = "GLOBALCOLLECT_SHIPTO_FNAME";
+
+    /**
+     * Ship To Last Name
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_LNAME = "GLOBALCOLLECT_SHIPTO_LNAME";
+
+    /**
+     * Ship To Street 1
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_HOUSENUMBER = "GLOBALCOLLECT_SHIPTO_HOUSENUMBER";
+
+    /**
+     * Ship To Street 1
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_STREET1 = "GLOBALCOLLECT_SHIPTO_STREET1";
+
+    /**
+     * Ship To City
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_CITY = "GLOBALCOLLECT_SHIPTO_CITY";
+
+    /**
+     * Ship To Company
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_COMP = "GLOBALCOLLECT_SHIPTO_COMP";
+
+    /**
+     * Ship To State
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_STATE = "GLOBALCOLLECT_SHIPTO_STATE";
+
+    /**
+     * Ship To Postal Code
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_POSTCODE = "GLOBALCOLLECT_SHIPTO_POSTCODE";
+
+    /**
+     * Ship To Country
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_COUNTRY = "GLOBALCOLLECT_SHIPTO_COUNTRY";
+
+    /**
+     * Bill To CountryCode
+     */
+    public final static String GLOBALCOLLECT_SHIPTO_CTRY_CODE = "GLOBALCOLLECT_SHIPTO_CTRY_CODE";
 
     /**
      * Order time
@@ -402,6 +411,15 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
                             + " sending the request to GlobalCollect.");
         }
         staticData.setRequestUrl(conf.getValue());
+
+        conf = getConfiguration(MODULE_PAYMENT_GLOBALCOLLECT_CUSTOM_CLASS);
+        if (conf == null)
+        {
+            // Only warn if absent because we can continue without it
+            log.warn("The Configuration MODULE_PAYMENT_GLOBALCOLLECT_CUSTOM_CLASS must be set to the name"
+                    + " of the custom class for GlobalCollect.");
+        }
+        staticData.setCustomClass(conf.getValue());
 
         conf = getConfiguration(MODULE_PAYMENT_GLOBALCOLLECT_RESPONSE_URL);
         if (conf == null)
@@ -654,6 +672,21 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
         parmList.add(new NameValue(GLOBALCOLLECT_CUST_EMAIL, order.getCustomerEmail()));
         parmList.add(new NameValue(GLOBALCOLLECT_PAYMENT_AMOUNT, removeCurrencySymbols(total
                 .toString())));
+
+        // ----------------------------------------------------------------------------------------
+        // Add Custom values
+
+        GlobalCollectCustomIf customClass = getCustomClass(sd.getCustomClass(), getEng());
+
+        if (customClass != null)
+        {
+            int numInstallments = customClass.getNumberOfInstallments(order);
+            if (numInstallments != -1)
+            {
+                parmList.add(new NameValue(GLOBALCOLLECT_NUMBEROFINSTALLMENTS, Integer
+                        .toString(numInstallments)));
+            }
+        }
 
         // ---------------------------------------------------------------------------------------
         // Set the billing details
@@ -1065,6 +1098,61 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
         }
     }
 
+    private GlobalCollectCustomIf getCustomClass(String customClassName, KKEngIf _eng)
+            throws Exception
+    {
+        if (Utils.isBlank(customClassName))
+        {
+            return null;
+        }
+
+        Class<?> mgrClass = null;
+        try
+        {
+            mgrClass = Class.forName(customClassName);
+        } catch (Exception e)
+        {
+            throw new KKException(
+                    "Unable to instantiate the GlobalCollect custom class with name : "
+                            + customClassName);
+        }
+
+        if (log.isInfoEnabled())
+        {
+            log.info("Found GlobalCollect custom class with name : " + customClassName);
+        }
+
+        String constructorArg = "com.konakart.appif.KKEngIf";
+        Constructor<?>[] constructors = mgrClass.getConstructors();
+        Constructor<?> engConstructor = null;
+        if (constructors != null && constructors.length > 0)
+        {
+            for (int i = 0; i < constructors.length; i++)
+            {
+                Constructor<?> constructor = constructors[i];
+                Class<?>[] parmTypes = constructor.getParameterTypes();
+                if (parmTypes != null && parmTypes.length == 1)
+                {
+                    String parmName = parmTypes[0].getName();
+                    if (parmName != null && parmName.equals(constructorArg))
+                    {
+                        engConstructor = constructor;
+                    }
+                }
+            }
+        }
+
+        if (engConstructor == null)
+        {
+            throw new KKException(
+                    "Could not find a constructor for the GlobalCollect custom class : "
+                            + customClassName + ", that requires one parameter of type "
+                            + constructorArg);
+        }
+
+        return (GlobalCollectCustomIf) engConstructor.newInstance(_eng);
+    }
+
     /**
      * Returns true or false
      * 
@@ -1347,6 +1435,8 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
 
         private boolean timeBasedOrderId;
 
+        private String customClass;
+
         /** Array of Allowed products */
         private int[] allowedProducts;
 
@@ -1556,6 +1646,23 @@ public class GlobalCollect extends BasePaymentModule implements PaymentInterface
         public void setProductsHM(Map<String, PaymentProduct[]> productsHM)
         {
             this.productsHM = productsHM;
+        }
+
+        /**
+         * @return the customClass
+         */
+        public String getCustomClass()
+        {
+            return customClass;
+        }
+
+        /**
+         * @param customClass
+         *            the customClass to set
+         */
+        public void setCustomClass(String customClass)
+        {
+            this.customClass = customClass;
         }
     }
 }

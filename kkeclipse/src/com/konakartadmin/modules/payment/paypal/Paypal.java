@@ -167,7 +167,7 @@ public class Paypal extends PaymentModule
         configs[i] = new KKConfiguration(
         /* title */"Cancel URL",
         /* key */"MODULE_PAYMENT_PAYPAL_CANCEL_URL",
-        /* value */"http://host:port/konakart/CatalogCheckoutExternalPaymentErrorPage.action",
+        /* value */"http://host:port/konakart/CheckoutPaymentError.action",
         /* description */"URL to return to when leaving PayPal web"
                 + " site after an unsuccesful transaction",
         /* groupId */groupId,

@@ -178,7 +178,7 @@ $(function() {
 	    						<tr>
 	    							<td class="narrow-col"><kk:msg  key="edit.cart.body.item"/></td>
 	    							<td class="wide-col"></td>
-	    							<td class="narrow-col"><kk:msg  key="edit.cart.body.quantity"/></td>
+	    							
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.price"/></td>
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.total"/></td>
 	    							<td class="narrow-col center"></td>
@@ -199,12 +199,11 @@ $(function() {
 		    								<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'  class="text-link"><%=item.getProduct().getName()%>
 		    									<kk:prodOptions options="<%=item.getOpts()%>"/>
 											</a>
-		    							</td>
-		    							<td>
-		    								<input type="text" class="qty-input" name="prodQty" id="q-<%=item.getId()%>" value="<%=item.getQuantity()%>">
+											<input type="text" class="qty-input" name="prodQty" id="q-<%=item.getId()%>" value="<%=item.getQuantity()%>">
 		    								<a id='<%="b-"+item.getId()%>' class="update-button small-rounded-corners"><kk:msg  key="common.update"/></a>
 		    								<span class="validation-msg"></span>
 		    							</td>
+		    						
 				    					<%if (item.getFinalPriceIncTax() != null && kkEng.displayPriceWithTax()){ %>				    					
 				    						<td class="right">
 				    							<%if (item.getQuantity()>0){ %>
@@ -221,7 +220,7 @@ $(function() {
 				    						</td>
 											<td class="total-price right"><%=kkEng.formatPrice(item.getFinalPriceExTax())%></td>
 										<% } %>		    							
-		    							<td class="center"><a href='<%="EditCartSubmit.action?action=r&id="+item.getId()%>' class="has-tooltip" title='<%=kkEng.getMsg("common.remove.item")%>'><img src="<%=kkEng.getImageBase()%>/x-button.png" border="0"></a></td>
+		    							<td class="center"><a class="remove fa fa-times-circle" href='<%="EditCartSubmit.action?action=r&id="+item.getId()%>' title='<%=kkEng.getMsg("common.remove.item")%>'></a></td>
 		    					    </tr>
 								<%}%>
 	    						<tr id="costs-and-promotions">
@@ -264,7 +263,7 @@ $(function() {
 														<tr>
 															<% OrderTotalIf ot = orderMgr.getCheckoutOrder().getOrderTotals()[j];%>
 															<td class="cost-overview-labels">
-																<% if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>																
+																<% if (kkEng.isDiscountModule(ot.getClassName())) {%>																
 																	<span class="discount"><%=ot.getTitle()%></span><br/>
 																<%}else{%>																
 																	<%=ot.getTitle()%><br/>
@@ -275,8 +274,8 @@ $(function() {
 																	<%=ot.getValue()%><br/>
 																<%}else if (ot.getClassName().equals("ot_free_product")){%>
 																	<%=ot.getText()%><br/>
-																<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>																
-																	<span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span><br/>
+																<%}else if (kkEng.isDiscountModule(ot.getClassName())) {%>														
+																	<span class="discount">-<%=kkEng.formatPrice(ot.getValue())%></span><br/>
 																<%}else{%>																
 																	<%=kkEng.formatPrice(ot.getValue())%><br/>
 																<%}%>

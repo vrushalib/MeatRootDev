@@ -39,6 +39,7 @@ import org.apache.struts2.interceptor.SessionAware;
 import org.apache.struts2.portlet.context.PortletActionContext;
 
 import com.konakart.al.KKAppEng;
+import com.konakart.al.KKAppEng.SessionCheckData;
 import com.konakart.al.KKAppException;
 import com.konakart.al.StoreInfo;
 import com.konakart.app.CustomerEvent;
@@ -389,30 +390,47 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
             return -1;
         }
 
-        // If an exception is thrown, set the forward and return it
         int custId;
-        try
+        if (kkAppEng.getSessionCheckData().needToCheck())
         {
-            custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
-        } catch (KKException e)
-        {
-            log.debug(e.getMessage());
-            if (forwardAfterLogin != null)
+            // If an exception is thrown, set the forward and return it
+            if (log.isDebugEnabled())
             {
-                kkAppEng.setForwardAfterLogin(forwardAfterLogin);
+                log.debug("Calling checkSession on KKEng");
             }
+            try
+            {
+                custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
+                SessionCheckData scd = kkAppEng.getSessionCheckData();
+                scd.setCustId(custId);
+                scd.setCheckTime(System.currentTimeMillis());
+            } catch (KKException e)
+            {
+                log.debug(e.getMessage());
+                if (forwardAfterLogin != null)
+                {
+                    kkAppEng.setForwardAfterLogin(forwardAfterLogin);
+                }
 
-            kkAppEng.getCustomerMgr().logout();
+                kkAppEng.getCustomerMgr().logout();
 
-            // Ensure that the guest customer is the one in the cookie
-            manageCookieLogout(request, response, kkAppEng);
+                // Ensure that the guest customer is the one in the cookie
+                manageCookieLogout(request, response, kkAppEng);
 
-            return -1;
+                return -1;
+            }
+        } else
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Using cached sessionId");
+            }
+            custId = kkAppEng.getSessionCheckData().getCustId();
         }
 
         // Check the XSRF token for a post. Don't check anything we are redirected to after a login
         // since the token wasn't available at the time of the post
-        if (kkAppEng.getXsrfToken() != null && checkXSRF
+        if (kkAppEng.getXsrfToken() != null && checkXSRF && request.getServletPath() != null
                 && !request.getServletPath().contains("LoginSubmit"))
         {
             String method = request.getMethod();
@@ -1148,13 +1166,17 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
     protected String login(KKAppEng kkAppEng, HttpServletRequest request, String emailAddr,
             String password) throws KKException, KKAppException
     {
-        // Change the session
-        changeSession(request);
+        if (!kkAppEng.isPortlet())
+        {
+            // Change the session
+            changeSession(request);
 
-        // Set this session to null to avoid struts interceptors from throwing an exception because
-        // the session is invalid
-        ActionContext context = ActionContext.getContext();
-        context.setSession(null);
+            // Set this session to null to avoid struts interceptors from throwing an exception
+            // because
+            // the session is invalid
+            ActionContext context = ActionContext.getContext();
+            context.setSession(null);
+        }
 
         // Login and return the new session
         String sessionId = kkAppEng.getCustomerMgr().login(emailAddr, password);

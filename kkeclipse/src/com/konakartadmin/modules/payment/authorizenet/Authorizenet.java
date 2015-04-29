@@ -53,12 +53,11 @@ public class Authorizenet extends PaymentModule
     }
 
     /**
-     * @return the implementation filename. (For oscommerce compatibility you can use the php
-     *         version for these names)
+     * @return the implementation filename.
      */
     public String getImplementationFileName()
     {
-        return "authorizenet.php";
+        return "Authorizenet";
     }
 
     /**
@@ -68,7 +67,7 @@ public class Authorizenet extends PaymentModule
     {
         return "authorizenet";
     }
-    
+
     /**
      * @return an array of configuration values for this payment module
      */
@@ -76,7 +75,7 @@ public class Authorizenet extends PaymentModule
     {
         if (configs == null)
         {
-            configs = new KKConfiguration[9];
+            configs = new KKConfiguration[16];
         }
 
         if (configs[0] != null && !Utils.isBlank(configs[0].getConfigurationKey()))
@@ -141,7 +140,7 @@ public class Authorizenet extends PaymentModule
         /* groupId */groupId,
         /* sort Order */i,
         /* useFun */"",
-        /* setFun */"",
+        /* setFun */"password",
         /* dateAdd */now);
 
         configs[i++] = new KKConfiguration(
@@ -159,7 +158,8 @@ public class Authorizenet extends PaymentModule
         /* title */"ARB Request URL",
         /* key */"MODULE_PAYMENT_AUTHORIZENET_ARB_REQUEST_URL",
         /* value */"https://apitest.authorize.net/xml/v1/request.api",
-        /* description */"URL for Automated Recurring Billing used by KonaKart to send the transaction details",
+        /* description */"URL for Automated Recurring Billing used by"
+                + " KonaKart to send the transaction details",
         /* groupId */groupId,
         /* sortO */i,
         /* useFun */"",
@@ -174,19 +174,106 @@ public class Authorizenet extends PaymentModule
         /* groupId */groupId,
         /* sort Order */i,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true', 'false')",
+        /* dateAdd */now,
+        /* returnByApi */true);
+
+
+        configs[i] = new KKConfiguration(
+        /* title */"Show CVV field",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV",
+        /* value */"true",
+        /* description */"If set to true, the CVV entry field will"
+                + " be shown when entering credit card details",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"choice('true', 'false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-                /* title */"Show CVV field",
-                /* key */"MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV",
-                /* value */"true",
-                /* description */"If set to true, the CVV entry field will be shown when entering credit card details",
-                /* groupId */groupId,
-                /* sortO */i++,
-                /* useFun */"",
-                /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
-                /* dateAdd */now);
+        /* title */"Use Direct Post Integration",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_DIRECT_POST",
+        /* value */"false",
+        /* description */"If set to true, direct post will be used instead of AIM",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"choice('true', 'false')",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"MD5 Hash Key",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_MD5_HASH_KEY",
+        /* value */"",
+        /* description */"Leave the MD5HashKey empty, unless you have"
+                + " explicitly set it in the merchant interface",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"password",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Direct Post Relay URL",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_RELAY_URL",
+        /* value */"https://host:port/konakart/AuthNetCallback.action",
+        /* description */"URL used by AuthorizeNet Direct Post to callback into KonaKart."
+                + " This would typically be HTTPS and reachable from the internet",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Direct Post Callback Username",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_CALLBACK_USERNAME",
+        /* value */"myuser",
+        /* description */"Valid username for KonaKart. Used by the callback"
+                + " code to log into KonaKart in order to make an engine call",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Direct Post Callback Password",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_CALLBACK_PASSWORD",
+        /* value */"mypassword",
+        /* description */"Valid password for KonaKart. Used by the callback"
+                + " code to log into KonaKart in order to make an engine call",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"password",
+        /* dateAdd */now);
+        
+        configs[i] = new KKConfiguration(
+        /* title */"Enable Customer Information Manager",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM",
+        /* value */"false",
+        /* description */"If set to true, AuthorizeNet will be used to manage credit cards",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"choice('true', 'false')",
+        /* dateAdd */now,
+        /* returnByApi */true);
+        
+        configs[i++] = new KKConfiguration(
+        /* title */"CIM Web Service URL",
+        /* key */"MODULE_PAYMENT_AUTHORIZENET_CIM_WEB_SERVICE_URL",
+        /* value */"https://apitest.authorize.net/xml/v1/request.api",
+        /* description */"URL for sending CIM XML messages."
+                + " For production use https://api.authorize.net/xml/v1/request.api",
+        /* groupId */groupId,
+        /* sortO */i,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now);
+
 
         return configs;
     }

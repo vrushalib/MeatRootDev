@@ -22,21 +22,21 @@ ANTLR (antlr.jar).                              See accompanying antlr.license.t
 Apache Tomcat/Catalina (various jars etc).      See accompanying apache.license.txt file.
 Apache Commons libraries (commons-*.jar).       See accompanying apache.license.txt file.
 Axis (axis.jar,saaj.jar,jaxrpc.jar,wsdl4j.jar). See accompanying apache.license.txt file.
+CDI (cdi*.jar).                                 See accompanying apache.license.txt file.
 DB2 JDBC driver (db2jcc*.jar).                  See accompanying ibm.db2.jdbc.type4.driver.redistribution.license.txt file.
-GWT (gwt-servlet.jar).                          See accompanying apache.license.txt file.
-Google Base (gdata-*.jar)                       See accompanying apache.license.txt file. 
+GWT (gwt-servlet.jar).                          See accompanying apache.license.txt file. 
 JDOM (jdom-*.jar).                              See accompanying jdom.license.txt file.
 Jakarta-Oro (oro*.jar, jakarta-oro.jar).        See accompanying apache.license.txt file.
 JavaMail (mail.jar).                            See accompanying mail.license.txt file.
 JAXB (jaxb-api.jar, jaxb-impl.jar)              See accompanying CDDL-LICENSE.TXT and GPL2-LICENSE.TXT files
-StAX (jsr173_1.0_api.jar)                       See accompanying CDDL-LICENSE.TXT and GPL2-LICENSE.TXT files
-JCS (jcs-20030822.182132.jar).                  See accompanying apache.license.txt file.
+StAX (jsr*.jar).                                See accompanying CDDL-LICENSE.TXT and GPL2-LICENSE.TXT files
+JCS (jcs-*.jar).                                See accompanying apache.license.txt file.
 Log4J (log4j.jar).                              See accompanying apache.license.txt file.
 MySQL (mysqljdbc.jar).                          See accompanying mysql.license.txt file.
-Oracle JDBC driver (ojdbc14.jar).               See accompanying oracle.license.txt file.
+Oracle JDBC driver (ojdbc*.jar).                See accompanying oracle.license.txt file.
 PDFBox Java PDF Library (PDFBox-*.jar).         See accompanying pdfbox.license.pdf file.
-PostgreSQL JDBC driver (postgresql.jar).        See accompanying postgresql.license.txt file.
-Solr/Lucence (apache-solr-1.2.0.war)            See accompanying apache.license.txt file.
+PostgreSQL JDBC driver (postgresql*.jar).       See accompanying postgresql.license.txt file.
+Solr/Lucence (apache-solr-*.war)                See accompanying apache.license.txt file.
 Stratum (stratum-*.jar).                        See accompanying apache.license.txt file.
 Struts (struts.jar).                            See accompanying apache.license.txt file.
 Torque (included in konakart-torque-*.jar).     See accompanying apache.license.txt file. 
@@ -46,5 +46,5 @@ Xerces (xerces.jar).                            See accompanying apache.license.
 XML Apis (xml-apis-*.jar).                      See accompanying dom.license.txt & sax.license.txt file.
 Unless otherwise indicated, all Content made available by the Eclipse Foundation is provided under the terms and conditions of the Eclipse Public License Version 1.0 ("EPL"). A copy of the EPL is provided with this Content and is also available at http://www.eclipse.org/legal/epl-v10.html. 
 
-Copyright 2009 DS Data Systems UK Ltd., All Rights Reserved.
+Copyright 2014 DS Data Systems UK Ltd., All Rights Reserved.
 

@@ -60,10 +60,18 @@
 									<%if (kkEng.getConfigAsBoolean("ACCOUNT_GENDER",false)) { %>
 										<div class="form-input radio-buttons">
 											<label><kk:msg  key="register.customer.body.gender"/></label>
-											<s:set scope="request" var="req_gender" value="gender"/> 
-											<%String g = (String)(request.getAttribute("req_gender")); %>
-											<span class="radio-button"><input type="radio" name="gender" value="m" <%=(g!=null&&g.equals("m"))?"checked":"" %>> <kk:msg  key="register.customer.body.male"/></span> 
-											<span class="radio-button"><input type="radio" name="gender" value="f" <%=(g!=null&&g.equals("f"))?"checked":"" %>> <kk:msg  key="register.customer.body.female"/></span>	
+											<% boolean otherGenderEnabled = kkEng.getConfigAsBoolean("ENABLE_OTHER_GENDER",false); %>
+											<% String radioClass = "radio-button"; %>
+											<%if (otherGenderEnabled) { %>
+												<% radioClass = "radio-button-1-and-2-of-3"; %>
+											<% } %>
+											<s:set scope="request" var="gender" value="gender"/>
+											<% String g = (String)request.getAttribute("gender");%> 
+											<span class="<%=radioClass%>"><input type="radio" name="gender" value="m" <%=(g!=null&&g.equals("m"))?"checked":"" %>> <kk:msg  key="register.customer.body.male"/></span> 
+											<span class="<%=radioClass%>"><input type="radio" name="gender" value="f" <%=(g!=null&&g.equals("f"))?"checked":"" %>> <kk:msg  key="register.customer.body.female"/></span>
+											<%if (otherGenderEnabled) { %>
+												<span class="radio-button-3-of-3"><input type="radio" name="gender" value="x" <%=(g!=null&&g.equals("x"))?"checked":"" %>> <kk:msg  key="register.customer.body.other"/></span>
+											<% } %>
 											<span class="required-icon required-blue"></span>	
 											<span class="validation-msg"></span>							
 										</div>
@@ -101,20 +109,33 @@
 									</div>
 								</div>
 							</div>
-							<%if (kkEng.getConfigAsBoolean("ACCOUNT_COMPANY",false)) { %>
+							<%boolean showCompany = kkEng.getConfigAsBoolean("ACCOUNT_COMPANY",false);%>
+							<%boolean showTaxId = kkEng.getConfigAsBoolean("ACCOUNT_TAX_ID",false);%>
+							<%if (showCompany || showTaxId) { %>
 								<div class="form-section">
 									<h3><kk:msg  key="register.customer.body.company.details"/></h3>
 									<div class="form-section-fields">
 										<div class="form-section-divider"></div>
-										<div class="form-input">
-											<label><kk:msg  key="register.customer.body.company.name"/></label>
-											<input type="text" value="<s:property value="company" />" id="company" name="company"/>
-											<span class="validation-msg"></span>
-										</div>
+										<%if (showCompany) { %>
+											<div class="form-input">
+												<label><kk:msg  key="register.customer.body.company.name"/></label>
+												<input type="text" value="<s:property value="company" />" id="company" name="company"/>
+												<span class="validation-msg"></span>
+											</div>
+										<% } else { %>
+											<input type="hidden" name="company" value=""/>
+										<% } %>
+										<%if (showTaxId) { %>
+											<div class="form-input">
+												<label><kk:msg  key="register.customer.body.tax.id"/></label>
+												<input type="text" value="<s:property value="taxId" />" id="taxId" name="taxId"/>
+												<span class="validation-msg"></span>
+											</div>
+										<% } else { %>
+											<input type="hidden" name="taxId" value=""/>
+										<% } %>										
 									</div>
 								</div>
-							<% } else { %>
-								<input type="hidden" name="company" value=""/>
 							<% } %>
 							<div class="form-section">
 								<h3><kk:msg  key="register.customer.body.addr"/></h3>

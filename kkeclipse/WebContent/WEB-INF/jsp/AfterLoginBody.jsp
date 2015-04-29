@@ -26,6 +26,7 @@
 <% com.konakart.appif.DigitalDownloadIf[] downloads = productMgr.getDigitalDownloads();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 
+ 		<%boolean manageCCAuthNetSIM=kkEng.getConfigAsBoolean("MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM", false, false); %>
    		<h1 id="page-title"><kk:msg  key="after.login.body.myaccountinfo"/></h1>
 	    		<div id="my-account" class="content-area rounded-corners">
 	    			<s:if test="hasActionErrors()">
@@ -108,16 +109,18 @@
 					    							<td><%=kkEng.getDateAsString(order.getDatePurchased())%></td>
 					    							<td><kk:msg  key="common.total"/>: <%=kkEng.formatPrice(order.getTotalIncTax(),order.getCurrencyCode())%></td>
 					    							<td><div class="label <%=statusClass%>"><%=order.getStatusText()%></div></td>
-					    							<td class="order-action"><a class="text-link" href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'><kk:msg  key="common.view"/></a></td>	
-					    							<td class="order-action"><a class="text-link" href='<%="RepeatOrder.action?orderId="+order.getId()%>'><kk:msg  key="common.repeat"/></a></td>	
-					    							<td class="order-action"><a class="text-link"><kk:msg  key="common.track"/></a></td>	
+					    							<td class="last-order-icons">
+					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
+					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
+					    								<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
 													<%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
-															<td class="order-action"><a class="text-link" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
+															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
 														<%} else {%>
-															<td class="order-action"><a class="text-link" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
+															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
 													<% } %>
+													</td>
 					    						</tr>
 				    						</tbody>
 				    						<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>
@@ -150,7 +153,67 @@
 					    						</tr>
 					    					<% } %>		    							    							    							    				
 					    				</table> 
-					    			</div>																	
+					    			</div>	
+					    			<div class="last-order-mobile">
+					    				<table>
+					    					<tbody>
+					    						<tr>
+					    							<td>#<%=order.getId()%></td>
+					    							<td><%=kkEng.getDateAsString(order.getDatePurchased())%></td>
+					    							
+					    							<td><div class="label <%=statusClass%>"><%=order.getStatusText()%></div></td>
+					    							<td class="last-order-icons">
+					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
+					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
+					    								<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
+													<%if (enableInvoice) {%>	
+														<%if (kkEng.isPortlet()){ %>
+															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
+														<%} else {%>
+															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
+														<%}%>
+													<% } %>
+													</td>
+					    						</tr>
+				    						</tbody>
+				    						<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>
+					    						<tr>
+					    							<td colspan="8">	    					
+							    						 <table>
+									    					<thead>
+									    						<tr>
+									    							<td class="wide-col"><kk:msg  key="common.item"/></td>
+									    							<td class="narrow-col right"><kk:msg  key="common.quantity"/></td>
+									    							<td class="narrow-col right"><kk:msg  key="common.total"/></td>		    						
+									    						</tr>
+									    					</thead>
+									    					<tbody>				    						
+							    							<% for (int j = 0; j < order.getOrderProducts().length; j++){ %>	
+							    								<% com.konakart.appif.OrderProductIf orderProd = order.getOrderProducts()[j];%>
+									    						<tr>
+									    							<td><a class="text-link" href='<%="SelectProd.action?prodId="+orderProd.getProductId()%>'><%=orderProd.getName()%></a></td>
+									    							<td class="right"><%=orderProd.getQuantity()%></td>
+									    							<%if (kkEng.displayPriceWithTax()) {%>
+																		<td class="right"><%=kkEng.formatPrice(orderProd.getFinalPriceIncTax(),order.getCurrencyCode())%></td>
+																	<%} else {%>
+																		<td class="right"><%=kkEng.formatPrice(orderProd.getFinalPriceExTax(),order.getCurrencyCode())%></td>
+																	<%}%>	
+									    						</tr>
+							    							<% } %>
+									    					</tbody>
+									    					<tfoot>
+										    					<tr class="total-amount">
+										    						<td><kk:msg  key="common.total"/>: </td>
+										    						<td></td>
+										    						<td><%=kkEng.formatPrice(order.getTotalIncTax(),order.getCurrencyCode())%></td>
+										    					</tr>  
+									    					</tfoot>  				
+									    				</table>
+								    				</td>
+					    						</tr>
+					    					<% } %>		    							    							    							    				
+					    				</table> 
+					    			</div>																
 				    			<% } %>
 					    	</div>																	
 				    	<% } %>
@@ -160,9 +223,13 @@
 							<div id="addressbook" class="my-account-area">
 								<h3><kk:msg  key="after.login.body.personal.information"/></h3>
 								<div class="my-account-area-content">
+									<a href="EditEmail.action" class="text-link"><kk:msg  key="after.login.body.changeemail"/></a>
+									<a href="ChangePassword.action" class="text-link"><kk:msg  key="after.login.body.changepassword"/></a>
 									<a href="EditCustomer.action" class="text-link"><kk:msg  key="after.login.body.changeaccountinfo"/></a>
 									<a href="AddressBook.action" class="text-link"><kk:msg  key="after.login.body.changeaddrbook"/></a>
-									<a href="ChangePassword.action" class="text-link"><kk:msg  key="after.login.body.changepassword"/></a>
+									<%if (manageCCAuthNetSIM) { %>
+										<a href="AuthorizeNetManageCreditCards.action" id="authNetManageCreditCards" class="text-link"><kk:msg  key="after.login.body.manageCreditCards"/></a>
+								    <% } %>
 								</div>
 							</div>
 							<%if (rewardPointMgr.isEnabled()) { %>				
@@ -201,3 +268,58 @@
 						</div>   	
 					<% } %>
 	    		</div>
+	    		
+		    	<s:set scope="request" var="token" value="token"/>
+				<% String token = (String)request.getAttribute("token");%> 
+				
+				<%if (manageCCAuthNetSIM && token != null) { %>
+
+					 <link href="AuthorizeNetCIM/manage.css" rel="stylesheet" type="text/css" />
+					 <script type="text/javascript" src="AuthorizeNetCIM/popup.js"></script>
+					 
+					  <script type="text/javascript">
+					  	<%boolean testMode = kkEng.getConfigAsBoolean("MODULE_PAYMENT_AUTHORIZENET_TESTMODE", true); %>
+						<%if (testMode) { %>
+							// Use https://test.authorize.net
+							AuthorizeNetPopup.options.useTestEnvironment = true;
+				    	<% } else { %>
+				    	 	// Use https://secure.authorize.net
+				    		AuthorizeNetPopup.options.useTestEnvironment = false;
+				    	<% } %>
+						
+						$(function() {
+							AuthorizeNetPopup.openManagePopup();
+						});
+					  </script>
+					 
+					<form method="post" id="formAuthorizeNetPopup" name="formAuthorizeNetPopup" target="iframeAuthorizeNet" style="display:none;">
+					  <input type="hidden" name="Token" value="<%=token%>" />
+					</form>
+					
+					<div id="divAuthorizeNetPopup" style="display:none;" class="AuthorizeNetPopupGrayFrameTheme">
+					  <div class="AuthorizeNetPopupOuter">
+					    <div class="AuthorizeNetPopupTop">
+					      <div class="AuthorizeNetPopupClose">
+					        <a href="javascript:;" onclick="AuthorizeNetPopup.closePopup();" title="Close"> </a>
+					      </div>
+					    </div>
+					    <div class="AuthorizeNetPopupInner">
+					      <iframe name="iframeAuthorizeNet" id="iframeAuthorizeNet" src="AuthorizeNetCIM/empty.html" frameborder="0" scrolling="no"></iframe>
+					    </div>
+					    <div class="AuthorizeNetPopupBottom">
+					      <div class="AuthorizeNetPopupLogo" title="Powered by Authorize.Net"></div>
+					    </div>
+					  </div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowT"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowR"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowB"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowL"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowTR"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowBR"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowBL"></div>
+					  <div class="AuthorizeNetShadow AuthorizeNetShadowTL"></div>
+					</div>
+										
+					<div id="divAuthorizeNetPopupScreen" style="display:none;"></div>
+					
+			    <% } %>    		

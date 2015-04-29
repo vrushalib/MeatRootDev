@@ -31,10 +31,13 @@
 		<put-attribute name="body3" value="/WEB-INF/jsp/FeaturedProductsBody.jsp"/>
 		<put-attribute name="body4" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
 	</definition>
-		<!-- Page shown for the detail of one product -->
+	<!-- Page shown for the detail of one product -->
+	<definition name="catalog.showprod.details.page.include" template="/WEB-INF/jsp/ProductDetailsBody.jsp">
+		<put-attribute name="pdInclude" value="/WEB-INF/jsp/ProductDetailsInclude.jsp"/>
+	</definition>	
 	<definition name="catalog.showprod.details.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.showprod.details.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/ProductDetailsBody.jsp"/>
+		<put-attribute name="body1" value="catalog.showprod.details.page.include"/>
 		<put-attribute name="body2" value="/WEB-INF/jsp/RecentlyViewedProductsBody.jsp"/>
 	</definition>	
 	<!-- Page shown when user wants to modify address book entries -->
@@ -143,6 +146,11 @@
 		<put-attribute name="defName" value="catalog.editcustomer.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/EditCustomerBody.jsp"/>
 	</definition>
+	<!-- Page shown to edit a customer's email -->
+	<definition name="catalog.editemail.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.editemail.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/EditEmailBody.jsp"/>
+	</definition>
 	<!-- Page shown to create a gift registry -->
 	<definition name="catalog.create.gift.registry.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.create.gift.registry.page"/>
@@ -222,38 +230,29 @@
 		<put-attribute name="defName" value="catalog.aboutus.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/AboutUsBody.jsp"/>
 	</definition>
-	<definition name="catalog.placingorder.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.placingorder.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/PlacingOrderBody.jsp"/>
+	<definition name="catalog.shippingandhandling.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.shippingandhandling.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ShippingAndHandlingBody.jsp"/>
 	</definition>
-	
-	<definition name="catalog.payment.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.payment.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/Payment.jsp"/>
+	<definition name="catalog.returns.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.returns.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/ReturnsBody.jsp"/>
 	</definition>
-	<definition name="catalog.deliverydetails.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.deliverydetails.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/DeliveryDetailsBody.jsp"/>
+	<definition name="catalog.internationalorders.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.internationalorders.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/InternationalOrdersBody.jsp"/>
 	</definition>
-	<definition name="catalog.ordertracking.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.ordertracking.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/OrderTrackingBody.jsp"/>
-	</definition>
-	<definition name="catalog.cancellationpolicy.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.cancellationpolicy.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/CancellationPrivacyBody.jsp"/>
-	</definition>
-	<definition name="catalog.contentchanges.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.contentchanges.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/ContentChangesBody.jsp"/>
+	<definition name="catalog.privacypolicy.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.privacypolicy.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/PrivacyBody.jsp"/>
 	</definition>
 	<definition name="catalog.termsofuse.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.termsofuse.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/TermsOfUseBody.jsp"/>
 	</definition>
-	<definition name="catalog.faq.page" extends="main.layout">
-		<put-attribute name="defName" value="catalog.faq.page"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/FAQBody.jsp"/>
+	<definition name="catalog.help.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.help.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/HelpBody.jsp"/>
 	</definition>
 	<definition name="catalog.contactus.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.contactus.page"/>
@@ -278,4 +277,15 @@
 		<put-attribute name="body1" value="/WEB-INF/jsp/CommideaCreditCardBody.jsp"/>
 	</definition>
 	<definition name="catalog.commidea3dsecurecheck.page" template="/WEB-INF/jsp/Commidea3DSecureBody.jsp"/>
+	<!-- Paymetric Payment Gateway Pages -->
+	<definition name="catalog.paymetric.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.paymetric.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/PaymetricCreditCardBody.jsp"/>
+	</definition>
+	<!-- AuthorizeNet DPM Payment Gateway Pages -->
+	<definition name="catalog.authnetcreditcard.page" extends="main.layout">
+		<put-attribute name="defName" value="catalog.authnetcreditcard.page"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/AuthNetCreditCardBody.jsp"/>
+	</definition>
+	
 </tiles-definitions>

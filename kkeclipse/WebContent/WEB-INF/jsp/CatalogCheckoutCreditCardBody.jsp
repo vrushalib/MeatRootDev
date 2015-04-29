@@ -42,7 +42,7 @@ $.validator.addMethod("notExpired", function () {
 
 </script>
 
- 				<h1 id="page-title"><kk:msg  key="checkout.cc.payment"/></h1>			
+ 				<h1 id="page-title"><kk:msg  key="checkout.cc.payment"/></h1>
 	    		<div class="content-area rounded-corners">
 		    		<div id="credit-card">
 		    			<s:if test="hasActionErrors()">
@@ -51,13 +51,13 @@ $.validator.addMethod("notExpired", function () {
 						            <s:property escape="false"/>
 						        </s:iterator>  
 			    			</div>  
-						</s:if>		    		    		
+						</s:if>
 			    		<form action="CheckoutServerPaymentSubmit.action" id="form1" autocomplete="off" method="post"> 
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<p><s:property value="warningMsg" escape="false"/>.</p>
 								<div>
-									<h3><kk:msg  key="checkout.cc.ccdetails"/><span class="required-text"><img src="<%=kkEng.getImageBase()%>/icons/required-blue.png">&nbsp;<kk:msg  key="common.required.fields"/></span></h3>							
+									<h3><kk:msg  key="checkout.cc.ccdetails"/><span class="required-text"><img src="<%=kkEng.getImageBase()%>/icons/required-blue.png">&nbsp;<kk:msg  key="common.required.fields"/></span></h3>
 								</div>
 								<div class="form-section-fields">
 									<div class="form-section-divider"></div>
@@ -72,7 +72,7 @@ $.validator.addMethod("notExpired", function () {
 											</select>
 											<span class="required-icon required-blue"></span>
 											<span class="validation-msg"></span>
-										</div>									
+										</div>
 									<%}%>
 									<%if (pd.isShowOwner()) {%>
 										<div class="form-input">
@@ -80,7 +80,7 @@ $.validator.addMethod("notExpired", function () {
 											<input type="text" value="<%=order.getCustomerName()%>" name="owner"/>
 											<span class="required-icon required-blue"></span>
 											<span class="validation-msg"></span>
-										</div>	
+										</div>
 									<%}else{%>
 										<input type="hidden" name="owner" value="<%=order.getCustomerName()%>">
 									<%}%>
@@ -105,17 +105,17 @@ $.validator.addMethod("notExpired", function () {
 											<option value="10"><kk:msg  key="month.oct"/></option>
 											<option value="11"><kk:msg  key="month.nov"/></option>
 											<option value="12"><kk:msg  key="month.dec"/></option>
-										</select>&nbsp;														
-										<select  name="expiryYear"  onChange="javascript:formValidate('form1','','true');" id="expiryYear" >													
-											<option value="14">2014</option>
+										</select>&nbsp;
+										<select name="expiryYear" onChange="javascript:formValidate('form1','','true');" id="expiryYear" >
 											<option value="15">2015</option>
 											<option value="16">2016</option>
 											<option value="17">2017</option>
 											<option value="18">2018</option>
-											<option value="19">2019</option>									
+											<option value="19">2019</option>
 											<option value="20">2020</option>
 											<option value="21">2021</option>
-										</select>										
+											<option value="22">2022</option>
+										</select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
 									</div>	
@@ -156,5 +156,3 @@ $.validator.addMethod("notExpired", function () {
 						</form>
 			    	</div>
 	    		</div>
-
-

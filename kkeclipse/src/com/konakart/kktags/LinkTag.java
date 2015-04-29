@@ -46,6 +46,8 @@ public class LinkTag extends BaseTag
     private String id;
     
     private String title;
+    
+    private String target;
 
     public int doStartTag() throws JspException
     {
@@ -99,6 +101,8 @@ public class LinkTag extends BaseTag
             {
                 // Stops Liferay complaining about invalid content type
                 href = href.replace("p_p_state=normal", "p_p_state=exclusive");
+                // Convert to a resource URL. Render URL always sets content type to text/html 
+                href = href.replace("p_p_lifecycle=0", "p_p_lifecycle=2");
             }
             link.append(" href=\"" + href + "\"");
         }
@@ -125,6 +129,10 @@ public class LinkTag extends BaseTag
         if (title != null)
         {
             link.append(" title=\"" + title + "\"");
+        }
+        if (target != null)
+        {
+            link.append(" target=\"" + target + "\"");
         }
         link.append(">");
         return link.toString();
@@ -257,6 +265,22 @@ public class LinkTag extends BaseTag
     public void setTitle(String title)
     {
         this.title = title;
+    }
+
+    /**
+     * @return the target
+     */
+    public String getTarget()
+    {
+        return target;
+    }
+
+    /**
+     * @param target the target to set
+     */
+    public void setTarget(String target)
+    {
+        this.target = target;
     }
 
 }

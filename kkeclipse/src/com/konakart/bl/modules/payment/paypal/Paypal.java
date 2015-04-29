@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2006-2014 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -34,8 +34,11 @@ import com.konakart.app.Order;
 import com.konakart.app.OrderTotal;
 import com.konakart.app.PaymentDetails;
 import com.konakart.app.SSOToken;
+import com.konakart.app.Zone;
+import com.konakart.app.ZoneSearch;
 import com.konakart.appif.KKEngIf;
 import com.konakart.appif.SSOTokenIf;
+import com.konakart.appif.ZoneSearchIf;
 import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
 import com.konakart.bl.modules.payment.BasePaymentModule;
@@ -44,7 +47,7 @@ import com.konakart.bl.modules.payment.PaymentInterface;
 import com.konakart.util.Utils;
 
 /**
- * PayPal IPN module
+ * PayPal IPN module - This uses "PayPal Payments Standard"
  */
 public class Paypal extends BasePaymentModule implements PaymentInterface
 {
@@ -351,9 +354,12 @@ public class Paypal extends BasePaymentModule implements PaymentInterface
         parmList.add(new NameValue("business", sd.getPayPalId()));
         parmList.add(new NameValue("currency_code", order.getCurrencyCode()));
         parmList.add(new NameValue("custom", uuid));
-        //parmList.add(new NameValue("no_shipping", "2"));
+        // parmList.add(new NameValue("no_shipping", "2"));
+        parmList.add(new NameValue("bn", "Kona_Cart"));
         parmList.add(new NameValue("no_note", "1"));
-        parmList.add(new NameValue("notify_url", sd.getPayPalCallbackUrl()));
+        
+        parmList.add(new NameValue("notify_url", sd.getPayPalCallbackUrl().replaceFirst(
+                hostPortSubstitute, info.getHostAndPort())));
 
         sd.setPayPalReturnUrl(sd.getPayPalReturnUrl().replaceFirst(hostPortSubstitute,
                 info.getHostAndPort()));
@@ -396,15 +402,38 @@ public class Paypal extends BasePaymentModule implements PaymentInterface
             parmList.add(new NameValue("address2", order.getDeliveryStreetAddress1()));
         }
         parmList.add(new NameValue("city", order.getDeliveryCity()));
-        parmList.add(new NameValue("state", order.getDeliveryState()));
-        
-        String iso2Country = getISO2CountryCodeFromCountryString(order.getDeliveryCountry());
+
+        Country deliveryCtry = getTaxMgr().getCountryPerName(order.getDeliveryCountry());
+
+        String iso2Country = null;
+        if (deliveryCtry != null)
+        {
+            iso2Country = deliveryCtry.getIsoCode2();
+        }
+
         if (iso2Country != null)
         {
             parmList.add(new NameValue("country", iso2Country));
         }
-        parmList.add(new NameValue("zip", order.getDeliveryPostcode()));
 
+        String deliveryState = order.getDeliveryState();
+        if (iso2Country != null)
+        {
+            if (iso2Country.equalsIgnoreCase("US"))
+            {
+                ZoneSearchIf search = new ZoneSearch();
+                search.setName(order.getDeliveryState());
+                search.setCountryId(deliveryCtry.getId());
+                Zone[] zones = getTaxMgr().searchForZones(search);
+                if (zones != null && zones.length == 1)
+                {
+                    deliveryState = zones[0].getZoneCode();
+                }
+            }
+        }
+
+        parmList.add(new NameValue("state", deliveryState));
+        parmList.add(new NameValue("zip", order.getDeliveryPostcode()));
         parmList.add(new NameValue("address_override", "1"));
 
         // Put the parameters into an array
@@ -420,26 +449,6 @@ public class Paypal extends BasePaymentModule implements PaymentInterface
         return pDetails;
     }
 
-    private String getISO2CountryCodeFromCountryString(String country)
-    {
-        try
-        {  
-            Country ctry = getTaxMgr().getCountryPerName(country);
-
-            if (ctry == null)
-            {
-                return null;
-            }
-
-            return ctry.getIsoCode2();
-        } catch (Exception e)
-        {
-            // We just ignore this for now
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
     /**
      * Returns true or false
      * 

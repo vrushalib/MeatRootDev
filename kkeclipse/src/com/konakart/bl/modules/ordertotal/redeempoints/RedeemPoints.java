@@ -303,7 +303,45 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
             // Title looks like "10 Reward Points Redeemed:"
             ot.setTitle(order.getPointsRedeemed() + " "
                     + rb.getString(MODULE_ORDER_TOTAL_REDEEM_POINTS_TITLE) + ":");
+            
+            
+            /*
+             * We need to reduce the tax amount. This is done differently depending on whether
+             * the discount is applied to the amount before or after tax.
+             */
+            BigDecimal total = null;
+            if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
+                    && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
+            {
+                // Use total including shipping cost
+                total = order.getTotalExTax();
+            } else
+            {
+                // Use subtotal that doesn't include shipping
+                total = order.getSubTotalExTax();
+            }
 
+            if (total != null && total.compareTo(new BigDecimal(0)) != 0
+                    && order.getTax() != null)
+            {
+                BigDecimal averageTaxRate = order.getTax().divide(total, 6,
+                        BigDecimal.ROUND_HALF_UP);
+                if (applyBeforeTax)
+                {
+                    // Calculate the tax discount based on the average tax
+                    BigDecimal taxDiscount = amount.multiply(averageTaxRate);
+                    taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
+                    ot.setTax(taxDiscount);
+                    order.setTax(order.getTax().subtract(taxDiscount));
+                    order.setTotalIncTax(order.getTotalIncTax().subtract(taxDiscount));
+                } else
+                {
+                    BigDecimal taxDiscount = getTaxFromTotal(amount, averageTaxRate, scale);
+                    ot.setTax(taxDiscount);
+                    order.setTax(order.getTax().subtract(taxDiscount));
+                }
+            }
+            
             return ot;
         }
 

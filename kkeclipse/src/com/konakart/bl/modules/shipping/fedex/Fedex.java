@@ -577,6 +577,7 @@ public class Fedex extends BaseShippingModule implements ShippingInterface
                     sq.setResponseText(getFriendlyServiceName(serviceName));
                     sq.setDescription(getFriendlyServiceName(serviceName));
                     sq.setCustom5(serviceName);
+                    sq.setShippingServiceCode(serviceName);
                     sq.setCost(total);
                     setQuotePrices(sq, info);
 

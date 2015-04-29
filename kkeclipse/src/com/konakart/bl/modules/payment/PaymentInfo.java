@@ -17,27 +17,33 @@ package com.konakart.bl.modules.payment;
 
 import java.util.Locale;
 
+import com.konakart.app.Country;
 import com.konakart.app.GeoZone;
 
 /**
  * PaymentInfo
  */
 public class PaymentInfo
-{    
+{
     private GeoZone[] deliveryGeoZoneArray;
-    
+
+    private Country country;
+
     private Locale locale;
-    
+
     private String storeName;
-    
+
     private boolean displayPriceWithTax;
-       
+
     private String hostAndPort;
-    
+
     private boolean returnDetails;
-    
 
     /**
+     * The default implementation of the PaymentMgr fills this array with the Billing Geo Zones
+     * rather than the Delivery Geo Zones as the name would suggest. The array of zones may be used
+     * to determine whether the payment module is active or not.
+     * 
      * @return Returns the deliveryGeoZoneArray.
      */
     public GeoZone[] getDeliveryGeoZoneArray()
@@ -46,11 +52,37 @@ public class PaymentInfo
     }
 
     /**
-     * @param deliveryGeoZoneArray The deliveryGeoZoneArray to set.
+     * The default implementation of the PaymentMgr fills this array with the Billing Geo Zones
+     * rather than the Delivery Geo Zones as the name would suggest. The array of zones may be used
+     * to determine whether the payment module is active or not.
+     * 
+     * @param deliveryGeoZoneArray
+     *            The deliveryGeoZoneArray to set.
      */
     public void setDeliveryGeoZoneArray(GeoZone[] deliveryGeoZoneArray)
     {
         this.deliveryGeoZoneArray = deliveryGeoZoneArray;
+    }
+
+    /**
+     * The default implementation of the PaymentMgr fills this attribute with the billing country.
+     * 
+     * @return the country
+     */
+    public Country getCountry()
+    {
+        return country;
+    }
+
+    /**
+     * The default implementation of the PaymentMgr fills this attribute with the billing country.
+     * 
+     * @param country
+     *            the country to set
+     */
+    public void setCountry(Country country)
+    {
+        this.country = country;
     }
 
     /**
@@ -62,7 +94,8 @@ public class PaymentInfo
     }
 
     /**
-     * @param locale The locale to set.
+     * @param locale
+     *            The locale to set.
      */
     public void setLocale(Locale locale)
     {
@@ -78,7 +111,8 @@ public class PaymentInfo
     }
 
     /**
-     * @param storeName The storeName to set.
+     * @param storeName
+     *            The storeName to set.
      */
     public void setStoreName(String storeName)
     {
@@ -94,13 +128,13 @@ public class PaymentInfo
     }
 
     /**
-     * @param displayPriceWithTax The displayPriceWithTax to set.
+     * @param displayPriceWithTax
+     *            The displayPriceWithTax to set.
      */
     public void setDisplayPriceWithTax(boolean displayPriceWithTax)
     {
         this.displayPriceWithTax = displayPriceWithTax;
     }
-
 
     /**
      * @return Returns the returnDetails.
@@ -111,7 +145,8 @@ public class PaymentInfo
     }
 
     /**
-     * @param returnDetails The returnDetails to set.
+     * @param returnDetails
+     *            The returnDetails to set.
      */
     public void setReturnDetails(boolean returnDetails)
     {
@@ -127,7 +162,8 @@ public class PaymentInfo
     }
 
     /**
-     * @param hostAndPort The hostAndPort to set.
+     * @param hostAndPort
+     *            The hostAndPort to set.
      */
     public void setHostAndPort(String hostAndPort)
     {

@@ -47,6 +47,13 @@ var ddpowerzoomer={
 	setupimage:function($, imgref, options){
 		var s=jQuery.extend({}, ddpowerzoomer.dsetting, options);
 		var $imgref=$(imgref);
+		if ($( window ).width() > 440) {
+			s.magnifiersize[0] = 200;
+			s.magnifiersize[1] = 200;
+		} else {
+			s.magnifiersize[0] = 125;
+			s.magnifiersize[1] = 125;
+		}
 		imgref.info={ //create object to remember various info regarding image 
 			power: {current:s.defaultpower, range:s.powerrange},
 			magdimensions: s.magnifiersize,
@@ -58,7 +65,7 @@ var ddpowerzoomer={
 			$magnifier.outer.css({width:s.magnifiersize[0], height:s.magnifiersize[1]}); //set magnifier's size
 			var offset=$imgref.offset(); //get image offset from document
 			var power=imgref.info.power.current;
-			$magnifier.inner.html('<img src="'+options.largeimagesrc+'"/>'); //get base image's src and create new image inside magnifier based on it
+			$magnifier.inner.html('<div class="ddp"><img src="'+options.largeimagesrc+'"/></div>'); //get base image's src and create new image inside magnifier based on it
 			$magnifier.image=$magnifier.outer.find('img:first')
 				.css({width:imgref.info.dimensions[0]*power, height:imgref.info.dimensions[1]*power}); //set size of enlarged image
 			var coords={left:offset.left, top:offset.top, right:offset.left+imgref.info.dimensions[0], bottom:offset.top+imgref.info.dimensions[1]};

@@ -773,6 +773,7 @@ public class Usps extends BaseShippingModule implements ShippingInterface
                         String mailService = Utils.replaceRegisteredSuperscriptFromHtml(cNode
                                 .getNodeValue());
                         currentQuote.setDescription(mailService);
+                        currentQuote.setShippingServiceCode(mailService);
                     }
                 } else if (parentNode.getNodeName().equals("Rate"))
                 {
@@ -827,7 +828,7 @@ public class Usps extends BaseShippingModule implements ShippingInterface
     private String getXmlRequest(Order order, ShippingInfo info, BigDecimal weight)
             throws KKException
     {
-        // <RateV3Request USERID="xxx">
+        // <RateV4Request USERID="xxx">
         // --<Package ID="P1">
         // ----<Service>PRIORITY</Service>
         // ----<ZipOrigination>44106</ZipOrigination>
@@ -838,14 +839,14 @@ public class Usps extends BaseShippingModule implements ShippingInterface
         // ----<Size>LARGE</Size>
         // ----<Machinable>true</Machinable>
         // --</Package>
-        // </RateV3Request>
+        // </RateV4Request>
 
         StaticData sd = staticDataHM.get(getStoreId());
         StringBuffer ret = new StringBuffer();
         /*
          * Start tags
          */
-        ret.append("<RateV3Request USERID=\"").append(sd.getUserid()).append("\">");
+        ret.append("<RateV4Request USERID=\"").append(sd.getUserid()).append("\">");
         ret.append("<Package ID=\"P1\">");
 
         /*
@@ -871,7 +872,7 @@ public class Usps extends BaseShippingModule implements ShippingInterface
          * End Tags
          */
         ret.append("</Package>");
-        ret.append("</RateV3Request>");
+        ret.append("</RateV4Request>");
 
         return ret.toString();
     }
@@ -909,7 +910,7 @@ public class Usps extends BaseShippingModule implements ShippingInterface
     private String sendRequest(String request) throws IOException, KKException
     {
         StaticData sd = staticDataHM.get(getStoreId());
-        String reqUrl = sd.getUspsUrl() + "?API=RateV3&XML=" + URLEncoder.encode(request, "UTF-8");
+        String reqUrl = sd.getUspsUrl() + "?API=RateV4&XML=" + URLEncoder.encode(request, "UTF-8");
 
         if (log.isDebugEnabled())
         {

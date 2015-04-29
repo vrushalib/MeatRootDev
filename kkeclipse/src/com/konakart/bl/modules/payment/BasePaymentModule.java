@@ -23,14 +23,22 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.TorqueException;
 
 import com.konakart.app.GeoZone;
+import com.konakart.app.KKEng;
 import com.konakart.app.KKException;
 import com.konakart.app.NameValue;
+import com.konakart.app.PaymentDetails;
 import com.konakart.appif.AddressIf;
 import com.konakart.appif.NameValueIf;
 import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.bl.modules.BaseModule;
+import com.konakart.blif.MultiStoreMgrIf;
+import com.konakart.db.KKBasePeer;
+import com.konakart.db.KKCriteria;
+import com.konakart.om.BaseZonesToGeoZonesPeer;
+import com.workingdogs.village.Record;
 
 /**
  * Base class for Payment Modules.
@@ -43,13 +51,14 @@ public class BasePaymentModule extends BaseModule
     protected Log log = LogFactory.getLog(BasePaymentModule.class);
 
     /**
-     * Ensures that the zone is within one of the Geo Zones contained in the DeliveryInfo object.
+     * Ensures that the geoZoneId is within one of the Geo Zones contained in the PaymentInfo
+     * object.
      * 
      * @param info
-     * @param zone
+     * @param geoZoneId
      * @throws KKException
      */
-    protected void checkZone(PaymentInfo info, int zone) throws KKException
+    protected void checkZone(PaymentInfo info, int geoZoneId) throws KKException
     {
         boolean found = false;
         if (info.getDeliveryGeoZoneArray() != null && info.getDeliveryGeoZoneArray().length > 0)
@@ -57,17 +66,101 @@ public class BasePaymentModule extends BaseModule
             for (int i = 0; i < info.getDeliveryGeoZoneArray().length; i++)
             {
                 GeoZone gz = info.getDeliveryGeoZoneArray()[i];
-                if (gz.getGeoZoneId() == zone)
+                if (gz.getGeoZoneId() == geoZoneId)
                 {
                     found = true;
+                    break;
                 }
+            }
+        } else if (info.getCountry() != null)
+        {
+            if (isGeoZoneMappedToCountry(geoZoneId, info.getCountry().getId()))
+            {
+                return;
             }
         }
         if (!found)
         {
             throw new KKException(
-                    "The delivery address of the order is not within the GeoZone, id = " + zone);
+                    "The billing address of the order is not within the GeoZone, id = " + geoZoneId);
         }
+    }
+
+    /**
+     * In some cases no zones may be defined for a country but a geo zone may be defined to map to
+     * all zones of that country. On these occasions the DeliveryGeoZoneArray in the ShippingInfo
+     * object is null so the checkZone method never returns true.
+     * <p>
+     * This method does a search in the zones_to_geo_zones table for any entries matching the
+     * geoZoneId, countryId and zoneId of 0 which is the id that is set when the mapping is for all
+     * zones of the country.
+     * 
+     * @param geoZoneId
+     * @param countryId
+     * @return Returns true if there is a mapping
+     * @throws KKException
+     * @throws TorqueException
+     */
+    protected boolean isGeoZoneMappedToCountry(int geoZoneId, int countryId)
+    {
+        try
+        {
+            KKCriteria c = getNewCriteria(isMultiStoreShareCustomers());
+            c.addSelectColumn(BaseZonesToGeoZonesPeer.ZONE_ID);
+            c.add(BaseZonesToGeoZonesPeer.ZONE_ID, 0);
+            c.add(BaseZonesToGeoZonesPeer.ZONE_COUNTRY_ID, countryId);
+            c.add(BaseZonesToGeoZonesPeer.GEO_ZONE_ID, geoZoneId);
+            List<Record> rows = KKBasePeer.doSelect(c);
+            if (rows == null || rows.size() == 0)
+            {
+                return false;
+            }
+            return true;
+        } catch (Exception e)
+        {
+            log.error("Unexpected exception in isGeoZoneMappedToCountry method", e);
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if we need to share customers in multi-store single db mode
+     * 
+     * @return the multiStoreShareCustomers
+     * @throws KKException
+     */
+    protected boolean isMultiStoreShareCustomers() throws KKException
+    {
+        KKEng eng = getEng();
+        if (eng == null)
+        {
+            throw new KKException("This manager has been instantiated with KKEng set to null");
+        }
+
+        if (eng.getEngConf() != null)
+        {
+            return eng.getEngConf().isCustomersShared();
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets a new KKCriteria object with the option of it being for all stores when in multi-store
+     * single db mode.
+     * 
+     * @return Returns a new KKCriteria object
+     */
+    protected KKCriteria getNewCriteria(boolean allStores)
+    {
+        MultiStoreMgrIf mgr = getMultiStoreMgr();
+        if (mgr != null)
+        {
+            return mgr.getNewCriteria(allStores);
+        }
+
+        KKCriteria crit = new KKCriteria();
+        return crit;
     }
 
     /**
@@ -288,5 +381,20 @@ public class BasePaymentModule extends BaseModule
             e.printStackTrace();
             throw new KKException("Problem finding IP Address", e);
         }
+    }
+
+    /**
+     * Method used to return any custom information required from the payment module. When used,
+     * this method will typically be overridden in the module.
+     * 
+     * @param sessionId
+     * @param parameters
+     * @return Returns information in a PaymentDetails object
+     * @throws Exception
+     */
+    public PaymentDetails getPaymentDetailsCustom(String sessionId, NameValueIf[] parameters)
+            throws Exception
+    {
+        return null;
     }
 }

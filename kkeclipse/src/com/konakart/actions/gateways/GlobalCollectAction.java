@@ -39,6 +39,7 @@ import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.bl.modules.payment.globalcollect.GlobalCollect;
 import com.konakart.bl.modules.payment.globalcollect.GlobalCollectUtils;
 import com.konakart.util.PrettyXmlPrinter;
+import com.konakart.util.Utils;
 
 /**
  * This class is an Action class for card payments at GlobalCollect
@@ -88,7 +89,7 @@ public class GlobalCollectAction extends GlobalCollectBaseAction
             {
                 setupResponseForSSLRedirect(response, redirForward);
                 return null;
-           }
+            }
 
             // Get the order
             OrderIf order = kkAppEng.getOrderMgr().getCheckoutOrder();
@@ -256,6 +257,16 @@ public class GlobalCollectAction extends GlobalCollectBaseAction
         msg.append("<HOSTEDINDICATOR>1</HOSTEDINDICATOR>");
         msg.append("<AMOUNT>" + hp.get(GlobalCollect.GLOBALCOLLECT_PAYMENT_AMOUNT) + "</AMOUNT>");
         msg.append("<CURRENCYCODE>" + order.getCurrencyCode() + "</CURRENCYCODE>");
+
+        if (hp.containsKey(GlobalCollect.GLOBALCOLLECT_NUMBEROFINSTALLMENTS))
+        {
+            String numbInstallments = hp.get(GlobalCollect.GLOBALCOLLECT_NUMBEROFINSTALLMENTS);
+            if (!Utils.isBlank(numbInstallments) && !numbInstallments.equals("-1"))
+            {
+                msg.append("<NUMBEROFINSTALLMENTS>" + numbInstallments + "</NUMBEROFINSTALLMENTS>");
+            }
+        }
+
         msg.append("<COUNTRYCODE>" + hp.get(GlobalCollect.GLOBALCOLLECT_BILLTO_CTRY_CODE)
                 + "</COUNTRYCODE>");
         msg.append("<LANGUAGECODE>" + order.getLocale().substring(0, 2) + "</LANGUAGECODE>");

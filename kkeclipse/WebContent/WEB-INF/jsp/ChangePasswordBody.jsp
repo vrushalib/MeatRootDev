@@ -22,7 +22,7 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 
- 				<h1 id="page-title"><kk:msg  key="change.password.body.mypassword"/></h1>			
+ 				<h1 id="page-title"><kk:msg  key="change.password.body.changepassword"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div>
 		    			<s:if test="hasActionErrors()">

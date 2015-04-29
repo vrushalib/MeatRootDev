@@ -20,15 +20,15 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 
- 				<h1 id="page-title"><kk:msg  key="header.terms.of.use"/></h1>			
+				<s:set scope="request" var="termsOfUseContent" value="termsOfUseContent"/> 
+				<%String termsOfUseContent = (String)(request.getAttribute("termsOfUseContent")); %>
+				<h1 id="page-title"><kk:msg  key="header.terms.of.use"/></h1>			
 	    		<div class="content-area rounded-corners">
 		    		<div id="about-us">
-		    		Introduction:
-The purpose of this site is to provide a simple and convenient service to our customers by
-delivering good quality meat at their doorsteps. The website shows information about our meat
-categories and their prices.<br/>
+		    			<%=termsOfUseContent%>
+						<div class="form-buttons-wide">
 							<a href="Welcome.action" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.close"/></span></a>
-						
+						</div>
 			    	</div>
 	    		</div>
 

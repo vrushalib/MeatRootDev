@@ -71,6 +71,9 @@ public class ChangePasswordSubmitAction extends BaseAction
 
             // Call the engine to change the password
             kkAppEng.getCustomerMgr().changePassword(getCurrentPassword(), getPassword());
+            
+            // Add a message to say all OK
+            addActionMessage(kkAppEng.getMsg("change.password.body.ok"));
 
             return SUCCESS;
 

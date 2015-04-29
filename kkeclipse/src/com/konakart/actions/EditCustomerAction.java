@@ -41,15 +41,13 @@ public class EditCustomerAction extends BaseAction
 
     private String birthDateString;
 
-    private String emailAddr;
-
     private String telephoneNumber;
 
     private String telephoneNumber1;
 
     private String faxNumber;
-
-    private String customerCustom1;
+    
+    private String taxId;
 
     public String execute()
     {
@@ -85,11 +83,10 @@ public class EditCustomerAction extends BaseAction
                 firstName = noNull(cust.getFirstName());
                 lastName = noNull(cust.getLastName());
                 birthDateString = noNull(kkAppEng.getDateAsString(cust.getBirthDate()));
-                emailAddr = noNull(cust.getEmailAddr());
                 telephoneNumber = noNull(cust.getTelephoneNumber());
                 telephoneNumber1 = noNull(cust.getTelephoneNumber1());
                 faxNumber = noNull(cust.getFaxNumber());
-                customerCustom1 = noNull(cust.getCustom1());
+                taxId = noNull(cust.getTaxIdentifier());
             }
 
             kkAppEng.getNav().add(kkAppEng.getMsg("header.customer.editaccount"), request);
@@ -171,23 +168,6 @@ public class EditCustomerAction extends BaseAction
     }
 
     /**
-     * @return the emailAddr
-     */
-    public String getEmailAddr()
-    {
-        return emailAddr;
-    }
-
-    /**
-     * @param emailAddr
-     *            the emailAddr to set
-     */
-    public void setEmailAddr(String emailAddr)
-    {
-        this.emailAddr = emailAddr;
-    }
-
-    /**
      * @return the telephoneNumber
      */
     public String getTelephoneNumber()
@@ -239,20 +219,19 @@ public class EditCustomerAction extends BaseAction
     }
 
     /**
-     * @return the customerCustom1
+     * @return the taxId
      */
-    public String getCustomerCustom1()
+    public String getTaxId()
     {
-        return customerCustom1;
+        return taxId;
     }
 
     /**
-     * @param customerCustom1
-     *            the customerCustom1 to set
+     * @param taxId the taxId to set
      */
-    public void setCustomerCustom1(String customerCustom1)
+    public void setTaxId(String taxId)
     {
-        this.customerCustom1 = customerCustom1;
+        this.taxId = taxId;
     }
 
 }

@@ -3,7 +3,6 @@
  */
 function callAction(parmArray, callback, url) {
 	
-	
 	if (document.getElementById('kk_portlet_id')) {
 		AUI().ready('liferay-portlet-url', function(A) { 
 	        var renderURL = Liferay.PortletURL.createResourceURL();
@@ -12,6 +11,9 @@ function callAction(parmArray, callback, url) {
 	        renderURL.setWindowState("exclusive");
 	        if (parmArray) {
 				for ( var i = 0; i < parmArray.length; i=i+2) {
+					// So that action class receives array values
+					parmArray[i] = parmArray[i].replace("%5B","[");
+					parmArray[i] = parmArray[i].replace("%5D","]");
 					renderURL.setParameter(parmArray[i], parmArray[i+1]);
 				}
 				renderURL.setParameter("xsrf_token", document.getElementById('kk_xsrf_token').value);
@@ -41,12 +43,10 @@ function callAction(parmArray, callback, url) {
 			});
 		});		
 	} else {
-		
 		var parms='{"":""}';
         if (parmArray) {
         	parms = '{';
 			for ( var i = 0; i < parmArray.length; i=i+2) {
-				
 				parms = parms + '"' + parmArray[i]+'":"'+ parmArray[i+1]+ '"';
 				if (i+2 < parmArray.length) {
 					parms = parms + ',';
@@ -123,11 +123,7 @@ function getURL(action, parmArray) {
  * Suggested search code used in Header.jsp. Figure out which search to do based
  * on value in key.
  */
-function kkSearch() {
-
-	// Get key and search string from page
-	var key = document.getElementById('kk_key').value;
-	var text = document.getElementById('search-input').value;
+function kkSearch(key, text) {
 
 	if (key != null && key.length > 0) {
 		var keyArray = key.split(',');
@@ -159,16 +155,24 @@ function kkSearch() {
 			}
 		}
 	} else if (text != null && text.length > 0) {
-		/*
-		 * Reach here if someone has entered free text and clicked the search
-		 * button or the enter key. Rather than doing a search on the text we
-		 * see if there is a suggested search hit and then use the extra
-		 * information returned from the suggested search hit to provide better
-		 * results. i.e. It provides results for a category search whereas a
-		 * simple search wouldn't show any results.
-		 */
-		callAction(new Array("term", text), suggestedSearchCallback,
-				getURL("SuggestedSearch.action"));
+		// Search optimization switched off by default since can be confusing
+		if (false) {
+			/*
+			 * Reach here if someone has entered free text and clicked the search
+			 * button or the enter key. Rather than doing a search on the text we
+			 * see if there is a suggested search hit and then use the extra
+			 * information returned from the suggested search hit to provide better
+			 * results. i.e. It provides results for a category search whereas a
+			 * simple search wouldn't show any results.
+			 */
+			callAction(new Array("term", text), suggestedSearchCallback,
+					getURL("SuggestedSearch.action"));
+		} else {
+			// Search based on text
+			document.getElementById('searchText').value = text;
+			document.getElementById('ssForm').action = getURL("QuickSearch.action");
+			document.getElementById('ssForm').submit();
+		}		
 	}
 }
 
@@ -177,9 +181,7 @@ function kkSearch() {
  */
 var suggestedSearchCallback = function(result, textStatus, jqXHR) {
 	if (result != null && result.length > 0) {
-		document.getElementById('kk_key').value = result[0].id;
-		document.getElementById('search-input').value = result[0].value;
-		kkSearch();
+		kkSearch(result[0].id, result[0].value);
 	} else {
 		var text = document.getElementById('search-input').value;
 		document.getElementById('searchText').value = text;
@@ -195,6 +197,10 @@ function kkKeydown() {
 	document.getElementById('kk_key').value = "";
 }
 
+function kkKeydownMobile() {
+	document.getElementById('kk_key-mobile').value = "";
+}
+
 /*
  * Used by address maintenance panels
  */
@@ -207,6 +213,9 @@ function changeCountry() {
 }
 
 $(function() {
+	
+	// Space out menu evenly
+	sizeMenu();		
 	
 	$("#shopping-cart").click(goToCartPage);
 	$("#wish-list").click(goToWishListPage);
@@ -228,11 +237,6 @@ $(function() {
 				$(this).find(".item-over").hide();
 			});
 
-	$('.add-to-cart-qty').click(function (evt) {
-	    evt.stopPropagation();
-
-	   
-	});
 	
 	/*
 	 * Hover effects for Sliding Cart 
@@ -299,23 +303,15 @@ $(function() {
 	/*
 	 * Add to Cart
 	 */
-	$(document).ready(function(){
-		
 	$(".add-to-cart-button")
 	.click(
 			function() {
-				var prodId = (this.id).split('-')[1];				
-				var id = $("#prodQuantityId option:selected").text();				
-				
-				callAction(new Array("prodId",prodId,"dropDownId",id), 
+				var prodId = (this.id).split('-')[1];
+				callAction(new Array("prodId",prodId), 
 						addToCartCallback,
-						"AddToCartFromProdId.action?id="+id);
-				
-				/*$("span#"+this.id).show();*/
-				
+						"AddToCartFromProdId.action");
 				return false;
 			});
-	});
 	
 	/*
 	 * Add to Wish List
@@ -418,37 +414,54 @@ function redirect(action) {
 	return false;
 }
 
+/*
+ * Returns true if the style is currently that for small devices
+ */
+function isSmallStyle() {
+	if($("#shopping-cart .top-bar-menu-title").is(':visible')) {
+		return false;
+	}
+	return true;
+}
 
 /*
  * Code to display the slide out cart
  */
 function showCart(cart) {
-	$(cart).addClass("small-rounded-corners-top shopping-cart-mouseover");
-	$("#shopping-cart-container").css("display","inline");
+	if(!isSmallStyle()) {
+		$(cart).addClass("small-rounded-corners-top shopping-cart-mouseover");
+		$("#shopping-cart-container").css("display","inline");
+	}
 }
 
 /*
  * Code to hide the slide out cart
  */
 function hideCart(cart) {
-	$("#shopping-cart-container").hide();
-	$(cart).removeClass("shopping-cart-mouseover small-rounded-corners-top");
+	if(!isSmallStyle()) {
+		$("#shopping-cart-container").hide();
+		$(cart).removeClass("shopping-cart-mouseover small-rounded-corners-top");
+	}
 }
 
 /*
  * Code to display the slide out wish list
  */
 function showWishList(wishList) {
-	$(wishList).addClass("small-rounded-corners-top shopping-cart-mouseover");	
-	$("#wish-list-container").css("display","inline");
+	if(!isSmallStyle()) {
+		$(wishList).addClass("small-rounded-corners-top shopping-cart-mouseover");	
+		$("#wish-list-container").css("display","inline");
+	}
 }
 
 /*
  * Code to hide the slide out wish list
  */
 function hideWishList(wishList) {
-	$("#wish-list-container").hide();
-	$(wishList).removeClass("small-rounded-corners-top shopping-cart-mouseover");
+	if(!isSmallStyle()) {
+		$("#wish-list-container").hide();
+		$(wishList).removeClass("small-rounded-corners-top shopping-cart-mouseover");
+	}
 }
 
 /*
@@ -471,6 +484,18 @@ function getProdImageExtension(prod) {
 	}
 	return "";
 }
+
+/*
+ * Remove "px" from the string
+ */
+function removepx(size){
+	if (size != null && size.length > 2) {
+		return parseInt(size.substring(0, size.length-2));
+	} else {
+		return 0;
+	}
+}
+
 
 /*
  * Common code called from addtoCart and addToWishlist callbacks
@@ -550,11 +575,16 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	/*
 	 * Update cart summary with new basket data
 	 */
-	txt = result.shoppingCartMsg;
+	txt1 = result.shoppingCartMsg;
+	txt2 = '';
+
 	if (result.numberOfItems > 0) {
-		txt += " ("+result.numberOfItems+")";
+		txt1 += '<span id="basket-items"> ('+result.numberOfItems+')</span>';
+		txt2 += '<span id="basket-items">('+result.numberOfItems+')</span>';
 	} 
-	$("#shopping-cart").html(txt);
+
+	$("#shopping-cart .top-bar-menu-title").html(txt1); // Shopping cart link on big displays
+	$("#shopping-cart .top-bar-menu-icon").html(txt2); // Shopping cart link on small displays
 
 	/*
 	 * Reset the position of the wish list slide out control since
@@ -567,6 +597,7 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	 */
 	showCart("#shopping-cart");
 	window.setTimeout("hideCart('#shopping-cart')", 2000);
+
 };
 
 /*
@@ -617,11 +648,17 @@ var addToWishListCallback = function(result, textStatus, jqXHR) {
 	/*
 	 * Update wish liat summary with new number of wlItems
 	 */
-	var txt = result.wishListMsg;
+
+	txt1 = result.wishListMsg;
+	txt2 = '';
+
 	if (result.numberOfItems > 0) {
-		txt += " ("+result.numberOfItems+")";
+		txt1 += '<span id="basket-items"> ('+result.numberOfItems+')</span>';
+		txt2 += '<span id="basket-items">('+result.numberOfItems+')</span>';
 	} 
-	$("#wish-list").html(txt);
+
+	$("#wish-list .top-bar-menu-title").html(txt1); // Shopping cart link on big displays
+	$("#wish-list .top-bar-menu-icon").html(txt2); // Shopping cart link on small displays
 	
 	/*
 	 * Display wish liat to show that something has been added
@@ -655,3 +692,131 @@ var subscribeNewsletterCallback = function(result, textStatus, jqXHR) {
 var agreeToCookiesCallback = function(result, textStatus, jqXHR) {
 	 $("#cookie-container").slideUp();
 };
+
+/*
+ * Menu sizing algorithm on each browser width change
+ */
+
+$(window).resize(function() {
+	sizeMenu();
+});	
+	
+function sizeMenu() {
+
+	var width = $("#main-menu").width() - 2;
+
+	// reset width and unwrap items from extra divs
+	// calculate menuLineWidth
+	var menuLineWidth = 0
+	var numItems = 0;
+	var itemPadding = 14;
+	var itemMarginRight = 5;
+	$("#main-menu a").each(function(index) {
+		var item = $(this);
+		item.css('width', 'auto');
+		item.css('margin-right', itemMarginRight + 'px');
+		var widthPlusPadding = item.width() + itemPadding;
+		item.width(widthPlusPadding);
+		menuLineWidth += widthPlusPadding + itemMarginRight;
+		numItems++;
+		var parent = item.parent();
+		if (parent.hasClass('menu-line')) {
+			item.unwrap();
+		}
+	});
+
+	// Adjust for last item
+	menuLineWidth -= itemMarginRight;
+
+	if (numItems == 0) {
+		return;
+	}
+
+	var numLines = Math.ceil(menuLineWidth / width);
+	var itemsPerLine = Math.ceil(numItems / numLines);
+
+	// Create arrays of items and widths for each line
+	var total = 0;
+	var lineIndex = 0;
+	var itemCount = 0;
+	var itemArray = new Array();
+	var lineArray = new Array();
+	var widthArray = new Array();
+	$("#main-menu a").each(function(index) {
+		var item = $(this);
+		var w = item.width() + itemMarginRight;
+		itemCount++;
+
+		if (total + w - itemMarginRight > width || itemCount > itemsPerLine) {
+			total -= itemMarginRight;
+			widthArray[itemArray.length] = total;
+			total = w;
+			itemArray[itemArray.length] = lineArray;
+			lineArray = new Array();
+			lineIndex = 0;
+			lineArray[lineIndex++] = item;
+			itemCount = 1;
+		} else {
+			total += w;
+			lineArray[lineIndex++] = item;
+		}
+	});
+	if (lineArray.length > 0) {
+		total -= itemMarginRight;
+		widthArray[itemArray.length] = total;
+		itemArray[itemArray.length] = lineArray;
+	}
+
+	// Surround each line with a div
+	var index = 0;
+	for ( var i = 0; i < itemArray.length; i++) {
+		lineArray = itemArray[i];
+		$("#main-menu a").slice(index, index + lineArray.length).wrapAll(
+				'<div class="menu-line"></div>');
+		index = index + lineArray.length;
+	}
+
+	// Pad lines out to same width
+	for ( var i = 0; i < itemArray.length; i++) {
+		lineArray = itemArray[i];
+		var totalExtra = width - widthArray[i];
+		var singleExtra = Math.floor((totalExtra / itemArray[i].length));
+		var countExtra = 0;
+		for ( var j = 0; j < lineArray.length; j++) {
+			var widget = lineArray[j];
+			if (j == lineArray.length - 1) {
+				widget.css('margin-right', '0px');
+				var w = widget.width();
+				var extra = totalExtra - countExtra;
+				widget.width(w + extra);
+			} else {
+				var w = widget.width();
+				var extra = singleExtra;
+				widget.width(w + extra);
+			}
+			countExtra += singleExtra;
+		}
+	}
+}
+	
+
+/*
+ * Function for setting controls of horizontal carousel 
+ */
+function setControls(carousel, prev, next) {
+	var items = carousel.jcarousel('items');
+	var visible = carousel.jcarousel('visible');
+	if (items[0] == visible[0]) {
+		prev.removeClass('prev-items').addClass('prev-items-inactive');
+	} else {
+		prev.removeClass('prev-items-inactive').addClass('prev-items');
+	}
+	if (items[items.length - 1] == visible[visible.length - 1]) {
+		next.removeClass('next-items').addClass('next-items-inactive');
+	} else {
+		next.removeClass('next-items-inactive').addClass('next-items');
+	}
+}  
+
+
+

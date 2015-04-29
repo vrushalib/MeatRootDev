@@ -482,7 +482,7 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
      * @throws InvocationTargetException
      * @throws ClassNotFoundException
      */
-    OrderTotalInterface getOrderTotalModuleForName(String moduleName)
+    public OrderTotalInterface getOrderTotalModuleForName(String moduleName)
             throws IllegalArgumentException, InstantiationException, IllegalAccessException,
             InvocationTargetException, ClassNotFoundException
     {
@@ -560,7 +560,7 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
             {
                 if (orderTotalModuleList == null)
                 {
-                    new ArrayList<String>();
+                    return new ArrayList<String>();
                 }
                 ArrayList<String> otModList = new ArrayList<String>(orderTotalModuleList);
                 return otModList;

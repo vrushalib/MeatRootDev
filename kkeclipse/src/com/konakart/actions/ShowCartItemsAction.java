@@ -117,6 +117,8 @@ public class ShowCartItemsAction extends BaseAction
                 BasketIf[] items = kkAppEng.getEng().updateBasketWithStockInfoWithOptions(
                         kkAppEng.getCustomerMgr().getCurrentCustomer().getBasketItems(),
                         kkAppEng.getBasketMgr().getAddToBasketOptions());
+                
+                kkAppEng.getCustomerMgr().getCurrentCustomer().setBasketItems(items);
 
                 /*
                  * Create a temporary order to get order totals that we can display in the edit cart

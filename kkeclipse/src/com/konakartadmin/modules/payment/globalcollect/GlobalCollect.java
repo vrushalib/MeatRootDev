@@ -69,7 +69,7 @@ public class GlobalCollect extends PaymentModule
     {
         if (configs == null)
         {
-            configs = new KKConfiguration[9];
+            configs = new KKConfiguration[10];
         }
 
         if (configs[0] != null && !Utils.isBlank(configs[0].getConfigurationKey()))
@@ -84,16 +84,16 @@ public class GlobalCollect extends PaymentModule
 
         // 1
         configs[i] = new KKConfiguration(
-                /* title */"GlobalCollect Status",
-                /* key */"MODULE_PAYMENT_GLOBALCOLLECT_STATUS",
-                /* value */"true",
-                /* description */"If set to false, the GlobalCollect module will be unavailable",
-                /* groupId */groupId,
-                /* sortO */i++,
-                /* useFun */"",
-                /* setFun */"choice('true', 'false')",
-                /* dateAdd */now,
-                /* return_by_api */ true);
+        /* title */"GlobalCollect Status",
+        /* key */"MODULE_PAYMENT_GLOBALCOLLECT_STATUS",
+        /* value */"true",
+        /* description */"If set to false, the GlobalCollect module will be unavailable",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"choice('true', 'false')",
+        /* dateAdd */now,
+        /* return_by_api */true);
 
         // 2
         configs[i] = new KKConfiguration(
@@ -167,7 +167,7 @@ public class GlobalCollect extends PaymentModule
         /* useFun */"",
         /* setFun */"",
         /* dateAdd */now);
- 
+
         // 7
         configs[i] = new KKConfiguration(
         /* title */"Supported Product Ids",
@@ -179,21 +179,36 @@ public class GlobalCollect extends PaymentModule
         /* useFun */"",
         /* setFun */"",
         /* dateAdd */now);
- 
+
         // 9
+        // This is used to implement customer-specific functionality
+        configs[i] = new KKConfiguration(
+        /* title */"Custom Class",
+        /* key */"MODULE_PAYMENT_GLOBALCOLLECT_CUSTOM_CLASS",
+        /* value */"com.konakart.bl.modules.payment.globalcollect.GlobalCollectCustom",
+        /* description */"the name of a custom class that imlpements "
+                + "com.konakart.bl.modules.payment.globalcollect.GlobalCollectCustomIf",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"",
+        /* setFun */"",
+        /* dateAdd */now,
+        /* return_by_api */false);
+
+        // 10
         // This is only used for testing so is made invisible
         configs[i] = new KKConfiguration(
-                /* title */"Time-based OrderId",
-                /* key */"MODULE_PAYMENT_GLOBALCOLLECT_TIME_ORDERID",
-                /* value */"false",
-                /* description */"If set to true, a time-based order Id will be generated",
-                /* groupId */groupId,
-                /* sortO */i++,
-                /* useFun */"invisible",
-                /* setFun */"choice('true', 'false')",
-                /* dateAdd */now,
-                /* return_by_api */ true);
-        
+        /* title */"Time-based OrderId",
+        /* key */"MODULE_PAYMENT_GLOBALCOLLECT_TIME_ORDERID",
+        /* value */"false",
+        /* description */"If set to true, a time-based order Id will be generated",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"invisible",
+        /* setFun */"choice('true', 'false')",
+        /* dateAdd */now,
+        /* return_by_api */true);
+
         return configs;
     }
 }

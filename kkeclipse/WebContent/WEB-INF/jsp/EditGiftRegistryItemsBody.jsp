@@ -96,13 +96,13 @@ $(function() {
 	    				<table>
 	    					<thead>
 	    						<tr>
-	    							<td class="narrow-col"><kk:msg  key="common.item"/></td>
+	    							<td class="image-col-edit"><kk:msg  key="common.item"/></td>
 	    							<td class="item-col"></td>
 	    							<td class="priority-drop-col"><kk:msg  key="edit.wishlist.body.priority"/></td>
 	    							<td class="q-desired-col"><kk:msg  key="edit.wishlist.body.q.desired"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.q.received"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
-	    							<td class="narrow-col center"></td>
+	    						
+	    							<td class="price-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
+	    							<td class="delete-col center"></td>
 	    						</tr>
 	    					</thead>
 	    					<tbody>
@@ -111,7 +111,7 @@ $(function() {
 									<%com.konakart.al.WishListUIItem item = iterator.next();%>
 					               <input type="hidden" name="itemList[<%=k%>].wishListItemId" value="<%=item.getWishListItemId()%>"/>
 		    						<tr>
-		    							<td>
+		    							<td class="product-image-td">
 		    							    <img class="product-image" src="<%=item.getProdImage()%>" border="0" alt="<%=item.getProdName()%>" title=" <%=item.getProdName()%> ">
 		    							</td>
 		    							<td>		    								
@@ -134,13 +134,12 @@ $(function() {
 											</select>
 		    							</td>
 		    							<td>
-		    								<input type="text" class="qty-input" name="prodQty" id="q-<%=item.getWishListItemId()%>" value="<%=item.getQuantityDesired()%>">
+		    								<span class="qty-desired"><span class="qty-desired-label"><kk:msg  key="show.giftregistry.items.body.desired"/>:</span> <input type="text" class="qty-input" name="prodQty" id="q-<%=item.getWishListItemId()%>" value="<%=item.getQuantityDesired()%>">
 		    								<a id='<%="w-"+item.getWishListItemId()%>' class="update-button small-rounded-corners"><kk:msg  key="common.update"/></a>
-		    								<span class="validation-msg"></span>
+		    								<span class="validation-msg"></span></span>
+		    								<span class="qty-received"><span class="qty-received-label"><kk:msg  key="show.giftregistry.items.body.received"/>:</span> <%=item.getQuantityReceived() %></span>
 		    							</td>
-		    							<td class="right">
-											<%=item.getQuantityReceived() %>		    							
-										</td>
+		    						
 		    							<td class="right">
 											<%if (kkEng.displayPriceWithTax()){%>
 												<%=kkEng.formatPrice(item.getTotalPriceIncTax() )%>
@@ -149,7 +148,7 @@ $(function() {
 											<%}%>		    																		
 		    							</td>	    							
 		    							<td class="center">
-		    								<a href='<%="EditWishListSubmit.action?action=r&wid="+id+"&id="+item.getWishListItemId()%>' class="has-tooltip" title='<%=kkEng.getMsg("common.remove.item")%>'><img src="<%=kkEng.getImageBase()%>/x-button.png" border="0"></a>
+		    								<a class="remove fa fa-times-circle" href='<%="EditWishListSubmit.action?action=r&wid="+id+"&id="+item.getWishListItemId()%>'  title='<%=kkEng.getMsg("common.remove.item")%>'></a>
 		    							</td>
 		    					    </tr>
 		    					    <% k++; %>	

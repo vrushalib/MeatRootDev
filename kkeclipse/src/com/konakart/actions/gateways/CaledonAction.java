@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2014 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -51,6 +51,9 @@ import com.konakart.util.RegExpUtils;
  * confirmation Typical replies:<br/>
  * TEXT=DECLINED (DUP) &CODE=1007<br/>
  * TEXT=T68414 $12.34&AUTH=T68414&CODE=0000<br/>
+ * <p>
+ * Note that for testing they need you to use a credit card Expiry Date of August 2014 (still the
+ * case despite the date is now after that expiry date - correct in January 2015).
  */
 public class CaledonAction extends BaseGatewayAction
 {
@@ -173,6 +176,11 @@ public class CaledonAction extends BaseGatewayAction
                 parmList.add(new NameValue("PASS", caledonPassword));
             }
 
+            if (log.isDebugEnabled())
+            {
+                log.debug("Before stripping TERMID\n" + pd.toString());
+            }
+
             // Remove TERMID if it's there
             int termIdsFound = 0;
             for (int i = 0; i < pd.getParameters().length; i++)
@@ -185,18 +193,33 @@ public class CaledonAction extends BaseGatewayAction
                 }
             }
 
+            if (log.isDebugEnabled())
+            {
+                log.debug("TERMIDs found : " + termIdsFound);
+            }
+
             // Terminal Id must be first parameter
             NameValue[] nvArray = new NameValue[pd.getParameters().length + 1 - termIdsFound];
-            nvArray[0] = new NameValue("TERMID", caledonTerminalId);
+            int nxtIdx = 0;
+            nvArray[nxtIdx++] = new NameValue("TERMID", caledonTerminalId);
             for (int i = 0; i < pd.getParameters().length; i++)
             {
                 NameValue nv = (NameValue) pd.getParameters()[i];
                 if (nv != null)
                 {
-                    nvArray[i + 1] = nv;
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("Set Parameter : " + nv.getName() + " = " + nv.getValue());
+                    }
+                    nvArray[nxtIdx++] = nv;
                 }
             }
             pd.setParameters(nvArray);
+
+            if (log.isDebugEnabled())
+            {
+                log.debug("After resetting TERMID\n" + pd.toString());
+            }
 
             // Do the GET
             String gatewayResp = getData(pd, parmList);
@@ -250,8 +273,7 @@ public class CaledonAction extends BaseGatewayAction
 
             if (log.isDebugEnabled())
             {
-                log.debug("Formatted Caledon response data:");
-                log.debug(sb.toString());
+                log.debug("Formatted Caledon response data:\n" + sb.toString());
             }
 
             // See if we need to send an email, by looking at the configuration

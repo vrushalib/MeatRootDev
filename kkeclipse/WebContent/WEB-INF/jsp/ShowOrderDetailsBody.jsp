@@ -196,9 +196,9 @@
 													<%}else if (ot.getClassName().equals("ot_total")) {%>
 														<td><%=ot.getTitle()%></td>
 														<td class="right"><%=kkEng.formatPrice(ot.getValue())%></td>
-													<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
+													<%}else if (kkEng.isDiscountModule(ot.getClassName())) {%>	
 													    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
-														<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
+														<td class="cost-overview-amounts right"><span class="discount">-<%=kkEng.formatPrice(ot.getValue())%></span></td>
 													<%}else{%>
 													    <td class="cost-overview"><%=ot.getTitle()%></td>	
 														<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td>
@@ -251,7 +251,7 @@
 														<%}else if (ot.getClassName().equals("ot_total")) {%>
 															<td><%=ot.getTitle()%></td>
 															<td class="right"><%=ot.getText()%></td>
-														<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
+														<%}else if (kkEng.isDiscountModule(ot.getClassName())) {%>	
 														    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
 															<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
 														<%}else{%>

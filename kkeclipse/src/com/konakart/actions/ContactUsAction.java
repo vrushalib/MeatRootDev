@@ -23,15 +23,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
+import com.konakart.appif.ContentIf;
+import com.konakart.util.KKConstants;
 
 /**
  * Gets called before displaying the contact us page
  */
 public class ContactUsAction extends BaseAction
 {
-
     private static final long serialVersionUID = 1L;
 
+    private String contactUsContent;
+    
     public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
@@ -58,6 +61,22 @@ public class ContactUsAction extends BaseAction
                 setupResponseForSSLRedirect(response, redirForward);
                 return null;
             }
+            
+            // Get the content
+            ContentIf[] content = null;
+
+            if (kkAppEng.getContentMgr().isEnabled())
+            {
+                content = kkAppEng.getContentMgr().getContentForId(1,KKConstants.CONTENTID_CONTACT);
+            }
+            
+            if (content != null && content.length > 0)
+            {
+                contactUsContent = content[0].getDescription().getContent();
+            } else
+            {
+                contactUsContent = kkAppEng.getMsg("common.add.info");
+            }
 
             kkAppEng.getNav().set(kkAppEng.getMsg("header.contact.us"), request);
             return SUCCESS;
@@ -67,6 +86,22 @@ public class ContactUsAction extends BaseAction
             return super.handleException(request, e);
         }
 
+    }
+
+    /**
+     * @return the contactUsContent
+     */
+    public String getContactUsContent()
+    {
+        return contactUsContent;
+    }
+
+    /**
+     * @param contactUsContent the contactUsContent to set
+     */
+    public void setContactUsContent(String contactUsContent)
+    {
+        this.contactUsContent = contactUsContent;
     }
 
 }

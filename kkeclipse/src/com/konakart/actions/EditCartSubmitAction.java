@@ -170,7 +170,7 @@ public class EditCartSubmitAction extends BaseAction
                                     return "ShowCart";
                                 }
 
-                                if (quantity == 0)
+                                if (quantity <= 0)
                                 {
                                     // remove the basket item
                                     kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */

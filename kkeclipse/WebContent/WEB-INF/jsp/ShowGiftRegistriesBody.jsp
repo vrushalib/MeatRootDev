@@ -43,17 +43,17 @@
 									<% com.konakart.appif.WishListIf wl = wishListArray[i];%>
 									<div class="single-registry <%=(i%2==0)?"even":"odd"%>">
 										<div class="left-col">
-											<label><kk:msg  key="show.giftregistries.body.eventname"/></label>
-											<div class="resgistry-attr"><%=wl.getName()%></div>
-											<label><kk:msg  key="show.giftregistries.body.groomname"/></label>
-											<div class="resgistry-attr"><%=wl.getCustomerFirstName() %>&nbsp;<%=wl.getCustomerLastName() %></div>
-											<label><kk:msg  key="show.giftregistries.body.bridename"/></label>
-											<div class="resgistry-attr"><%=wl.getCustomer1FirstName() %>&nbsp;<%=wl.getCustomer1LastName() %></div>
-											<label><kk:msg  key="show.giftregistries.body.eventdate"/></label>
-											<div class="resgistry-attr"><%=kkEng.getDateAsString(wl.getEventDate())%></div>
+											<div class="registry-label"><kk:msg  key="show.giftregistries.body.eventname"/></div>
+											<div class="registry-attr"><%=wl.getName()%></div>
+											<div class="registry-label"><kk:msg  key="show.giftregistries.body.groomname"/></div>
+											<div class="registry-attr"><%=wl.getCustomerFirstName() %>&nbsp;<%=wl.getCustomerLastName() %></div>
+											<div class="registry-label"><kk:msg  key="show.giftregistries.body.bridename"/></div>
+											<div class="registry-attr"><%=wl.getCustomer1FirstName() %>&nbsp;<%=wl.getCustomer1LastName() %></div>
+											<div class="registry-label"><kk:msg  key="show.giftregistries.body.eventdate"/></div>
+											<div class="registry-attr"><%=kkEng.getDateAsString(wl.getEventDate())%></div>
 											<%if (wl.getLinkUrl() != null && wl.getLinkUrl().length() > 0) {%>
-												<label><kk:msg  key="create.gift.registry.body.event.link.url"/></label>
-												<div class="resgistry-attr"><a class="text-link" href="<%=wl.getLinkUrl()%>"><%=wl.getLinkUrl()%></a></div>
+												<div class="registry-label"><kk:msg  key="create.gift.registry.body.event.link.url"/></div>
+												<div class="registry-attr"><a class="text-link" href="<%=wl.getLinkUrl()%>"><%=wl.getLinkUrl()%></a></div>
 											<%}%>
 										</div>
 										<div class="right-col">

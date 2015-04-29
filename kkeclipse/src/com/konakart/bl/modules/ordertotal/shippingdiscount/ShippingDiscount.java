@@ -173,6 +173,8 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
         // List to contain an order total for each promotion
         List<OrderTotal> myOrderTotalList = new ArrayList<OrderTotal>();
 
+        boolean applyBeforeTax = true;
+
         if (promArray != null)
         {
 
@@ -201,7 +203,7 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
 
                 // If set to true, discount is applied to pre-tax value. Only relevant for
                 // percentage discount.
-                boolean applyBeforeTax = getCustomBoolean(promotion.getCustom6(), 6);
+                applyBeforeTax = getCustomBoolean(promotion.getCustom6(), 6);
 
                 // The discount only applies to the following shipping module
                 String appliesTo = getCustomString(promotion.getCustom7(), 7);
@@ -340,6 +342,33 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
                             + rb.getString(MODULE_ORDER_TOTAL_SHIPPING_DISCOUNT_TITLE));
 
                 }
+
+                /*
+                 * We need to reduce the tax amount. This is done differently depending on whether
+                 * the discount is applied to the amount before or after tax.
+                 */
+                BigDecimal shippingTotalExTax = order.getShippingQuote().getTotalExTax();
+                BigDecimal shippingTotalIncTax = order.getShippingQuote().getTotalIncTax();
+                if (shippingTotalExTax != null && shippingTotalIncTax != null
+                        && ot.getValue() != null
+                        && shippingTotalExTax.compareTo(new BigDecimal(0)) != 0)
+                {
+                    int scale = getTaxMgr().getTaxScale();
+                    BigDecimal tax = shippingTotalIncTax.subtract(shippingTotalExTax);
+                    if (applyBeforeTax)
+                    {
+                        BigDecimal taxDiscount = ((ot.getValue().divide(shippingTotalExTax, 6,
+                                BigDecimal.ROUND_HALF_UP)).multiply(tax)).setScale(scale,
+                                BigDecimal.ROUND_HALF_UP);
+                        ot.setTax(taxDiscount);
+                    } else
+                    {
+                        BigDecimal discount = shippingTotalIncTax.subtract(shippingTotalExTax);
+                        BigDecimal taxRate = discount.divide(shippingTotalExTax, 6,
+                                BigDecimal.ROUND_HALF_UP);
+                        ot.setTax(getTaxFromTotal(ot.getValue(), taxRate, scale));
+                    }
+                }
                 myOrderTotalList.add(ot);
             }
         } else
@@ -349,7 +378,7 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
         }
 
         // Call a helper method to decide which OrderTotal we should return
-        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList);
+        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
         return retOT;
 

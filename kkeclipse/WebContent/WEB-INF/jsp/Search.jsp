@@ -67,24 +67,21 @@
 			   },
 			minLength: 1,
 			select: function( event, ui ) {
-				document.getElementById('kk_key').value = ui.item.id;
-				document.getElementById('search-input').value = ui.item.value;
-				self.kkSearch();
+				self.kkSearch(ui.item.id,ui.item.value);
 			}
-		}).data( "autocomplete" )._renderItem = function( ul, item ) {
-	           return $( "<li></li>" )
+		}).data( "uiAutocomplete" )._renderItem = function( ul, item ) {
+			   ul.addClass('ui-corner-all');
+	           return $( "<li class='ui-corner-all'></li>" )
 	               .data( "item.autocomplete", item )
 	               .append( "<a>"+ item.label + "</a>" )
 	               .appendTo( ul );
 		};
 		
-		$("#search-input").keydown(function (e){
-		    if(e.keyCode == 13){
+		
+		$("#search-button").click(function (){
 		    	var key = document.getElementById('kk_key').value;
-		    	if (key == null || key == '') {
-		    		self.kkSearch();
-				}
-		    }
+			    var text = document.getElementById('search-input').value;
+		    	self.kkSearch(key,text);
 		});
 	});	
 	</script>
@@ -101,30 +98,28 @@
 <%if (showCookieWarning) { %>	
 	<div id="cookie-container">
 		<div id="cookie-warning">
-			<div id="cookie-warning-text">
-				<kk:msg  key="cookie.warning"/><div id="cookie-warn-button" class="button small-rounded-corners"><kk:msg  key="common.continue"/></div>
-			</div>
+				<span style="display:table-cell; vertical-align:top;"><kk:msg  key="cookie.warning"/></span>
+				<span style="display:table-cell; vertical-align:middle;"><div id="cookie-warn-button" class="button small-rounded-corners"><kk:msg  key="common.continue"/></div></span>
 		</div>
 	</div>
 <% } %>
 
 <div id="header-container">
 	<div id="header">
-	<a href="Welcome.action"><img id="headerlogo" alt="MeatRoot" src="<%=kkEng.getImageBase()%>/headerLogo.jpg"></a>
-		<div id="logo">		
-			
+		<div id="logo">
+			<a href="Welcome.action">KonaKart</a>
 		</div>
 		<div id="search">
 			<%if (useSolr) { %>						
 				<input type="text" id="search-input" class="rounded-corners-left" name="searchText" onkeydown="javascript:kkKeydown();">
 				<input id="kk_key" type="hidden"/>
-				<a id="search-button" class="rounded-corners-right" onclick="javascript:kkSearch();"><kk:msg  key="suggested.search.search"/></a>
+				<a id="search-button" class="rounded-corners-right"><kk:msg  key="suggested.search.search"/></a>
 			<% } else { %>	
 				<form action="QuickSearch.action" id="quickSearchForm" method="post">
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 					<input type="hidden" value="true" name="searchInDesc"/>
 					<input type="text" id="search-input" class="rounded-corners-left" name="searchText">
-					<a id="search-button" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchForm').submit();"><span class="searchicon icon-search"></span><kk:msg  key="suggested.search.search"/></a>
+					<a id="search-button" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchForm').submit();"><kk:msg  key="suggested.search.search"/></a>
 				</form>	
             <% } %>
 		</div>

@@ -18,6 +18,7 @@
 package com.konakart.bl.modules.ordertotal.taxcloud;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,6 +38,7 @@ import com.konakart.app.KKException;
 import com.konakart.app.Order;
 import com.konakart.app.OrderTotal;
 import com.konakart.appif.KKEngIf;
+import com.konakart.appif.OrderIf;
 import com.konakart.appif.OrderProductIf;
 import com.konakart.appif.ShippingQuoteIf;
 import com.konakart.bl.modules.BaseModule;
@@ -234,7 +236,6 @@ public class TaxCloud extends BaseOrderTotalModule implements OrderTotalInterfac
      * @throws DataSetException
      * @throws TorqueException
      */
-
     private void callTaxCloud(StaticData sd, Order order, OrderTotal ot) throws TorqueException,
             DataSetException, Exception
     {
@@ -424,7 +425,6 @@ public class TaxCloud extends BaseOrderTotalModule implements OrderTotalInterfac
         // Set the order with tax information
         order.setTax(taxAmountBD);
         order.setTotalIncTax(order.getTotalExTax().add(taxAmountBD));
-
     }
 
     /**
@@ -474,6 +474,56 @@ public class TaxCloud extends BaseOrderTotalModule implements OrderTotalInterfac
             log.error("Error in verifyAddress: ", e);
         }
         return address;
+    }
+
+    /**
+     * Commit the Order transaction - Call TaxCloud to authorize and capture the transaction
+     * 
+     * @param order
+     * @throws Exception
+     *             if something unexpected happens
+     */
+    public void commitOrder(OrderIf order) throws Exception
+    {
+        try
+        {
+            StaticData sd = staticDataHM.get(getStoreId());
+
+            // Call TaxCloud to authorize and capture the transaction
+
+            net.taxcloud.service.AuthorizedService authorizedService = new net.taxcloud.service.AuthorizedService();
+            String apiLoginId = sd.getLoginId();
+            String apiKey = sd.getLoginKey();
+            String customerId = String.valueOf(order.getCustomerId());
+
+            // Unique ID for cart generated when order was created
+            String cartId = order.getLifecycleId();
+
+            // Unique ID for order
+            String orderId = String.valueOf(order.getId());
+
+            Calendar dateAuthorized = Calendar.getInstance();
+
+            boolean authorized = authorizedService.authorized(apiLoginId, apiKey, customerId,
+                    cartId, orderId, dateAuthorized);
+
+            if (log.isDebugEnabled())
+            {
+                log.debug("Authorized returned: " + authorized + " for\n customerId = "
+                        + customerId + "\n cartId = " + cartId + "\n orderId = " + orderId);
+            }
+
+            if (authorized)
+            {
+                net.taxcloud.service.CapturedService capturedService = new net.taxcloud.service.CapturedService();
+                boolean captured = capturedService.captured(apiLoginId, apiKey, orderId);
+                log.debug("Captured returned: " + captured + " for orderId = " + orderId);
+            }
+        } catch (Exception e)
+        {
+            log.warn("Problem authorizing / capturing TaxCloud transaction");
+            e.printStackTrace();
+        }
     }
 
     public int getSortOrder()

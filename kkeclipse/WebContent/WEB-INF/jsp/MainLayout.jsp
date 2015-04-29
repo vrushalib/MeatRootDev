@@ -47,17 +47,21 @@
     <% } else { %>
 		<html>
 			<head>
-				<title>MeatRoot</title>
-				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
+				<title><%=kkEng.getPageTitle()%></title>
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
 				<meta name="description" content="<%=kkEng.getMetaDescription()%>" />
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" />
+				<link type="text/css" rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/jquery.selectboxit.css" />
+				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/font-awesome/css/font-awesome.css" />
+				<link type='text/css' rel='stylesheet' href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600,700'  >		
+				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/jcarousel.css" />				
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/kk-style.css" />
-			
-		 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>  
-				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+
+		 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+				<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>				
+				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.validate.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.json-2.3.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.tools.min.js"></script>
@@ -74,10 +78,15 @@
 				***********************************************/
 				</script>			 
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.jcarousel.min.js"></script>
+				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.touchSwipe.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.cookie.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.js"></script>	
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.validation.js"></script>	
-							
+				<script>
+				// Picture element HTML5 shiv
+				document.createElement( "picture" );
+				</script>
+				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/picturefill-min.js"></script>							
 				<%
 				// Set the base
 				String scheme = pageContext.getRequest().getScheme()+"://";
@@ -87,7 +96,7 @@
 				String base = scheme+server+((port==80)?"":":"+port)+path+"/";
 				%>
 				<base href="<%=base%>"/>										
-				<!--- KonaKart v7.2.0.2.11093 -->
+				<!--- KonaKart v7.4.0.1.12158 -->
 			</head>
 			<%if (defName != null) {%>
 				<body id="<%=defName%>">

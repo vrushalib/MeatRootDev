@@ -32,11 +32,13 @@ import com.konakart.al.json.OrderJson;
 import com.konakart.al.json.OrderProductJson;
 import com.konakart.al.json.OrderTotalJson;
 import com.konakart.al.json.ShippingQuoteJson;
+import com.konakart.app.NameValue;
 import com.konakart.app.ShippingQuote;
 import com.konakart.appif.OptionIf;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.OrderProductIf;
 import com.konakart.appif.OrderTotalIf;
+import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.appif.ShippingQuoteIf;
 
 /**
@@ -75,8 +77,10 @@ public class CheckoutOnePageRefreshAction extends BaseAction
     private String qtyMsg;
 
     private boolean otValid = true;
-    
+
     private String xsrf_token;
+
+    private NameValue[] paymentMethods;
 
     public String execute()
     {
@@ -162,7 +166,8 @@ public class CheckoutOnePageRefreshAction extends BaseAction
                         if (vOrder.getStoreId() != null && storeId != null
                                 && vOrder.getStoreId().equals(storeId))
                         {
-                            kkAppEng.getOrderMgr().addShippingQuoteToVendorOrder(shipping, vOrder, null);
+                            kkAppEng.getOrderMgr().addShippingQuoteToVendorOrder(shipping, vOrder,
+                                    null);
                         }
 
                         // Add values to quote for main order
@@ -214,7 +219,56 @@ public class CheckoutOnePageRefreshAction extends BaseAction
                 } catch (Exception e)
                 {
                 }
+
+                // set the new billing address
                 kkAppEng.getOrderMgr().setCheckoutOrderBillingAddress(addrId);
+
+                // Get the current codes
+                String currentCode = "";
+                String currentSubCode = null;
+                if (checkoutOrder.getPaymentDetails() != null)
+                {
+                    currentCode = checkoutOrder.getPaymentDetails().getCode();
+                    currentSubCode = checkoutOrder.getPaymentDetails().getSubCode();
+                }
+
+                // Reset the order payment details
+                checkoutOrder.setPaymentDetails(null);
+                checkoutOrder.setPaymentMethod(null);
+                checkoutOrder.setPaymentModuleCode(null);
+                checkoutOrder.setPaymentModuleSubCode(null);
+
+                // Get payment gateways from the engine for the new billing address
+                PaymentDetailsIf[] pdArray = kkAppEng.getOrderMgr().createPaymentGatewayList();
+                if (pdArray != null && pdArray.length > 0)
+                {
+                    // Create a single code
+                    String code = currentCode
+                            + ((currentSubCode == null) ? "" : ("~~" + currentSubCode));
+                    boolean added = kkAppEng.getOrderMgr().addPaymentDetailsToOrder(code);
+                    if (!added)
+                    {
+                        // The current Payment Gateway isn't available for the new address so
+                        // add the top of the list
+                        code = pdArray[0].getCode()
+                                + ((pdArray[0].getSubCode() == null) ? "" : ("~~" + pdArray[0]
+                                        .getSubCode()));
+                        kkAppEng.getOrderMgr().addPaymentDetailsToOrder(code);
+
+                        // Create an array to populate the drop list in the UI
+                        paymentMethods = new NameValue[pdArray.length];
+                        for (int i = 0; i < pdArray.length; i++)
+                        {
+                            PaymentDetailsIf pd = pdArray[i];
+                            paymentMethods[i] = new NameValue(pd.getCode(), pd.getDescription());
+                        }
+                    }
+                } else
+                {
+                    paymentMethods = new NameValue[1];
+                    paymentMethods[0] = new NameValue("-1",
+                            kkAppEng.getMsg("one.page.checkout.no.payment.methods"));
+                }
             }
 
             // Call the engine to get the Order Totals
@@ -386,7 +440,7 @@ public class CheckoutOnePageRefreshAction extends BaseAction
                     if (opt.getCustomerText() != null)
                     {
                         optClone.setCustomerText(opt.getCustomerText());
-                    }                    
+                    }
                     if (opt.getCustomerPrice() != null)
                     {
                         optClone.setFormattedCustPrice(kkAppEng.formatPrice(opt.getCustomerPrice()));
@@ -663,10 +717,28 @@ public class CheckoutOnePageRefreshAction extends BaseAction
     }
 
     /**
-     * @param xsrf_token the xsrf_token to set
+     * @param xsrf_token
+     *            the xsrf_token to set
      */
     public void setXsrf_token(String xsrf_token)
     {
         this.xsrf_token = xsrf_token;
+    }
+
+    /**
+     * @return the paymentMethods
+     */
+    public NameValue[] getPaymentMethods()
+    {
+        return paymentMethods;
+    }
+
+    /**
+     * @param paymentMethods
+     *            the paymentMethods to set
+     */
+    public void setPaymentMethods(NameValue[] paymentMethods)
+    {
+        this.paymentMethods = paymentMethods;
     }
 }

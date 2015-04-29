@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
+import com.konakart.app.KKException;
 import com.konakart.appif.DigitalDownloadIf;
 import com.konakart.util.FileUtils;
 import com.konakart.util.Utils;
@@ -47,6 +48,20 @@ public class DigitalDownloadAction extends BaseAction
     private FileInputStream kkInputName;
 
     private String kkContentDisposition;
+    
+    private boolean extCall = false;
+
+    /**
+     * Typically called from a KonaKart tile not part of the standard storefront application
+     * 
+     * @return Returns a forward string
+     */
+    public String externalCall()
+    {
+        this.extCall = true;
+        execute();
+        return null;
+    }
 
     public String execute()
     {
@@ -60,6 +75,31 @@ public class DigitalDownloadAction extends BaseAction
             int custId;
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
+            
+            if (this.extCall == true)
+            {
+                String sessionId = request.getParameter("sessionId");
+                if (sessionId == null)
+                {
+                    return null;
+                }
+
+                // Use the session of the logged in user to initialise kkAppEng
+                try
+                {
+                    kkAppEng.getEng().checkSession(sessionId);
+                } catch (KKException e)
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("DownloadInvoiceAction called with invalid session Id :"
+                                + sessionId);
+                    }
+                    return null;
+                }
+
+                kkAppEng.getCustomerMgr().loginBySession(sessionId);
+            }           
             
             // Check to see whether the user is logged in
             custId = this.loggedIn(request, response, kkAppEng, "MyAccount");

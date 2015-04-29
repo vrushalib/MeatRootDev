@@ -173,6 +173,8 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
         // List to contain an order total for each promotion
         List<OrderTotal> myOrderTotalList = new ArrayList<OrderTotal>();
 
+        boolean applyBeforeTax = true;
+
         if (promArray != null)
         {
 
@@ -201,7 +203,7 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
 
                 // If set to true, discount is applied to pre-tax value. Only relevant for
                 // percentage discount.
-                boolean applyBeforeTax = getCustomBoolean(promotion.getCustom6(), 6);
+                applyBeforeTax = getCustomBoolean(promotion.getCustom6(), 6);
 
                 // Don't bother going any further if there is no discount
                 if (discountApplied == null || discountApplied.equals(new BigDecimal(0)))
@@ -312,24 +314,36 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
                 }
 
                 /*
-                 * If the discount is applied to the amount before tax we may want to reduce the
-                 * total tax amount so that tax is only paid on the total less discount.
+                 * We need to reduce the tax amount. This is done differently depending on whether
+                 * the discount is applied to the amount before or after tax.
                  */
-                if (applyBeforeTax && order.getTax() != null && order.getSubTotalExTax() != null
-                        && order.getSubTotalExTax().compareTo(new BigDecimal(0)) != 0)
+                BigDecimal total = null;
+                if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
+                        && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
                 {
-                    /*
-                     * Figure out the average tax rate calculated for the order. We divide the tax
-                     * by the order sub total (which doesn't include shipping)
-                     */
-                    BigDecimal averageTaxRate = order.getTax().divide(order.getSubTotalExTax(), 6,
+                    // Use total including shipping cost
+                    total = order.getTotalExTax();
+                } else
+                {
+                    // Use subtotal that doesn't include shipping
+                    total = order.getSubTotalExTax();
+                }
+
+                if (total != null && total.compareTo(new BigDecimal(0)) != 0
+                        && order.getTax() != null)
+                {
+                    BigDecimal averageTaxRate = order.getTax().divide(total, 6,
                             BigDecimal.ROUND_HALF_UP);
-
-                    // Calculate the tax discount based on the average tax
-                    BigDecimal taxDiscount = discount.multiply(averageTaxRate);
-                    taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
-
-                    ot.setTax(taxDiscount);
+                    if (applyBeforeTax)
+                    {
+                        // Calculate the tax discount based on the average tax
+                        BigDecimal taxDiscount = discount.multiply(averageTaxRate);
+                        taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
+                        ot.setTax(taxDiscount);
+                    } else
+                    {
+                        ot.setTax(getTaxFromTotal(discount, averageTaxRate, scale));
+                    }
                 }
 
                 myOrderTotalList.add(ot);
@@ -341,7 +355,7 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
         }
 
         // Call a helper method to decide which OrderTotal we should return
-        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList);
+        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
         return retOT;
 

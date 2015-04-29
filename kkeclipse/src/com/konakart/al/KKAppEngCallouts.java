@@ -188,6 +188,15 @@ public class KKAppEngCallouts
             log.error("No shipping module found: \n" + order.getDeliveryFormattedAddress());
             return false;
         }
+        
+        /*
+         * Check that a payment method is always present on the order. 
+         */
+        if (order.getPaymentDetails() == null)
+        {
+            log.error("No payment method found: \n" + order.getBillingFormattedAddress());
+            return false;
+        }
 
         return true;
     }

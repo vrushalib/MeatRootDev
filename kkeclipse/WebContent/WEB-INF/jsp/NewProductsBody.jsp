@@ -30,5 +30,5 @@
 	<%title = kkEng.getMsg("new.products.body.title")+" "+kkEng.getMsg("common.in")+" "+catName;%>
 <% } %> 
 		    	
-<kk:carousel prods="<%=prodMgr.getNewProducts()%>" title="<%=title%>" width="<%=kkEng.getContentClass()%>"/>
+<kk:carousel prods="<%=prodMgr.getNewProducts()%>" title="<%=title%>" width="180" widthSmall="150" breakpointSmall="440"/>
 

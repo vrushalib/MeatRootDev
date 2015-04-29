@@ -26,13 +26,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import net.authorize.sim.Fingerprint;
+
 import com.konakart.app.KKException;
 import com.konakart.app.NameValue;
 import com.konakart.app.Order;
 import com.konakart.app.OrderTotal;
 import com.konakart.app.PaymentDetails;
+import com.konakart.app.SSOToken;
 import com.konakart.appif.CountryIf;
 import com.konakart.appif.KKEngIf;
+import com.konakart.appif.NameValueIf;
+import com.konakart.appif.SSOTokenIf;
 import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
 import com.konakart.bl.modules.payment.BasePaymentModule;
@@ -66,6 +71,8 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
             .synchronizedMap(new HashMap<String, StaticData>());
 
     private static String mutex = "authorizenetMutex";
+
+    private static final String hostPortSubstitute = "host:port";
 
     // Configuration Keys
 
@@ -110,6 +117,39 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
      * To show CVV field
      */
     private final static String MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV = "MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV";
+
+    /**
+     * If set to true, direct post will be used instead of AIM
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_DIRECT_POST = "MODULE_PAYMENT_AUTHORIZENET_DIRECT_POST";
+
+    /**
+     * Leave the MD5HashKey empty, unless you have explicitly set it in the merchant interface
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_MD5_HASH_KEY = "MODULE_PAYMENT_AUTHORIZENET_MD5_HASH_KEY";
+
+    /**
+     * URL used by AuthorizeNet Direct Post to callback into KonaKart. This would typically be HTTPS
+     * and reachable from the internet.
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_RELAY_URL = "MODULE_PAYMENT_AUTHORIZENET_RELAY_URL";
+
+    /**
+     * Username and password used to log into the engine by the callback from AuthorizeNet
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_CALLBACK_USERNAME = "MODULE_PAYMENT_AUTHORIZENET_CALLBACK_USERNAME";
+
+    private final static String MODULE_PAYMENT_AUTHORIZENET_CALLBACK_PASSWORD = "MODULE_PAYMENT_AUTHORIZENET_CALLBACK_PASSWORD";
+
+    /**
+     * If set to true, CIM functionality is enabled
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM = "MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM";
+
+    /**
+     * URL used by KonaKart to send CIM XML messages
+     */
+    private final static String MODULE_PAYMENT_AUTHORIZENET_CIM_WEB_SERVICE_URL = "MODULE_PAYMENT_AUTHORIZENET_CIM_WEB_SERVICE_URL";
 
     // Message Catalogue Keys
     private final static String MODULE_PAYMENT_AUTHORIZENET_TEXT_TITLE = "module.payment.authorizenet.text.title";
@@ -183,14 +223,66 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         }
 
         staticData.setAuthorizeNetTxnKey(confVal);
-        staticData.setTestMode(getConfigurationValueAsBool(
-                MODULE_PAYMENT_AUTHORIZENET_TESTMODE, true));
-        staticData.setZone(getConfigurationValueAsIntWithDefault(
-                MODULE_PAYMENT_AUTHORIZENET_ZONE, 0));
+        staticData.setTestMode(getConfigurationValueAsBool(MODULE_PAYMENT_AUTHORIZENET_TESTMODE,
+                true));
+        staticData.setZone(getConfigurationValueAsIntWithDefault(MODULE_PAYMENT_AUTHORIZENET_ZONE,
+                0));
         staticData.setSortOrder(getConfigurationValueAsIntWithDefault(
                 MODULE_PAYMENT_AUTHORIZENET_SORT_ORDER, 0));
-        staticData.setShowCVV(getConfigurationValueAsBool(
-                MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV, true));
+        staticData.setShowCVV(getConfigurationValueAsBool(MODULE_PAYMENT_AUTHORIZENET_SHOW_CVV,
+                true));
+        staticData.setUseDirectPost(getConfigurationValueAsBool(
+                MODULE_PAYMENT_AUTHORIZENET_DIRECT_POST, false));
+
+        confVal = getConfigurationValue(MODULE_PAYMENT_AUTHORIZENET_MD5_HASH_KEY);
+        if (confVal == null || confVal.length() == 0)
+        {
+            staticData.setMd5HashKey(null);
+        } else
+        {
+            staticData.setMd5HashKey(confVal);
+        }
+
+        confVal = getConfigurationValue(MODULE_PAYMENT_AUTHORIZENET_RELAY_URL);
+        if ((confVal == null || confVal.length() == 0) && staticData.isUseDirectPost())
+        {
+            throw new KKException(
+                    "The Configuration MODULE_PAYMENT_AUTHORIZENET_RELAY_URL must be set to the URL used for calling back"
+                            + " into KonaKart from Authorize.Net. (e.g. https://host:port/konakart/AuthNetCallback.action)");
+        }
+        staticData.setDirectPostRelayUrl(confVal);
+
+        staticData.setCimEnabled(getConfigurationValueAsBool(
+                MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM, false));
+
+        confVal = getConfigurationValue(MODULE_PAYMENT_AUTHORIZENET_CIM_WEB_SERVICE_URL);
+        if ((confVal == null || confVal.length() == 0) && staticData.isCimEnabled())
+        {
+            throw new KKException(
+                    "The Configuration MODULE_PAYMENT_AUTHORIZENET_CIM_WEB_SERVICE_URL must be set to the URL used for sending"
+                            + " CIM XML messages . (e.g. https://apitest.authorize.net/xml/v1/request.api for test"
+                            + " and https://api.authorize.net/xml/v1/request.api for production)");
+        }
+        staticData.setCimWebServiceUrl(confVal);
+
+        confVal = getConfigurationValue(MODULE_PAYMENT_AUTHORIZENET_CALLBACK_USERNAME);
+        if ((confVal == null || confVal.length() == 0) && staticData.isUseDirectPost())
+        {
+            throw new KKException(
+                    "The Configuration MODULE_PAYMENT_AUTHORIZENET_CALLBACK_USERNAME must be set to the Callback Username for the"
+                            + " callback functionality.");
+        }
+        staticData.setCallbackUsername(confVal);
+
+        confVal = getConfigurationValue(MODULE_PAYMENT_AUTHORIZENET_CALLBACK_PASSWORD);
+        if ((confVal == null || confVal.length() == 0) && staticData.isUseDirectPost())
+        {
+            throw new KKException(
+                    "The Configuration MODULE_PAYMENT_AUTHORIZENET_CALLBACK_PASSWORD must be set to the Callback Password for the"
+                            + " callback functionality.");
+        }
+        staticData.setCallbackPassword(confVal);
+
     }
 
     /**
@@ -218,8 +310,8 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
 
         // Get the resource bundle
-        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap, info
-                .getLocale());
+        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap,
+                info.getLocale());
         if (rb == null)
         {
             throw new KKException("A resource file cannot be found for the country "
@@ -229,7 +321,14 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         PaymentDetails pDetails = new PaymentDetails();
         pDetails.setCode(code);
         pDetails.setSortOrder(sd.getSortOrder());
-        pDetails.setPaymentType(PaymentDetails.SERVER_PAYMENT_GATEWAY);
+        if (sd.isUseDirectPost())
+        {
+            pDetails.setPaymentType(PaymentDetails.BROWSER_IN_FRAME_PAYMENT_GATEWAY);
+            pDetails.setPreProcessCode("AuthorizenetDPM");
+        } else
+        {
+            pDetails.setPaymentType(PaymentDetails.SERVER_PAYMENT_GATEWAY);
+        }
         pDetails.setDescription(rb.getString(MODULE_PAYMENT_AUTHORIZENET_TEXT_DESCRIPTION));
         pDetails.setTitle(rb.getString(MODULE_PAYMENT_AUTHORIZENET_TEXT_TITLE));
 
@@ -245,14 +344,10 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
 
         List<NameValue> parmList = new ArrayList<NameValue>();
 
-        parmList.add(new NameValue("x_delim_data", "True"));
-        parmList.add(new NameValue("x_relay_response", "False"));
+        parmList.add(new NameValue("x_invoice_num", order.getId()));
         parmList.add(new NameValue("x_login", sd.getAuthorizeNetLoginId()));
-        parmList.add(new NameValue("x_tran_key", sd.getAuthorizeNetTxnKey()));
-        parmList.add(new NameValue("x_delim_char", ","));
-        parmList.add(new NameValue("x_encap_char", ""));
-        parmList.add(new NameValue("x_method", "CC"));
         parmList.add(new NameValue("x_type", "AUTH_CAPTURE"));
+        parmList.add(new NameValue("x_test_request", (sd.isTestMode() ? "TRUE" : "FALSE")));
 
         // AuthorizeNet requires details of the final price - inclusive of tax.
         BigDecimal total = null;
@@ -271,14 +366,10 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         }
 
         parmList.add(new NameValue("x_amount", total.toString()));
-        parmList.add(new NameValue("x_currency_code", order.getCurrency().getCode()));
-        parmList.add(new NameValue("x_invoice_num", order.getId())); // TODO
-        parmList.add(new NameValue("x_test_request", (sd.isTestMode() ? "TRUE" : "FALSE")));
 
-        // Set the billing address
+        // Set the billing information
 
         // Set the billing name from the billing address Id
-
         String[] bNames = getFirstAndLastNamesFromAddress(order.getBillingAddrId());
         if (bNames != null)
         {
@@ -316,6 +407,65 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
             parmList.add(new NameValue("x_country", country.getIsoCode2()));
         }
 
+        parmList.add(new NameValue("x_method", "CC"));
+
+        if (sd.isUseDirectPost())
+        {
+            /*
+             * Only required when using when using direct post. Currency code isn't sent because the
+             * AuthorizeNet SDK Fingerprint class doesn't accept it as input when creating the hash
+             * and so AuthorizeNet replies with an error. The docs say that if you are attempting to
+             * pass the field x_currency_code with your payment form request, you must include this
+             * field in your fingerprint hash generation. Since Authorize.Net currently handles
+             * transaction amounts in the merchant's local currency by default, you may alternately
+             * stop passing x_currency_code. Therefore we don't pass it.
+             */
+            Fingerprint fingerprint = Fingerprint.createFingerprint(sd.getAuthorizeNetLoginId(),
+                    sd.getAuthorizeNetTxnKey(), order.getId(), total.toString());
+
+            long x_fp_sequence = fingerprint.getSequence();
+            long x_fp_timestamp = fingerprint.getTimeStamp();
+            String x_fp_hash = fingerprint.getFingerprintHash();
+
+            parmList.add(new NameValue("x_version", "3.1"));
+            parmList.add(new NameValue("x_fp_hash", x_fp_hash));
+            parmList.add(new NameValue("x_relay_url", sd.getDirectPostRelayUrl().replaceFirst(
+                    hostPortSubstitute, info.getHostAndPort())));
+            parmList.add(new NameValue("x_fp_sequence", Long.toString(x_fp_sequence)));
+            parmList.add(new NameValue("x_fp_timestamp", Long.toString(x_fp_timestamp)));
+
+            /*
+             * Create a session here which will be used by the IPN callback
+             */
+            SSOTokenIf ssoToken = new SSOToken();
+            String sessionId = getEng().login(sd.getCallbackUsername(), sd.getCallbackPassword());
+            if (sessionId == null)
+            {
+                throw new KKException(
+                        "Unable to log into the engine using the AuthorizeNet Callback Username and Password");
+            }
+            ssoToken.setSessionId(sessionId);
+            ssoToken.setCustom1(String.valueOf(order.getId()));
+            ssoToken.setCustom2(sd.getAuthorizeNetLoginId());
+            ssoToken.setCustom3(sd.getMd5HashKey());
+
+            /*
+             * Save the SSOToken
+             */
+            String uuid = getEng().saveSSOToken(ssoToken);
+            parmList.add(new NameValue("kk_uuid", uuid));
+
+        } else
+        {
+            // Required for AIM
+            parmList.add(new NameValue("x_delim_data", "True"));
+            parmList.add(new NameValue("x_relay_response", "False"));
+            parmList.add(new NameValue("x_tran_key", sd.getAuthorizeNetTxnKey()));
+            parmList.add(new NameValue("x_delim_char", ","));
+            parmList.add(new NameValue("x_encap_char", ""));
+            parmList.add(new NameValue("x_currency_code", order.getCurrency().getCode()));
+        }
+
         // Put the parameters into an array
         NameValue[] nvArray = new NameValue[parmList.size()];
         parmList.toArray(nvArray);
@@ -347,6 +497,38 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
     }
 
     /**
+     * Method used to return any custom information required from the payment module. In this case
+     * we use it to return the authentication information required by the CIM implementation.
+     * 
+     * @param sessionId
+     * @param parameters
+     * @return Returns information in a PaymentDetails object
+     * @throws Exception
+     */
+    public PaymentDetails getPaymentDetailsCustom(String sessionId, NameValueIf[] parameters)
+            throws Exception
+    {
+        if (parameters != null && parameters.length == 1 && parameters[0] != null
+                && parameters[0].getValue() != null && parameters[0].getValue().equals("CIM"))
+        {
+            StaticData sd = staticDataHM.get(getStoreId());
+            List<NameValue> parmList = new ArrayList<NameValue>();
+            parmList.add(new NameValue("loginId", sd.getAuthorizeNetLoginId()));
+            parmList.add(new NameValue("transactionKey", sd.getAuthorizeNetTxnKey()));
+            parmList.add(new NameValue("webServiceURL", sd.getCimWebServiceUrl()));
+
+            PaymentDetails pDetails = new PaymentDetails();
+            NameValue[] nvArray = new NameValue[parmList.size()];
+            parmList.toArray(nvArray);
+            pDetails.setParameters(nvArray);
+
+            return pDetails;
+        }
+        return null;
+
+    }
+
+    /**
      * Used to store the static data of this module
      */
     protected class StaticData
@@ -356,6 +538,13 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         // The Authorize.Net Url used to POST the payment request.
         // "https://secure.authorize.net/gateway/transact.dll"
         private String authorizeNetRequestUrl;
+
+        // URL used by AuthorizeNet Direct Post to callback into KonaKart
+        // "https://host:port/konakart/AuthNetCallback.action"
+        private String directPostRelayUrl;
+
+        // URL for sending CIM XML messages
+        private String cimWebServiceUrl;
 
         // Login ID
         private String authorizeNetLoginId;
@@ -371,6 +560,21 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
 
         // zone where AuthorizeNet will be made available
         private int zone;
+
+        // Use direct post instead of AIM
+        private boolean useDirectPost = false;
+
+        // Enable CIM functionality
+        private boolean cimEnabled = false;
+
+        // Leave the MD5HashKey empty, unless you have explicitly set it in the merchant interface
+        private String md5HashKey = null;
+
+        // username used by the callback to login to the engine
+        private String callbackUsername;
+
+        // password used by the callback to login to the engine
+        private String callbackPassword;
 
         /**
          * @return the sortOrder
@@ -489,6 +693,125 @@ public class Authorizenet extends BasePaymentModule implements PaymentInterface
         public void setZone(int zone)
         {
             this.zone = zone;
+        }
+
+        /**
+         * @return the useDirectPost
+         */
+        public boolean isUseDirectPost()
+        {
+            return useDirectPost;
+        }
+
+        /**
+         * @param useDirectPost
+         *            the useDirectPost to set
+         */
+        public void setUseDirectPost(boolean useDirectPost)
+        {
+            this.useDirectPost = useDirectPost;
+        }
+
+        /**
+         * @return the md5HashKey
+         */
+        public String getMd5HashKey()
+        {
+            return md5HashKey;
+        }
+
+        /**
+         * @param md5HashKey
+         *            the md5HashKey to set
+         */
+        public void setMd5HashKey(String md5HashKey)
+        {
+            this.md5HashKey = md5HashKey;
+        }
+
+        /**
+         * @return the directPostRelayUrl
+         */
+        public String getDirectPostRelayUrl()
+        {
+            return directPostRelayUrl;
+        }
+
+        /**
+         * @param directPostRelayUrl
+         *            the directPostRelayUrl to set
+         */
+        public void setDirectPostRelayUrl(String directPostRelayUrl)
+        {
+            this.directPostRelayUrl = directPostRelayUrl;
+        }
+
+        /**
+         * @return the callbackUsername
+         */
+        public String getCallbackUsername()
+        {
+            return callbackUsername;
+        }
+
+        /**
+         * @param callbackUsername
+         *            the callbackUsername to set
+         */
+        public void setCallbackUsername(String callbackUsername)
+        {
+            this.callbackUsername = callbackUsername;
+        }
+
+        /**
+         * @return the callbackPassword
+         */
+        public String getCallbackPassword()
+        {
+            return callbackPassword;
+        }
+
+        /**
+         * @param callbackPassword
+         *            the callbackPassword to set
+         */
+        public void setCallbackPassword(String callbackPassword)
+        {
+            this.callbackPassword = callbackPassword;
+        }
+
+        /**
+         * @return the cimWebServiceUrl
+         */
+        public String getCimWebServiceUrl()
+        {
+            return cimWebServiceUrl;
+        }
+
+        /**
+         * @param cimWebServiceUrl
+         *            the cimWebServiceUrl to set
+         */
+        public void setCimWebServiceUrl(String cimWebServiceUrl)
+        {
+            this.cimWebServiceUrl = cimWebServiceUrl;
+        }
+
+        /**
+         * @return the cimEnabled
+         */
+        public boolean isCimEnabled()
+        {
+            return cimEnabled;
+        }
+
+        /**
+         * @param cimEnabled
+         *            the cimEnabled to set
+         */
+        public void setCimEnabled(boolean cimEnabled)
+        {
+            this.cimEnabled = cimEnabled;
         }
 
     }

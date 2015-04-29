@@ -115,6 +115,19 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 		}else{
 			$('#continue-button').show();
 		}
+		
+		if (result.paymentMethods != null) {
+			var txt = "";
+			for ( var i = 0; i < result.paymentMethods.length; i++) {
+				var nv = result.paymentMethods[i];
+				if (i==0) {
+					txt += '<option  value="'+nv.name+'" selected="selected">'+nv.value+'</option>';
+				} else {
+					txt += '<option  value="'+nv.name+'" >'+nv.value+'</option>';
+				}
+			}			
+			$('#paymentDetails').html(txt);
+		}
 	}
 };
 
@@ -131,9 +144,9 @@ function getOrderTotalRow(ot) {
 	} else if (ot.className == "ot_total") {
 		row += '<td>'+ot.title+'</td>';	
 		row += '<td class="right">'+ot.value+'</td>';
-	} else if (ot.className == "ot_product_discount" || ot.className == "ot_total_discount") {
+	} else if (isDiscountModule(ot.className)) {
 		row += '<td class="cost-overview"><span class="discount">'+ot.title+'</span></td>';	
-		row += '<td class="cost-overview-amounts right"><span class="discount">'+ot.value+'</span></td>';
+		row += '<td class="cost-overview-amounts right"><span class="discount">-'+ot.value+'</span></td>';
 	} else  {
 		row += '<td class="cost-overview">'+ot.title+'</td>';	
 		row += '<td class="cost-overview-amounts right">'+ot.value+'</td>';
@@ -142,6 +155,16 @@ function getOrderTotalRow(ot) {
 	return row;
 }
 
+function isDiscountModule(module) {
+	if (module != null
+            && (module=="ot_product_discount" || module=="ot_total_discount"
+            || module=="ot_buy_x_get_y_free"  || module=="ot_gift_certificate"
+            || module=="ot_redeem_points"     || module=="ot_shipping_discount"))
+    {
+        return true;
+    }
+    return false;
+}
 
 function getOrderProductRow(result, op) {	
  	var row = '<tr><td>';
@@ -253,14 +276,20 @@ $(function() {
 	
 	$("#addr-dialog").dialog({
 		autoOpen: false,
-		width: "500",
+		width: "90%",
 		modal: "true",
-		hide: "blind"
+		hide: "blind",
+		open: function( event, ui ) {
+			var width = $( "#addr-dialog" ).width();
+			if (width > 500) {
+				$( "#addr-dialog" ).dialog( "option", "width", 500 );
+			}
+		}
 	});
 	
 	$("#error-dialog").dialog({
 		autoOpen: false,
-		width: "500",
+		width: "90%",
 		modal: "true",
 		hide: "blind"
 	});
@@ -319,43 +348,6 @@ $(function() {
 
 </script>
 
-  	    	<div id="error-dialog" title="<kk:msg  key="one.page.checkout.problem.title"/>" class="content-area rounded-corners">
-	    		<div>
-					<div class="form-section">
-						<div class="form-section-title no-margin">
-							<h3><kk:msg  key="one.page.checkout.problem"/></h3>									
-						</div>
-						<a onclick='closeErrorDialog();' class="button small-rounded-corners">
-							<span ><kk:msg  key="common.close"/></span>
-						</a>															
-					</div>
-		    	</div>
-		    </div>
-    		
- 	    	<div id="addr-dialog" title="<span><kk:msg  key="header.address.book"/>" class="content-area rounded-corners">
-	    		<div>
-					<div class="form-section">
-						<div class="form-section-title no-margin">
-							<h3><kk:msg  key="address.book.dialog.select"/></h3>									
-						</div>
-						<%if (cust.getAddresses() != null && cust.getAddresses().length > 0){ %>
-							<% for (int i = 0; i < cust.getAddresses().length; i++){ %>
-								<% com.konakart.appif.AddressIf addr = cust.getAddresses()[i];%>						
-								<div class="select-addr-section <%=(i%2==0)?"even":"odd"%>">
-									<div class="select-addr">
-										<%=kkEng.removeCData(addr.getFormattedAddress())%>
-									</div>
-									<div class="select-addr-buttons">
-										<a onclick='<%="selectAddr("+addr.getId()+");"%>' class="button small-rounded-corners">
-											<span ><kk:msg  key="common.select"/></span>
-										</a>									
-									</div>
-								</div>
-							<%}%>
-						<%}%>
-					</div>
-		    	</div>
-		    </div>
 
 
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
@@ -564,9 +556,9 @@ $(function() {
 													<%}else if (ot.getClassName().equals("ot_total")) {%>
 														<td ><%=ot.getTitle()%></td>
 														<td class="right"><%=kkEng.formatPrice(ot.getValue())%></td>
-													<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
+													<%}else if (kkEng.isDiscountModule(ot.getClassName())) {%>	
 													    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
-														<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
+														<td class="cost-overview-amounts right"><span class="discount">-<%=kkEng.formatPrice(ot.getValue())%></span></td>
 													<%}else{%>
 													    <td class="cost-overview"><%=ot.getTitle()%></td>	
 														<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td>
@@ -619,9 +611,9 @@ $(function() {
 														<%}else if (ot.getClassName().equals("ot_total")) {%>
 															<td><%=ot.getTitle()%></td>
 															<td class="right"><%=kkEng.formatPrice(ot.getValue())%></td>
-														<%}else if (ot.getClassName().equals("ot_product_discount") || ot.getClassName().equals("ot_total_discount")) {%>
+														<%}else if (kkEng.isDiscountModule(ot.getClassName())) {%>	
 														    <td class="cost-overview"><span class="discount"><%=ot.getTitle()%></span></td>
-															<td class="cost-overview-amounts right"><span class="discount"><%=kkEng.formatPrice(ot.getValue())%></span></td>
+															<td class="cost-overview-amounts right"><span class="discount">-<%=kkEng.formatPrice(ot.getValue())%></span></td>
 														<%}else{%>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	
 															<td class="cost-overview-amounts right"><%=kkEng.formatPrice(ot.getValue())%></td>
@@ -642,6 +634,43 @@ $(function() {
 					</form>			    	
 	    		</div>
 
+  	    	<div id="error-dialog" title="<kk:msg  key="one.page.checkout.problem.title"/>" class="content-area rounded-corners">
+	    		<div>
+					<div class="form-section">
+						<div class="form-section-title no-margin">
+							<h3><kk:msg  key="one.page.checkout.problem"/></h3>									
+						</div>
+						<a onclick='closeErrorDialog();' class="button small-rounded-corners">
+							<span ><kk:msg  key="common.close"/></span>
+						</a>															
+					</div>
+		    	</div>
+		    </div>
+    		
+ 	    	<div id="addr-dialog" title="<kk:msg  key="header.address.book"/>" class="content-area rounded-corners">
+	    		<div>
+					<div class="form-section">
+						<div class="form-section-title no-margin">
+							<h3><kk:msg  key="address.book.dialog.select"/></h3>									
+						</div>
+						<%if (cust.getAddresses() != null && cust.getAddresses().length > 0){ %>
+							<% for (int i = 0; i < cust.getAddresses().length; i++){ %>
+								<% com.konakart.appif.AddressIf addr = cust.getAddresses()[i];%>						
+								<div class="select-addr-section <%=(i%2==0)?"even":"odd"%>">
+									<div class="select-addr">
+										<%=kkEng.removeCData(addr.getFormattedAddress())%>
+									</div>
+									<div class="select-addr-buttons">
+										<a onclick='<%="selectAddr("+addr.getId()+");"%>' class="button small-rounded-corners">
+											<span ><kk:msg  key="common.select"/></span>
+										</a>									
+									</div>
+								</div>
+							<%}%>
+						<%}%>
+					</div>
+		    	</div>
+		    </div>
 
 
 

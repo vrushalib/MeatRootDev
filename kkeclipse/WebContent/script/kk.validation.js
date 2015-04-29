@@ -41,6 +41,11 @@ var validationRules = {
 			minlength : 2,
 			maxlength : 32
 		},
+		taxId : {
+			required : false,
+			minlength : 2,
+			maxlength : 64
+		},
 		streetAddress : {
 			required : true,
 			minlength : 2,

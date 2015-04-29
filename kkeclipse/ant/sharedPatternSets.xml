@@ -117,7 +117,7 @@
 	<patternset id="konakart_custom_jar">
 		<include name="**/al/KKAppEngCallouts.*" />
 		<include name="**/al/SPSManagerIf.*" />
-		<include name="**/bl/OrderIntegrationMgr.*" />
+		<include name="**/bl/OrderIntegrationMgr*.*" />
 		<include name="**/bl/LoginIntegrationMgr.*" />
 		<include name="**/bl/ReorderMgr.*" />
 		<include name="**/blif/LDAPMgrIf.*" />
@@ -125,10 +125,20 @@
 		<include name="**/com/konakart/actions/*Action.*" />
 		<include name="**/com/konakart/actions/gateways/BaseGatewayAction.*" />
 		<include name="**/com/konakart/kktags/*.*" />
-		<include name="**/modules/shipping/Base*.*" />
-		<include name="**/modules/shipping/*.properties" />
 		<include name="**/modules/payment/Base*.*" />
+		<include name="**/modules/payment/PaymentInfo*.*" />
+		<include name="**/modules/payment/PaymentInterface*.*" />
+		<include name="**/modules/payment/PaymentMgr*.*" />
 		<include name="**/modules/ordertotal/Base*.*" />
+		<include name="**/modules/ordertotal/OrderTotalInterface*.*" />
+		<include name="**/modules/ordertotal/OrderTotalMgr*.*" />
+		<include name="**/modules/others/AddrValidationInterface*.*" />
+		<include name="**/modules/shipping/Base*.*" />
+		<include name="**/modules/shipping/ShippingInfo*.*" />
+		<include name="**/modules/shipping/ShippingInterface*.*" />
+		<include name="**/modules/shipping/ShippingMgr*.*" />
+		<include name="**/modules/shipping/WeightCost*.*" />
+		<include name="**/modules/shipping/*.properties" />
     </patternset>
 	
 	<patternset id="enterprise_konakart_customEE_files">

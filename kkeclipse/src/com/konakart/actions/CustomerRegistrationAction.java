@@ -70,6 +70,8 @@ public class CustomerRegistrationAction extends BaseAction
     private int productNotifications;
 
     private String company;
+    
+    private String taxId;
 
     private String streetAddress;
 
@@ -784,6 +786,22 @@ public class CustomerRegistrationAction extends BaseAction
     public void setAllowNoRegister(boolean allowNoRegister)
     {
         this.allowNoRegister = allowNoRegister;
+    }
+
+    /**
+     * @return the taxId
+     */
+    public String getTaxId()
+    {
+        return taxId;
+    }
+
+    /**
+     * @param taxId the taxId to set
+     */
+    public void setTaxId(String taxId)
+    {
+        this.taxId = taxId;
     }
 
 }

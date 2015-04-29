@@ -14,8 +14,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
-// Original version contributed by Chris Derham (Atomus Ltd)
-//
 
 package com.konakart.actions.gateways;
 
@@ -189,6 +187,7 @@ public class GlobalCollectResponseAction extends GlobalCollectBaseAction
                 throw new Exception("Unexpected Problem. Checkout order is null.");
             }
 
+            customerEmail = order.getCustomerEmail();
             PaymentDetailsIf pd = order.getPaymentDetails();
             HashMap<String, String> hp = hashParameters(pd, null);
 
@@ -497,30 +496,56 @@ public class GlobalCollectResponseAction extends GlobalCollectBaseAction
      */
     private boolean isPaymentUnsuccessful(int statusId, int paymentProductId)
     {
+        if (log.isDebugEnabled())
+        {
+            log.debug("statusId = " + statusId + "  paymentProductId = " + paymentProductId);
+        }
+
         if (statusId < 50)
         {
             // Not successful
+            if (log.isDebugEnabled())
+            {
+                log.debug("statusId < 50 - Payment Unsuccessful");
+            }
             return true;
         }
 
         if (statusId == 50 || statusId == 650)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug("statusId == 50 or 650 - Payment Unsuccessful");
+            }
             // Status Not obtained from the bank
             return true;
         }
 
         if (statusId >= 800 && paymentProductId != 11)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug("statusId >= 800 && not product 11 - Payment Successful");
+            }
             // Payment successful and was confirmed to WebCollect
             return false;
         }
 
         if (statusId >= 800 && paymentProductId == 11)
         {
+            if (log.isDebugEnabled())
+            {
+                log.debug("statusId >= 800 && product 11 - Payment Unsuccessful");
+            }
             // Unclear but WebCollect stopped trying to find the status from the 3rd Party
             return true;
         }
 
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("At End - Payment Unsuccessful");
+        }
         return true;
     }
 
@@ -673,10 +698,10 @@ public class GlobalCollectResponseAction extends GlobalCollectBaseAction
             int paymentProductId = Integer.valueOf(pd.getSubCode());
             if (isPaymentUnsuccessful(kkResultId, paymentProductId))
             {
-                ipnHistory.setKonakartResultDescription(RET0_DESC);
+                ipnHistory.setKonakartResultDescription(RET2_DESC);
             } else
             {
-                ipnHistory.setKonakartResultDescription(RET2_DESC);
+                ipnHistory.setKonakartResultDescription(RET0_DESC);
             }
             ipnHistory.setGatewayTransactionId(REQUESTID);
             ipnHistory.setKonakartResultId(kkResultId);

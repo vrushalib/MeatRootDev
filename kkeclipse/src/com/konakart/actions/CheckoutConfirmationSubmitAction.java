@@ -106,8 +106,8 @@ public class CheckoutConfirmationSubmitAction extends BaseAction
             checkoutOrder.setStatusTrail(oshArray);
 
             // Uncomment this for Canada Post - it sets the packaging details
-            //checkoutOrder.setCustom4(checkoutOrder.getShippingQuote().getCustom4());
-            
+            // checkoutOrder.setCustom4(checkoutOrder.getShippingQuote().getCustom4());
+
             /*
              * Check to see whether the order total is set to 0. Don't bother with a payment gateway
              * if it is.
@@ -153,6 +153,12 @@ public class CheckoutConfirmationSubmitAction extends BaseAction
                 PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(kkAppEng.getSessionId(),
                         checkoutOrder.getPaymentDetails().getCode(), orderId, hostAndPort,
                         kkAppEng.getLangId());
+                if (pd == null)
+                {
+                    throw new KKAppException("The payment gateway "
+                            + checkoutOrder.getPaymentDetails().getCode()
+                            + " returned a null PaymentDetails object");
+                }
                 checkoutOrder.setPaymentDetails(pd);
                 checkoutOrder.setPaymentMethod(pd.getTitle());
                 checkoutOrder.setPaymentModuleCode(pd.getCode());

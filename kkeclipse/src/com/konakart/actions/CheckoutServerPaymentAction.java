@@ -24,8 +24,10 @@ import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
+import com.konakart.app.KKException;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.OrderTotalIf;
+import com.konakart.appif.PaymentDetailsIf;
 
 /**
  * Action called before showing the JSP that collects credit card details
@@ -46,6 +48,63 @@ public class CheckoutServerPaymentAction extends BaseAction
             int custId;
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
+
+            String sessionId = request.getParameter("sessionId");
+            String orderIdStr = request.getParameter("orderId");
+            if (sessionId != null && orderIdStr != null)
+            {
+                // We are being called from a KonaKart tile
+
+                // Use the session of the logged in user to initialise kkAppEng
+                try
+                {
+                    kkAppEng.getEng().checkSession(sessionId);
+                } catch (KKException e)
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("CheckoutServerPaymentAction called with invalid session Id :"
+                                + sessionId);
+                    }
+                    return null;
+                }
+
+                int orderId;
+                try
+                {
+                    orderId = new Integer(orderIdStr).intValue();
+                } catch (Exception e)
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("CheckoutServerPaymentAction called with invalid order Id :"
+                                + orderIdStr);
+                    }
+                    return null;
+                }
+
+                // log in the customer
+                kkAppEng.getCustomerMgr().loginBySession(sessionId);
+
+                // get the order
+                OrderIf o = kkAppEng.getEng().getOrder(sessionId, orderId, kkAppEng.getLangId());
+                if (o == null)
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("CheckoutServerPaymentAction called with invalid order Id :"
+                                + orderIdStr + ". An order doesn't exist for this id.");
+                    }
+                    return null;
+                }
+                
+                // Get a fully populated PaymentDetails object and attach it to the order
+                PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(sessionId,
+                        o.getPaymentModuleCode(), orderId, null,
+                        kkAppEng.getLangId());
+                o.setPaymentDetails(pd);                                
+                kkAppEng.getOrderMgr().setCheckoutOrder(o);                               
+            }
 
             custId = this.loggedIn(request, response, kkAppEng, "Checkout");
 

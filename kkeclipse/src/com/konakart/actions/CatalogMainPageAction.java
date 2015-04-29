@@ -34,7 +34,6 @@ import com.konakart.bl.ProductMgr;
  */
 public class CatalogMainPageAction extends BaseAction
 {
-
     private static final long serialVersionUID = 1L;
 
     public String execute()
@@ -98,7 +97,7 @@ public class CatalogMainPageAction extends BaseAction
                 dd.setOrderBy(DataDescConstants.ORDER_BY_RATING_DESCENDING);
                 kkAppEng.getProductMgr().fetchCustomProducts1Array(new ProductSearch(), dd);
             }
-
+                        
             // Fetch all sale items
             // kkAppEng.getProductMgr().fetchSpecialsArray(/* categoryId */ProductMgr.DONT_INCLUDE,
             // /* searchInSubCats */

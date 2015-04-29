@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2014 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -19,10 +19,8 @@ import com.konakart.app.KKException;
 import com.konakart.app.Order;
 import com.konakart.app.ShippingQuote;
 
-
 /**
- * 
- * 
+ * Interface for Shipping Modules
  */
 public interface ShippingInterface
 {
@@ -45,7 +43,5 @@ public interface ShippingInterface
      * 
      * @throws KKException
      */
-    public void setStaticVariables() throws KKException;
-
-    
+    public void setStaticVariables() throws KKException;   
 }

@@ -160,7 +160,7 @@ public class CheckoutAction extends BaseAction
             for (int i = 0; i < cust.getBasketItems().length; i++)
             {
                 BasketIf b = cust.getBasketItems()[i];
-                if (b.getQuantity() == 0)
+                if (b.getQuantity() <= 0)
                 {
                     kkAppEng.getBasketMgr().removeFromBasket(b, /* refresh */false);
                     removed = true;
@@ -349,7 +349,8 @@ public class CheckoutAction extends BaseAction
              * Check to see whether all compulsory order totals are present. The code in the
              * KKAppEngCallouts class may be modified to match your requirements.
              */
-            otValid = new KKAppEngCallouts().validateOrderTotals(kkAppEng, order);
+            otValid = new KKAppEngCallouts().validateOrderTotals(kkAppEng, kkAppEng.getOrderMgr()
+                    .getCheckoutOrder());
 
             // Ensure that the current customer has his addresses populated
             kkAppEng.getCustomerMgr().populateCurrentCustomerAddresses(/* force */false);

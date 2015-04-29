@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
+import com.konakart.appif.ContentIf;
+import com.konakart.util.KKConstants;
 
 /**
  * Gets called before displaying the Terms of Use page
@@ -31,11 +33,13 @@ public class TermsOfUseAction extends BaseAction
 {
     private static final long serialVersionUID = 1L;
 
+    private String termsOfUseContent;
+
     public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
-        
+
         try
         {
             int custId;
@@ -58,6 +62,23 @@ public class TermsOfUseAction extends BaseAction
                 return null;
             }
 
+            // Get the content
+            ContentIf[] content = null;
+
+            if (kkAppEng.getContentMgr().isEnabled())
+            {
+                content = kkAppEng.getContentMgr()
+                        .getContentForId(1, KKConstants.CONTENTID_TERMS_OF_USE);
+            }
+
+            if (content != null && content.length > 0)
+            {
+                termsOfUseContent = content[0].getDescription().getContent();
+            } else
+            {
+                termsOfUseContent = kkAppEng.getMsg("common.add.info");
+            }
+
             kkAppEng.getNav().set(kkAppEng.getMsg("header.terms.of.use"), request);
             return SUCCESS;
 
@@ -65,5 +86,22 @@ public class TermsOfUseAction extends BaseAction
         {
             return super.handleException(request, e);
         }
+    }
+
+    /**
+     * @return the termsOfUseContent
+     */
+    public String getTermsOfUseContent()
+    {
+        return termsOfUseContent;
+    }
+
+    /**
+     * @param termsOfUseContent
+     *            the termsOfUseContent to set
+     */
+    public void setTermsOfUseContent(String termsOfUseContent)
+    {
+        this.termsOfUseContent = termsOfUseContent;
     }
 }

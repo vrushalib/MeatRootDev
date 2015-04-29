@@ -22,14 +22,20 @@
 $(function() {
 	$("#addr-val-dialog").dialog({
 		autoOpen: false,
-		width: "400",
+		width: "90%",
 		modal: "true",
-		hide: "blind"
+		hide: "blind",
+		open: function( event, ui ) {
+			var width = $( "#addr-val-dialog" ).width();
+			if (width > 500) {
+				$( "#addr-val-dialog" ).dialog( "option", "width", 500 );
+			}
+		}
 	});
 });
 </script>
 
-   	<div id="addr-val-dialog" title="<span><kk:msg  key="address.validate.title"/>" class="content-area rounded-corners">
+   	<div id="addr-val-dialog" title="<kk:msg  key="address.validate.title"/>" class="content-area rounded-corners">
   	        <input type="hidden" id="buttonLabel_conf"/>
   	        <input type="hidden" id="streetAddress_conf"/>
   	        <input type="hidden" id="postcode_conf"/>

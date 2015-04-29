@@ -169,6 +169,8 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
         // List to contain an order total for each promotion
         List<OrderTotal> myOrderTotalList = new ArrayList<OrderTotal>();
 
+        boolean applyBeforeTax = true;
+
         if (promArray != null)
         {
             for (int i = 0; i < promArray.length; i++)
@@ -192,7 +194,7 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
                 BigDecimal discountApplied = getCustomBigDecimal(promotion.getCustom4(), 4);
 
                 // If set to true, minimum value of order is applied to pre-tax value.
-                boolean applyBeforeTax = getCustomBoolean(promotion.getCustom5(), 5);
+                applyBeforeTax = getCustomBoolean(promotion.getCustom5(), 5);
 
                 // Don't bother going any further if there is no discount
                 if (discountApplied == null || discountApplied.equals(new BigDecimal(0)))
@@ -281,6 +283,40 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
                 ot.setTitle(formattedDiscount + " "
                         + rb.getString(MODULE_ORDER_TOTAL_GIFT_CERTIFICATE_TITLE));
 
+                /*
+                 * We need to reduce the tax amount. This is done differently depending on whether
+                 * the discount is applied to the amount before or after tax.
+                 */
+                BigDecimal total = null;
+                if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
+                        && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
+                {
+                    // Use total including shipping cost
+                    total = order.getTotalExTax();
+                } else
+                {
+                    // Use subtotal that doesn't include shipping
+                    total = order.getSubTotalExTax();
+                }
+
+                if (total != null && total.compareTo(new BigDecimal(0)) != 0
+                        && order.getTax() != null)
+                {
+                    int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+                    BigDecimal averageTaxRate = order.getTax().divide(total, 6,
+                            BigDecimal.ROUND_HALF_UP);
+                    if (applyBeforeTax)
+                    {
+                        // Calculate the tax discount based on the average tax
+                        BigDecimal taxDiscount = discountApplied.multiply(averageTaxRate);
+                        taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
+                        ot.setTax(taxDiscount);
+                    } else
+                    {
+                        ot.setTax(getTaxFromTotal(discountApplied, averageTaxRate, scale));
+                    }
+                }
+
                 myOrderTotalList.add(ot);
             }
         } else
@@ -290,7 +326,7 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
         }
 
         // Call a helper method to decide which OrderTotal we should return
-        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList);
+        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
         return retOT;
 

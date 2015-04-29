@@ -191,6 +191,8 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
         // List to contain an order total for each promotion
         List<OrderTotal> myOrderTotalList = new ArrayList<OrderTotal>();
 
+        boolean applyBeforeTax = true;
+
         if (promArray != null)
         {
 
@@ -216,7 +218,7 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
 
                 // If set to true, discount is applied to pre-tax value. Only relevant for
                 // percentage discount.
-                boolean applyBeforeTax = getCustomBoolean(promotion.getCustom5(), 5);
+                applyBeforeTax = getCustomBoolean(promotion.getCustom5(), 5);
 
                 // Don't bother going any further if there is no discount
                 if (discountApplied == null || discountApplied.equals(new BigDecimal(0)))
@@ -311,13 +313,20 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                         {
                             // Set the order total attributes
                             ot.setValue(discount);
-                            if (applyBeforeTax && op.getTaxRate() != null)
+                            if (op.getTaxRate() != null)
                             {
-                                BigDecimal taxDiscount = discount.multiply(op.getTaxRate()).divide(
-                                        new BigDecimal(100));
+                                BigDecimal taxDiscount = null;
+                                if (applyBeforeTax)
+                                {
+                                    taxDiscount = discount.multiply(op.getTaxRate()).divide(
+                                            new BigDecimal(100));
+                                } else
+                                {
+                                    taxDiscount = getTaxFromTotal(discount,
+                                            op.getTaxRate().divide(new BigDecimal(100)), scale);
+                                }
                                 ot.setTax(taxDiscount);
                             }
-
                             if (percentageDiscount)
                             {
                                 ot.setText("-" + formattedDiscount);
@@ -334,10 +343,18 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                         {
                             // Set the order total attributes
                             ot.setValue(ot.getValue().add(discount));
-                            if (applyBeforeTax && op.getTaxRate() != null)
+                            if (op.getTaxRate() != null)
                             {
-                                BigDecimal taxDiscount = discount.multiply(op.getTaxRate()).divide(
-                                        new BigDecimal(100));
+                                BigDecimal taxDiscount = null;
+                                if (applyBeforeTax)
+                                {
+                                    taxDiscount = discount.multiply(op.getTaxRate()).divide(
+                                            new BigDecimal(100));
+                                } else
+                                {
+                                    taxDiscount = getTaxFromTotal(discount,
+                                            op.getTaxRate().divide(new BigDecimal(100)), scale);
+                                }
                                 if (ot.getTax() == null)
                                 {
                                     ot.setTax(taxDiscount);
@@ -346,7 +363,6 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                                     ot.setTax(ot.getTax().add(taxDiscount));
                                 }
                             }
-
                             ot.setText("-"
                                     + getCurrMgr().formatPrice(ot.getValue(),
                                             order.getCurrencyCode()));
@@ -406,7 +422,7 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
         }
 
         // Call a helper method to decide which OrderTotal we should return
-        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList);
+        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
         return retOT;
 

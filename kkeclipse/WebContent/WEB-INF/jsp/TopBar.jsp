@@ -18,6 +18,7 @@
 --%>
 <%@include file="Taglibs.jsp" %>
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
+<% boolean useSolr = kkEng.isUseSolr();%>
 <% int basketItems = kkEng.getBasketMgr().getNumberOfItems();%>
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf currentCustomer = customerMgr.getCurrentCustomer();%>
@@ -32,66 +33,184 @@
 	<%}%>		
 <%}%>		
 
-
-<!-- <script type="text/javascript">	
+<script type="text/javascript">	
 $(function() {
 	$('#lang-select').selectBoxIt({
 		downArrowIcon: "selectboxit-down-arrow"
-    });	 	
+    });	 
+
+	<%if (kkEng.isPortlet()){ %>
+	// Liferay hack to stop data-icon text being displayed 
+	$('#lang-select').bind({
+	      "open": function(ev, obj) {
+	 		$('.selectboxit-option').attr('data-icon', '')
+	      }	
+	});
+	<% } %>
+		
 	$('#currency-select').selectBoxIt({
 		downArrowIcon: "selectboxit-down-arrow"
-    });	 
+    });	
+	
+	<%-- Slide out search bar --%>
+    $('#open-search').click(function() {
+        $('#slide-out-search').slideToggle('fast');
+    });
+    $('#close-search').click(function() {
+        $('#slide-out-search').slideToggle('fast');
+    });
+    
+<%if (useSolr) { %>	
+    /* Auto complete widget */
+    if ($( "#search-input-mobile" ).length != 0) {
+		
+		$( "#search-input-mobile" ).autocomplete({
+			source: function(request, response) {
+				if (document.getElementById('kk_portlet_id'))  {
+					AUI().ready('liferay-portlet-url', function(A) { 
+				        var renderURL = Liferay.PortletURL.createResourceURL();
+				        renderURL.setParameter("struts.portlet.action", "/SuggestedSearch.action");
+				        renderURL.setPortletId(document.getElementById('kk_portlet_id').value);
+				        renderURL.setWindowState("exclusive");
+						renderURL.setParameter("term", request.term);
+						
+						$.ajax({
+						type : 'POST',
+						timeout : '20000',
+						scriptCharset : "utf-8",
+						contentType : "application/json; charset=utf-8",
+						url : renderURL.toString(),
+						dataType : 'json',
+						data : null,
+					       success: function(result, textStatus, jqXHR) {					         
+					      		response(result);
+					      }
+					    });
+					});	
+				} else {
+				     $.ajax({
+				 		type : 'POST',
+						timeout : '20000',
+						scriptCharset : "utf-8",
+						contentType : "application/json; charset=utf-8",
+						url : "SuggestedSearch.action",
+						dataType : 'json',
+						data : '{"term":"' + request.term + '"}',
+				        success: function(result, textStatus, jqXHR) {					         
+				       		response(result);
+				       }
+				     });
+				}
+			   },
+			minLength: 1,
+			select: function( event, ui ) {
+				self.kkSearch(ui.item.id,ui.item.value);
+			}
+		}).data( "uiAutocomplete" )._renderItem = function( ul, item ) {
+			   ul.addClass('ui-corner-all');
+	           return $( "<li class='ui-corner-all'></li>" )
+	               .data( "item.autocomplete", item )
+	               .append( "<a>"+ item.label + "</a>" )
+	               .appendTo( ul );
+		};
+				
+		$("#search-button-mobile").click(function (){
+		    	var key = document.getElementById('kk_key-mobile').value;
+			    var text = document.getElementById('search-input-mobile').value;
+		    	self.kkSearch(key,text);
+		});
+	}
+<% } %>	
+
 });
-</script> -->
+</script>
 
 <div id="top-bar-container">
-  	<div id="top-bar">
-  		<div id="options">
-	  		<div id="language-selector" class="top-bar-menu-item">
-	  			<form action="SetLocale.action" method="post">  
-	  				<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-					<%-- <select id="lang-select" name="locale"  onchange="submit()">
-						<option  value="en_GB" data-icon="flag flag-en-GB" <%=kkEng.getLocale().equals("en_GB")?"selected=\"selected\"":""%>>English</option>
-						<option  value="de_DE" data-icon="flag flag-de-DE"  <%=kkEng.getLocale().equals("de_DE")?"selected=\"selected\"":""%>>Deutsch</option>
-						<option  value="es_ES" data-icon="flag flag-es-ES"  <%=kkEng.getLocale().equals("es_ES")?"selected=\"selected\"":""%>>Español</option>
-						<option  value="pt_BR" data-icon="flag flag-pt-BR"  <%=kkEng.getLocale().equals("pt_BR")?"selected=\"selected\"":""%>>Português</option>
-					</select> --%>
-				</form>									
-	  		</div>
-	  		<div id="currency-selector"  class="top-bar-menu-item">
-				<form action="SelectCurrency.action" method="post">  
+	<div id="slide-out-search">
+		 
+		 <div id="search">
+			<%if (useSolr) { %>	
+				<div id="quickSearchFormMobile">			
+					<input type="text" id="search-input-mobile" class="rounded-corners-left" name="searchText" onkeydown="javascript:kkKeydownMobile();">
+					<input id="kk_key-mobile" type="hidden"/>
+					<a id="search-button-mobile" class="rounded-corners-right"><kk:msg  key="suggested.search.search"/></a>
+				</div>	
+			<% } else { %>	
+				<form action="QuickSearch.action" id="quickSearchFormMobile" method="post">
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-					<%-- <select id="currency-select" name="currencyCode"  onchange="submit()">
-						<% for (int i = 0; i < kkEng.getCurrencies().length; i++){ %>
-							<% com.konakart.appif.CurrencyIf currency = kkEng.getCurrencies()[i];%>
-							<% if (currency != null) { %>
-								<option  value="<%=currency.getCode()%>"><%=currency.getTitle()%></option>
+					<input type="hidden" value="true" name="searchInDesc"/>
+					<input type="text" id="search-input" class="rounded-corners-left" name="searchText">
+					<a id="search-button-mobile" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchFormMobile').submit();"><kk:msg  key="suggested.search.search"/></a>
+				</form>	
+            <% } %>
+
+			<a id="adv-search-link" href="AdvancedSearch.action"><kk:msg  key="header.advanced.search"/></a>
+		</div>
+		<span id="close-search" class="fa fa-times" title='<kk:msg  key="common.close"/>'></span>
+	</div>
+  	<div id="top-bar">
+  		<div id="search-container">
+	  		<div id="top-bar-search" class="top-bar-menu-item">
+			  	<span id="open-search" class="fa fa-search top-bar-menu-icon" title="<kk:msg  key='suggested.search.search'/>"></span> 
+			</div>
+		</div>
+		<div id="selections-container">
+			<div id="selections">
+		  		<div id="language-selector" class="top-bar-menu-item">
+		  			<form action="SetLocale.action" method="post">  
+		  				<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
+						<select id="lang-select" name="locale"  onchange="submit()">
+							<option  value="en_GB" data-icon="flag flag-en-GB" <%=kkEng.getLocale().equals("en_GB")?"selected=\"selected\"":""%>>English</option>
+							<option  value="de_DE" data-icon="flag flag-de-DE"  <%=kkEng.getLocale().equals("de_DE")?"selected=\"selected\"":""%>>Deutsch</option>
+							<option  value="es_ES" data-icon="flag flag-es-ES"  <%=kkEng.getLocale().equals("es_ES")?"selected=\"selected\"":""%>>Español</option>
+							<option  value="pt_BR" data-icon="flag flag-pt-BR"  <%=kkEng.getLocale().equals("pt_BR")?"selected=\"selected\"":""%>>Português</option>
+						</select>
+					</form>									
+		  		</div>
+		  		<div id="currency-selector"  class="top-bar-menu-item">
+					<form action="SelectCurrency.action" method="post">  
+						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
+						<select id="currency-select" name="currencyCode"  onchange="submit()">
+							<% for (int i = 0; i < kkEng.getCurrencies().length; i++){ %>
+								<% com.konakart.appif.CurrencyIf currency = kkEng.getCurrencies()[i];%>
+								<% if (currency != null) { %>
+									<option  value="<%=currency.getCode()%>"><%=currency.getTitle()%></option>
+								<% } %>
 							<% } %>
-						<% } %>
-					</select> --%>
-				</form>										  			
-	  		</div>
+						</select>
+					</form>										  			
+		  		</div>
+		  	</div>
+		  </div>
+		 <div id="options-container">
+	  		<div id="options">		
+
 	  		<%if (kkEng.getSessionId() != null && kkEng.getSessionId().length() > 0) {%>	
 		  		<div  class="top-bar-menu-item">
-		  			<a href="LogOut.action" class="header2-top"><kk:msg  key="header.logout.page"/></a>
+		  			<span class="fa fa-unlock-alt top-bar-menu-icon"><a href="LogOut.action" class="header2-top" title='<%=kkEng.getMsg("header.logout.page")%>'></a></span>
+		  			<span class="top-bar-menu-title"><a href="LogOut.action" class="header2-top"><kk:msg  key="header.logout.page"/></a></span>
 		  		</div>
 			<% } %>	  		
 	  		<div id="my-account" class="top-bar-menu-item">
-	  			<a href="LogIn.action"><kk:msg  key="header.my.account"/></a>
+	  			<span class="fa fa-user top-bar-menu-icon"><a href="LogIn.action" title='<%=kkEng.getMsg("header.my.account")%>'></a></span>  			
+		  		<span class="top-bar-menu-title"><a href="LogIn.action"><kk:msg  key="header.my.account"/></a></span>
+	  			
 	  		</div>
 	  		<%if (kkEng.getConfigAsBoolean("ENABLE_GIFT_REGISTRY", false)) {%>	
-		  		<div id="gift-registry" class="top-bar-menu-item">	  			
-		  			<a href="GiftRegistrySearch.action" class="header2-top"><kk:msg  key="header.gift.registries"/></a>
+
+		  		<div id="gift-registry" class="top-bar-menu-item">		  
+		  			<span class="fa fa-gift top-bar-menu-icon"><a href="GiftRegistrySearch.action" class="header2-top" title='<%=kkEng.getMsg("header.gift.registries")%>'></a></span> 		
+		  			<span class="top-bar-menu-title"><a href="GiftRegistrySearch.action" class="header2-top"><kk:msg  key="header.gift.registries"/></a></span> 
 		  		</div>	
 			<%}%>	
 			<%if (kkEng.isWishListEnabled()) { %>
-		  		<div id="wish-list" class="top-bar-menu-item">	  			
-		  			<kk:msg  key="wishlist.tile.wishlist"/>
-			  		<%if (wishlistItems > 0) { %>			 	
-						(<%=wishlistItems%>)
-					<%}%>				  		
-		  		</div>	
-			   	<div id="wish-list-container">
+		  		<div id="wish-list" class="top-bar-menu-item">	
+		  			<span class="fa fa-heart-o top-bar-menu-icon" title='<kk:msg  key="wishlist.tile.wishlist"/>'><span id="wishlist-items"><%if (wishlistItems > 0) { %>(<%=wishlistItems%>)
+				<%}%></span></span>  			
+		  			<span class="top-bar-menu-title"><kk:msg  key="wishlist.tile.wishlist"/><span id="wishlist-items"> <%if (wishlistItems > 0) { %>(<%=wishlistItems%>)
+				<%}%></span></span>
+			  		 			
+			   		<div id="wish-list-container">
 			   		<div id="wish-list-mouseover-shadow" class="slide-out-shadow"></div>
 				  	<div id="wish-list-contents" class="slide-out-contents shadow">			  	
 			  			<%if (wishlistItems==0){%>
@@ -138,13 +257,16 @@ $(function() {
 				  		<%}%>				  				  	
 				  	</div>	
 				</div> 
+				</div>
 			<%}%>
 			<div id="shopping-cart" class="top-bar-menu-item">
-		  		<kk:msg key="cart.tile.shoppingcart"/>
-		  		<%if (basketItems > 0) { %>			 	
-					(<%=basketItems%>)
-				<%}%>
-		  	</div>
+				<span class="fa fa-shopping-cart top-bar-menu-icon" title='<kk:msg key="cart.tile.shoppingcart"/>'><span id="basket-items"><%if (basketItems > 0) { %>(<%=basketItems%>)
+				<%}%></span></span>  			
+		  		<span class="shopping-cart-title top-bar-menu-title"><kk:msg key="cart.tile.shoppingcart"/><span id="basket-items"> <%if (basketItems > 0) {%>(<%=basketItems%>)
+				<%}%></span></span>
+		  		
+		  		
+		  	
 		    <div id="shopping-cart-container">
 			  	<div id="shopping-cart-mouseover-shadow" class="slide-out-shadow"></div>
 			  	<div id="shopping-cart-contents" class="slide-out-contents shadow">
@@ -181,6 +303,8 @@ $(function() {
 					<%}%>				  		
 			  	</div>	
 			</div>
+			</div>
+		</div>
 		</div>
   	</div>
 </div>  

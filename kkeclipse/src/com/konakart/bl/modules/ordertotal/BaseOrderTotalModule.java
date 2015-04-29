@@ -31,6 +31,7 @@ import com.konakart.app.Product;
 import com.konakart.app.Promotion;
 import com.konakart.app.PromotionResult;
 import com.konakart.appif.CouponIf;
+import com.konakart.appif.OrderIf;
 import com.konakart.appif.PromotionIf;
 import com.konakart.bl.modules.BaseModule;
 
@@ -158,6 +159,27 @@ public class BaseOrderTotalModule extends BaseModule
     protected OrderTotal getDiscountOrderTotalFromList(Order order, List<OrderTotal> orderTotalsList)
             throws Exception
     {
+        return getDiscountOrderTotalFromList(order, orderTotalsList, /* applyBeforeTax */true);
+    }
+
+    /**
+     * This is a helper method for the discount modules. Many promotions may be relevant for an
+     * order. This method receives all of the relative promotions (in the form of Order Total
+     * objects) in a list as an input parameter. It sums all of the cumulative promotions into a
+     * single Order Total object and then compares all of the order totals that it has, in order to
+     * select the one that provides the largest discount.
+     * 
+     * @param order
+     * @param orderTotalsList
+     * @param applyBeforeTax
+     *            True when the discount is applied to total before tax is calculated. false when
+     *            the discount is applied to the total including tax.
+     * @return An OrderTotal object
+     * @throws Exception
+     */
+    protected OrderTotal getDiscountOrderTotalFromList(Order order,
+            List<OrderTotal> orderTotalsList, boolean applyBeforeTax) throws Exception
+    {
         if (orderTotalsList == null || order == null)
         {
             return null;
@@ -179,7 +201,10 @@ public class BaseOrderTotalModule extends BaseModule
             if (localOt.getTax() != null)
             {
                 order.setTax(order.getTax().subtract(localOt.getTax()));
-                order.setTotalIncTax(order.getTotalIncTax().subtract(localOt.getTax()));
+                if (applyBeforeTax)
+                {
+                    order.setTotalIncTax(order.getTotalIncTax().subtract(localOt.getTax()));
+                }
             }
             // Set the promotion id used in the order
             setPromotionIds(order, Integer.toString(localOt.getPromotions()[0].getId()));
@@ -276,12 +301,15 @@ public class BaseOrderTotalModule extends BaseModule
 
             // Subtract the discount of the selected OrderTotal from the total of the order
             order.setTotalIncTax(order.getTotalIncTax().subtract(selectedOT.getValue()));
-            
+
             // Reduce the tax of the order
             if (selectedOT.getTax() != null)
             {
                 order.setTax(order.getTax().subtract(selectedOT.getTax()));
-                order.setTotalIncTax(order.getTotalIncTax().subtract(selectedOT.getTax()));
+                if (applyBeforeTax)
+                {
+                    order.setTotalIncTax(order.getTotalIncTax().subtract(selectedOT.getTax()));
+                }
             }
 
             // If the order total consists of more than one promotion and / or more than one valid
@@ -398,5 +426,47 @@ public class BaseOrderTotalModule extends BaseModule
             throws Exception
     {
         return null;
+    }
+
+    /**
+     * Commit the Order transaction. Default implementation does nothing. Typically implemented in a
+     * tax service Order Total module such as Avalara.
+     * 
+     * @param order
+     * @throws Exception
+     *             if something unexpected happens
+     */
+    public void commitOrder(OrderIf order) throws Exception
+    {
+        return;
+    }
+
+    /**
+     * The total is the total value including tax. The tax rate is the rate / 100 so 10% would be
+     * 0.1.
+     * <p>
+     * If the total = 10 and the tax rate = 0.1 then the method would return 0.9091 because in this
+     * case the total of 10 is equivalent to 9.0909 + 0.9091 = 10 .
+     * <p>
+     * The value returned is (total x taxRate) / (1 + taxRate)
+     * 
+     * @param total
+     * @param taxRate
+     * @param scale
+     * @return Returns the tax part of the total
+     */
+    public BigDecimal getTaxFromTotal(BigDecimal total, BigDecimal taxRate, int scale)
+    {
+        if (total == null || taxRate == null)
+        {
+            return new BigDecimal(0);
+        }
+
+        BigDecimal dividend = total.multiply(taxRate);
+        BigDecimal divisor = taxRate.add(new BigDecimal(1));
+
+        BigDecimal retVal = dividend.divide(divisor, scale, BigDecimal.ROUND_HALF_UP);
+
+        return retVal;
     }
 }

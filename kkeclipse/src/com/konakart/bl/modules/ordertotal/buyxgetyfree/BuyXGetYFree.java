@@ -198,6 +198,8 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
         // List to contain an order total for each promotion
         List<OrderTotal> myOrderTotalList = new ArrayList<OrderTotal>();
 
+        boolean applyBeforeTax = true;
+
         if (promArray != null)
         {
             for (int i = 0; i < promArray.length; i++)
@@ -220,7 +222,7 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
 
                 // If set to true, discount is applied to pre-tax value. Only relevant for
                 // percentage discount.
-                boolean applyBeforeTax = getCustomBoolean(promotion.getCustom4(), 4);
+                applyBeforeTax = getCustomBoolean(promotion.getCustom4(), 4);
 
                 if (log.isDebugEnabled())
                 {
@@ -326,6 +328,21 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                         {
                             // Set the order total attributes
                             ot.setValue(discount);
+                            if (op.getTaxRate() != null)
+                            {
+                                BigDecimal taxDiscount = null;
+                                if (applyBeforeTax)
+                                {
+                                    taxDiscount = discount.multiply(op.getTaxRate()).divide(
+                                            new BigDecimal(100));
+                                } else
+                                {
+                                    taxDiscount = getTaxFromTotal(discount,
+                                            op.getTaxRate().divide(new BigDecimal(100)), scale);
+                                }
+                                ot.setTax(taxDiscount);
+                            }
+
                             ot.setText("-" + formattedDiscount);
                             // Title looks like "-10EUR Philips TV"
                             ot.setTitle("-" + formattedDiscount + " " + op.getName());
@@ -333,6 +350,26 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                         {
                             // Set the order total attributes
                             ot.setValue(ot.getValue().add(discount));
+                            if (op.getTaxRate() != null)
+                            {
+                                BigDecimal taxDiscount = null;
+                                if (applyBeforeTax)
+                                {
+                                    taxDiscount = discount.multiply(op.getTaxRate()).divide(
+                                            new BigDecimal(100));
+                                } else
+                                {
+                                    taxDiscount = getTaxFromTotal(discount,
+                                            op.getTaxRate().divide(new BigDecimal(100)), scale);
+                                }
+                                if (ot.getTax() == null)
+                                {
+                                    ot.setTax(taxDiscount);
+                                } else
+                                {
+                                    ot.setTax(ot.getTax().add(taxDiscount));
+                                }
+                            }
                             String formattedTotalDiscount = getCurrMgr().formatPrice(ot.getValue(),
                                     order.getCurrencyCode());
                             ot.setText("-" + formattedTotalDiscount);
@@ -388,7 +425,7 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
         }
 
         // Call a helper method to decide which OrderTotal we should return
-        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList);
+        OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
         return retOT;
     }

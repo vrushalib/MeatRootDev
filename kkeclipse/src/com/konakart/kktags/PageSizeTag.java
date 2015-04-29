@@ -39,6 +39,8 @@ public class PageSizeTag extends BaseTag
     private int maxNum;
 
     private long timestamp = -1;
+    
+    private String type;
 
     public int doStartTag() throws JspException
     {
@@ -65,7 +67,10 @@ public class PageSizeTag extends BaseTag
             sb.append(eng.getXsrfToken());
             sb.append("\" name=\"xsrf_token\"/>");
 
-            sb.append(eng.getMsg("common.show"));
+            if (type == null || !type.equalsIgnoreCase("small"))
+            {
+                sb.append(eng.getMsg("common.show"));
+            }
             sb.append("<select name=\"");
             sb.append(name);
             sb.append("\" onchange=\"submit()\">");
@@ -191,5 +196,21 @@ public class PageSizeTag extends BaseTag
     public void setTimestamp(long timestamp)
     {
         this.timestamp = timestamp;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType()
+    {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type)
+    {
+        this.type = type;
     }
 }

@@ -52,15 +52,14 @@ import com.konakart.bl.LanguageMgr;
  * This class is an Action class for sending credit card details to Authorize.net and receiving
  * confirmation
  */
-public class AuthorizenetAction extends BaseGatewayAction
+public class AuthorizenetAction extends AuthorizeNetBaseAction
 {
     /**
      * The <code>Log</code> instance for this application.
      */
     protected Log log = LogFactory.getLog(AuthorizenetAction.class);
 
-    // Module name must be the same as the class name although it can be all in lowercase in order
-    // to remain compatible with osCommerce.
+    // Module name must be the same as the class name although it can be all in lowercase
     private static String code = "authorizenet";
 
     // Authorize.net constants for request
@@ -300,7 +299,8 @@ public class AuthorizenetAction extends BaseGatewayAction
                     sendOrderConfirmationMail(kkAppEng, order.getId(), /* success */false);
                 }
 
-                String msg = kkAppEng.getMsg("checkout.cc.gateway.error");
+                String msg = kkAppEng.getMsg("checkout.cc.gateway.error", new String[]
+                        { "" });
                 addActionError(msg);
 
                 // Redirect the user back to the credit card screen
@@ -326,7 +326,8 @@ public class AuthorizenetAction extends BaseGatewayAction
                     sendOrderConfirmationMail(kkAppEng, order.getId(), /* success */false);
                 }
 
-                String msg = kkAppEng.getMsg("checkout.cc.gateway.error");
+                String msg = kkAppEng.getMsg("checkout.cc.gateway.error", new String[]
+                        { "" });
                 addActionError(msg);
 
                 // Redirect the user back to the credit card screen
@@ -349,35 +350,6 @@ public class AuthorizenetAction extends BaseGatewayAction
             }
             return super.handleException(request, e);
         }
-    }
-
-    /**
-     * Adds a description to the Gateway Result
-     * 
-     * @param code
-     * @return Returns a result with an added description
-     */
-    protected String getGatewayResultDescription(String code)
-    {
-        if (code == null)
-        {
-            return code;
-        }
-        String ret = code;
-        if (code.equals("1"))
-        {
-            ret += " - This transaction has been approved.";
-        } else if (code.equals("2"))
-        {
-            ret += " - This transaction has been declined.";
-        } else if (code.equals("3"))
-        {
-            ret += " - There has been an error processing this transaction.";
-        } else if (code.equals("4"))
-        {
-            ret += " - This transaction is being held for review.";
-        }
-        return ret;
     }
 
     /**
@@ -452,142 +424,5 @@ public class AuthorizenetAction extends BaseGatewayAction
         return isSubscription;
     }
 
-    /**
-     * Authorize.net returns a response as delimiter separated variables. In order to make them
-     * readable, we tag each one with a desscription before saving in the ipnHistory table.
-     * 
-     * @param position
-     * @return Response Description
-     */
-    private String getRespDesc(int position)
-    {
-        String ret = "unknown";
-        switch (position)
-        {
-        case 1:
-            ret = "Response Code";
-            break;
-        case 2:
-            ret = "Response Subcode";
-            break;
-        case 3:
-            ret = "Response Reason Code";
-            break;
-        case 4:
-            ret = "Response Reason Text";
-            break;
-        case 5:
-            ret = "Approval Code";
-            break;
-        case 6:
-            ret = "AVS Result Code";
-            break;
-        case 7:
-            ret = "Transaction ID";
-            break;
-        case 8:
-            ret = "Invoice Number";
-            break;
-        case 9:
-            ret = "Description";
-            break;
-        case 10:
-            ret = "Amount";
-            break;
-        case 11:
-            ret = "Method";
-            break;
-        case 12:
-            ret = "Transaction Type";
-            break;
-        case 13:
-            ret = "Customer ID";
-            break;
-        case 14:
-            ret = "Cardholder First Name";
-            break;
-        case 15:
-            ret = "Cardholder Last Name";
-            break;
-        case 16:
-            ret = "Company";
-            break;
-        case 17:
-            ret = "Billing Address";
-            break;
-        case 18:
-            ret = "City";
-            break;
-        case 19:
-            ret = "State";
-            break;
-        case 20:
-            ret = "Zip";
-            break;
-        case 21:
-            ret = "Country";
-            break;
-        case 22:
-            ret = "Phone";
-            break;
-        case 23:
-            ret = "Fax";
-            break;
-        case 24:
-            ret = "Email";
-            break;
-        case 25:
-            ret = "Ship to First Name";
-            break;
-        case 26:
-            ret = "Ship to Last Name";
-            break;
-        case 27:
-            ret = "Ship to Company";
-            break;
-        case 28:
-            ret = "Ship to Address";
-            break;
-        case 29:
-            ret = "Ship to City";
-            break;
-        case 30:
-            ret = "Ship to State";
-            break;
-        case 31:
-            ret = "Ship to Zip";
-            break;
-        case 32:
-            ret = "Ship to Country";
-            break;
-        case 33:
-            ret = "Tax Amount";
-            break;
-        case 34:
-            ret = "Duty Amount";
-            break;
-        case 35:
-            ret = "Freight Amount";
-            break;
-        case 36:
-            ret = "Tax Exempt Flag";
-            break;
-        case 37:
-            ret = "PO Number";
-            break;
-        case 38:
-            ret = "MD5 Hash";
-            break;
-        case 39:
-            ret = "(CVV2/CVC2/CID)Response Code";
-            break;
-        case 40:
-            ret = "(CAVV) Response Code";
-            break;
-        default:
-            break;
-        }
 
-        return ret;
-    }
 }

@@ -24,10 +24,10 @@ import com.konakart.app.OrderTotal;
 import com.konakart.app.Product;
 import com.konakart.app.Promotion;
 import com.konakart.app.PromotionResult;
+import com.konakart.appif.OrderIf;
 
 /**
- * 
- * 
+ * Interfaces to be implemented by Order Total Modules
  */
 public interface OrderTotalInterface
 {
@@ -93,4 +93,12 @@ public interface OrderTotalInterface
     public PromotionResult getPromotionResult(Product product, Promotion promotion)
             throws Exception;
 
+    /**
+     * Commit the Order transaction.  Typically used to commit order transactions in tax service modules (such as Avalara).
+     * 
+     * @param order
+     * @throws Exception
+     *             if something unexpected happens
+     */
+    public void commitOrder(OrderIf order) throws Exception;
 }

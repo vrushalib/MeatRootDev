@@ -38,6 +38,7 @@ import com.konakart.app.Order;
 import com.konakart.app.PaymentDetails;
 import com.konakart.app.Zone;
 import com.konakart.appif.KKEngIf;
+import com.konakart.appif.NameValueIf;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.bl.BaseMgr;
@@ -335,8 +336,8 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
 
             if (log.isDebugEnabled())
             {
-                log.debug("PaymentModule Found in list of Available modules : " + moduleName
-                        + " (" + jModuleName + ")");
+                log.debug("PaymentModule Found in list of Available modules : " + moduleName + " ("
+                        + jModuleName + ")");
             }
 
             PaymentInterface paymentModule = getPaymentModuleForName(jModuleName);
@@ -443,7 +444,7 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
      * @param orderId
      * @param hostAndPort
      * @param languageId
-     * @return Return an array of PaymentDetail objects
+     * @return Returns a PaymentDetails object
      * @throws Exception
      */
     public PaymentDetails getPaymentDetails(String sessionId, String moduleCode, int orderId,
@@ -451,7 +452,6 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
     {
         checkRequired(sessionId, "String", "sessionId");
         checkRequired(moduleCode, "String", "moduleCode");
-        checkRequired(hostAndPort, "String", "hostPort");
 
         // Get the order
         Order order = getOrderMgr().getOrder(sessionId, orderId, languageId);
@@ -475,7 +475,7 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
      * @param order
      * @param hostAndPort
      * @param languageId
-     * @return Return an array of PaymentDetail objects
+     * @return Returns a PaymentDetails object
      * @throws Exception
      */
     public PaymentDetails getPaymentDetailsPerOrder(String sessionId, String moduleCode,
@@ -483,7 +483,6 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
     {
         checkRequired(sessionId, "String", "sessionId");
         checkRequired(moduleCode, "String", "moduleCode");
-        checkRequired(hostAndPort, "String", "hostPort");
         checkRequired(order, "Order", "order");
 
         if (order.getOrderTotals() == null)
@@ -514,6 +513,48 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
                 if (paymentModule.isAvailable())
                 {
                     PaymentDetails payDet = paymentModule.getPaymentDetails((Order) order, info);
+                    return payDet;
+                }
+            } catch (KKException e)
+            {
+                log.warn("Called the getPaymentDetails method on module " + moduleName
+                        + ". The module isn't available because of the following problem: "
+                        + e.getMessage());
+            } catch (Exception e)
+            {
+                log.error("Could not instantiate the Payment Module " + moduleName, e);
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * Method used to return any custom information required from the payment module.
+     * 
+     * @param sessionId
+     * @param moduleCode
+     * @param parameters
+     * @return Returns a PaymentDetails object
+     * @throws Exception
+     */
+    public PaymentDetails getPaymentDetailsCustom(String sessionId, String moduleCode,
+            NameValueIf[] parameters) throws Exception
+    {
+        checkRequired(moduleCode, "String", "moduleCode");
+
+        // Instantiate the payment module
+        String moduleName = getJavaModuleName(moduleCode);
+
+        if (moduleName != null)
+        {
+            try
+            {
+                PaymentInterface paymentModule = getPaymentModuleForName(moduleName);
+                if (paymentModule.isAvailable())
+                {
+                    PaymentDetails payDet = paymentModule.getPaymentDetailsCustom(sessionId,
+                            parameters);
                     return payDet;
                 }
             } catch (KKException e)
@@ -566,13 +607,14 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
         info.setLocale(new Locale(lang.getCode()));
 
         // Add GeoZones
-        // Get the delivery country from the database
+        // Get the billing country from the database
         Country billingCountry = getTaxMgr().getCountryPerName(order.getBillingCountry());
         if (billingCountry == null)
         {
-            throw new KKException("Cannot find the delivery country " + order.getBillingCountry()
+            throw new KKException("Cannot find the billing country " + order.getBillingCountry()
                     + " in the database");
         }
+        info.setCountry(billingCountry);
 
         // Get the billing zone using the country and state
         Zone zone = null;
@@ -662,7 +704,7 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
      * @throws InvocationTargetException
      * @throws ClassNotFoundException
      */
-    PaymentInterface getPaymentModuleForName(String moduleName) throws IllegalArgumentException,
+    protected PaymentInterface getPaymentModuleForName(String moduleName) throws IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException,
             ClassNotFoundException
     {

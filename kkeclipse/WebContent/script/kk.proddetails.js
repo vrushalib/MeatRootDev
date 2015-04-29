@@ -1,4 +1,22 @@
 $(function() {
+	
+	// Accordion
+	var prodMobile = $("#product-content-mobile");
+	if (prodMobile !=null && prodMobile.attr("class") != null && prodMobile.attr("class").indexOf("accordion-show-reviews") == 0) {
+		prodMobile.accordion({
+			collapsible: true,
+			active: 2,
+			heightStyle: "content"
+		});
+	} else {
+		prodMobile.accordion({
+			collapsible: true,
+			active: 0,
+			heightStyle: "content"
+		});
+		$(window).scrollTop(0);
+	}
+	
 	if ($("#product-reviews-tab").length) {
 
 		$(window).scroll(function() {
@@ -11,65 +29,17 @@ $(function() {
 		}
 		
 		$("#AddToCartForm").submit(function(){
-			var formInput=$(this).serialize();			
-			if (document.getElementById('kk_portlet_id')) {
-				var postArray = new Array();
-				var parmArray = formInput.split('&');
-				var j=0;
-				for ( var i = 0; i < parmArray.length; i++) {
-					var parms = parmArray[i];
-					var parmsArray = parms.split("=");
-					postArray[j++] = parmsArray[0];
-					postArray[j++] = parmsArray[1];
-				}
-				if (document.getElementById('addToWishList').value=="true") {
-					if (document.getElementById('wishListId').value!="-1") {
-						callAction(postArray, addToGiftRegistryCallback, 'AddToCartOrWishListFromPost.action');
-					} else {
-						callAction(postArray, addToWishListCallback, 'AddToCartOrWishListFromPost.action');
-					} 		
-				} else {
-			 		callAction(postArray, addToCartCallback, 'AddToCartOrWishListFromPost.action');
-				}
-			} else {			
-				if (document.getElementById('addToWishList').value=="true") {
-					if (document.getElementById('wishListId').value!="-1") {
-						$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToGiftRegistryCallback);
-					} else {
-						$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToWishListCallback);
-					} 		
-				} else {
-			 		$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToCartCallback);
-				}
-			}			
+			var formInput=$(this).serialize();	
+			addToCartFormPost(formInput);
 			return false;					
 		});
-	
-		jQuery('#related-carousel').jcarousel({
-	        vertical: true,
-	        scroll: 3,
-	        itemFallbackDimension: 300,
-	        initCallback: relatedCarousel_initCallback,
-	        buttonNextCallback: relatedCarousel_nextCallback,
-	        buttonPrevCallback: relatedCarousel_prevCallback,
-	        // This tells jCarousel NOT to autobuild prev/next buttons
-	        buttonNextHTML: null,
-	        buttonPrevHTML: null
-	    });
 		
-		jQuery('#also-bought-carousel').jcarousel({
-	        vertical: true,
-	        scroll: 3,
-	        itemFallbackDimension: 300,
-	        initCallback: alsoBought_initCallback,
-	        buttonNextCallback: alsoBought_nextCallback,
-	        buttonPrevCallback: alsoBought_prevCallback,
-	        // This tells jCarousel NOT to autobuild prev/next buttons
-	        buttonNextHTML: null,
-	        buttonPrevHTML: null
-	    });
-	
-		
+		$("#AddToCartFormSmall").submit(function(){
+			var formInput=$(this).serialize();	
+			addToCartFormPost(formInput);
+			return false;					
+		});     
+	     		
 		// Tabs
 		if ($("#product-reviews-tab").attr("class").indexOf("selected-product-content-tab") >= 0) {
 			$("#product-description").hide();
@@ -118,6 +88,56 @@ $(function() {
 		getImage(imgBase, index, extension);
 	}	
 });
+
+// Common Code
+function addToCartFormPost(formInput){
+	
+	if (document.getElementById('kk_portlet_id')) {
+		var postArray = new Array();
+		var parmArray = formInput.split('&');
+		var j=0;
+		for ( var i = 0; i < parmArray.length; i++) {
+			var parms = parmArray[i];
+			var parmsArray = parms.split("=");
+			postArray[j++] = parmsArray[0];
+			postArray[j++] = parmsArray[1];
+		}
+		if (document.getElementById('addToWishList').value=="true") {
+			if (document.getElementById('wishListId').value!="-1") {
+				callAction(postArray, addToGiftRegistryCallback, 'AddToCartOrWishListFromPost.action');
+			} else {
+				callAction(postArray, addToWishListCallback, 'AddToCartOrWishListFromPost.action');
+			} 		
+		} else {
+	 		callAction(postArray, addToCartCallback, 'AddToCartOrWishListFromPost.action');
+		}
+	} else {			
+		if (document.getElementById('addToWishList').value=="true") {
+			if (document.getElementById('wishListId').value!="-1") {
+				$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToGiftRegistryCallback);
+			} else {
+				$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToWishListCallback);
+			} 		
+		} else {
+	 		$.getJSON('AddToCartOrWishListFromPost.action', formInput, addToCartCallback);
+		}
+	}				
+}
+
+function setVerticalControls(carousel, prev, next) {
+	var items = carousel.jcarousel('items');
+	var visible = carousel.jcarousel('visible');
+	if (items[0] == visible[0]) {
+		prev.removeClass('prev-items-down').addClass('prev-items-down-inactive');
+	} else {
+		prev.removeClass('prev-items-down-inactive').addClass('prev-items-down');
+	}
+	if (items[items.length-1] == visible[visible.length-1]) {
+		next.removeClass('next-items-up').addClass('next-items-up-inactive');
+	} else {
+		next.removeClass('next-items-up-inactive').addClass('next-items-up');
+	}
+}
 
 
 function getImage(imgBase, index, extension) {
@@ -224,25 +244,31 @@ function alsoBought_prevCallback(carousel,control,flag) {
 };
 
 function setAddToWishList() {
-			document.getElementById('addToWishList').value="true";
-			document.getElementById('wishListId').value="-1";
+	$(".addToWishList").val("true");
+	$(".wishListId").val("-1");
+			//document.getElementById('addToWishList').value="true";
+			//document.getElementById('wishListId').value="-1";
 		}
 	
 function resetAddToWishList() {
-		    document.getElementById('addToWishList').value="false";
+	$(".addToWishList").val("false");	    
+	//document.getElementById('addToWishList').value="false";
 		}
 
 function setWishListId(id) {
-	document.getElementById('wishListId').value=id;
-	document.getElementById('addToWishList').value="true";
+	$(".addToWishList").val("true");
+	$(".wishListId").val(id);
+
+	//document.getElementById('wishListId').value=id;
+	//document.getElementById('addToWishList').value="true";
 }
 
 		
-function addtoCartOrWishListFunc(){
+function addtoCartOrWishListFunc(formId){
 	// Random value needed to stop IE thinking that it doesn't have to send the request again because it hasn't changed
 	var d = new Date();
 	document.getElementById('random').value=d.getMilliseconds();
-	var val = $("#AddToCartForm").validate({
+	var val = $("#"+formId).validate({
 		errorPlacement: function(error, element) {
 			var val = error[0].innerHTML;
 			if (val.length > 0) {
@@ -254,7 +280,7 @@ function addtoCartOrWishListFunc(){
 		}
 	}).form();
 	if (val) {
-		$("#AddToCartForm").submit();
+		$("#"+formId).submit();
 	}
 	return val;	
 }

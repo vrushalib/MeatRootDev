@@ -81,6 +81,8 @@ public class CustomerRegistrationSubmitAction extends BaseAction
 
     private String company;
 
+    private String taxId;
+
     private String streetAddress;
 
     private String streetAddress1;
@@ -172,6 +174,7 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             // Copy the inputs from the form to the customer registration object
             cr.setCity(escapeFormInput(getCity()));
             cr.setCompany(escapeFormInput(getCompany()));
+            cr.setTaxIdentifier(escapeFormInput(getTaxId()));
             cr.setCountryId(getCountryId());
             cr.setEmailAddr(escapeFormInput(getEmailAddr()));
             cr.setFaxNumber(escapeFormInput(getFaxNumber()));
@@ -203,6 +206,15 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             if (getBirthDateString() != null && !getBirthDateString().equals(""))
             {
                 SimpleDateFormat sdf = new SimpleDateFormat(kkAppEng.getMsg("date.format"));
+                sdf.setLenient(false);
+                try
+                {
+                    birthDate = sdf.parse(getBirthDateString());
+                } catch (Exception e)
+                {
+                    addActionError(kkAppEng.getMsg("register.customer.body.dob.error"));
+                    return "ApplicationError";
+                }
                 birthDate = sdf.parse(getBirthDateString());
                 if (birthDate != null)
                 {
@@ -961,5 +973,22 @@ public class CustomerRegistrationSubmitAction extends BaseAction
     public void setAllowNoRegister(boolean allowNoRegister)
     {
         this.allowNoRegister = allowNoRegister;
+    }
+
+    /**
+     * @return the taxId
+     */
+    public String getTaxId()
+    {
+        return taxId;
+    }
+
+    /**
+     * @param taxId
+     *            the taxId to set
+     */
+    public void setTaxId(String taxId)
+    {
+        this.taxId = taxId;
     }
 }

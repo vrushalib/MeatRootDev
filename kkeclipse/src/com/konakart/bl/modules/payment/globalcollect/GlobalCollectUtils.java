@@ -14,8 +14,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
-// Original version contributed by Chris Derham (Atomus Ltd)
-//
 
 package com.konakart.bl.modules.payment.globalcollect;
 
@@ -35,8 +33,11 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import com.konakart.app.KKException;
+import com.konakart.app.NameValue;
 import com.konakart.app.OrderTotal;
+import com.konakart.appif.NameValueIf;
 import com.konakart.appif.OrderIf;
+import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
 
 /**
@@ -108,6 +109,38 @@ public class GlobalCollectUtils
         return total;
     }
 
+    /**
+     * Add the specified name / value pair to the parameter list on the PaymentDetails object.
+     * 
+     * @param pd
+     *            PaymentDetails object
+     * @param name
+     *            name of the new parameter
+     * @param value
+     *            value of the new parameter
+     */
+    public void addToPaymentDetailsParameters(PaymentDetailsIf pd, String name, String value)
+    {
+        if (pd.getParameters() == null || pd.getParameters().length == 0)
+        {
+            NameValueIf[] nva = new NameValue[1];
+            nva[0] = new NameValue(name, value);
+            pd.setParameters(nva);
+            return;
+        }
+
+        NameValue[] nva = new NameValue[pd.getParameters().length + 1];
+        int i = 0;
+        for (NameValueIf nv : pd.getParameters())
+        {
+            nva[i] = new NameValue(nv.getName(), nv.getValue());
+            i++;
+        }
+        nva[i] = new NameValue(name, value);
+        pd.setParameters(nva);
+        return;
+    }
+    
     /**
      * @param gatewayResp
      * @return a Map of objects found in the XML string returned by the gateway

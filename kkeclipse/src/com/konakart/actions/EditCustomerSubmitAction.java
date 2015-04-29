@@ -47,15 +47,13 @@ public class EditCustomerSubmitAction extends BaseAction
 
     private String birthDateString;
 
-    private String emailAddr;
-
     private String telephoneNumber;
 
     private String telephoneNumber1;
 
     private String faxNumber;
 
-    private String customerCustom1;
+    private String taxId;
 
     public String execute()
     {
@@ -84,29 +82,38 @@ public class EditCustomerSubmitAction extends BaseAction
                 return null;
             }
 
-            // Copy the inputs from the form to a customer object
+            CustomerIf currentCustomer = kkAppEng.getCustomerMgr().getCurrentCustomer();
+
             CustomerIf cust = new Customer();
+
+            // Attributes from current customer
+            cust.setId(currentCustomer.getId());
+            cust.setType(currentCustomer.getType());
+            cust.setGroupId(currentCustomer.getGroupId());
+
+            // Copy the inputs from the form to a customer object
             cust.setGender(escapeFormInput(getGender()));
             cust.setFirstName(escapeFormInput(getFirstName()));
             cust.setLastName(escapeFormInput(getLastName()));
-            cust.setEmailAddr(escapeFormInput(getEmailAddr()));
             cust.setFaxNumber(escapeFormInput(getFaxNumber()));
             cust.setTelephoneNumber(escapeFormInput(getTelephoneNumber()));
             cust.setTelephoneNumber1(escapeFormInput(getTelephoneNumber1()));
-            cust.setId(kkAppEng.getCustomerMgr().getCurrentCustomer().getId());
-            cust.setCustom1(escapeFormInput(getCustomerCustom1()));
-
-            CustomerIf currentCustomer = kkAppEng.getCustomerMgr().getCurrentCustomer();
-            if (currentCustomer != null)
-            {
-                cust.setType(currentCustomer.getType());
-            }
+            cust.setTaxIdentifier(escapeFormInput(getTaxId()));
 
             // Set the date
             if (getBirthDateString() != null && !getBirthDateString().equals(""))
             {
                 SimpleDateFormat sdf = new SimpleDateFormat(kkAppEng.getMsg("date.format"));
-                Date d = sdf.parse(getBirthDateString());
+                sdf.setLenient(false);
+                Date d = null;
+                try
+                {
+                    d = sdf.parse(getBirthDateString());
+                } catch (Exception e)
+                {
+                    addActionError(kkAppEng.getMsg("register.customer.body.dob.error"));
+                    return "ApplicationError";
+                }
                 if (d != null)
                 {
                     GregorianCalendar gc = new GregorianCalendar();
@@ -131,7 +138,7 @@ public class EditCustomerSubmitAction extends BaseAction
             }
             kkAppEng.getCustomerTagMgr().insertCustomerTag(ct);
 
-            // Call the engine registration method
+            // Call the engine edit customer method
             try
             {
                 kkAppEng.getCustomerMgr().editCustomer(cust);
@@ -140,6 +147,9 @@ public class EditCustomerSubmitAction extends BaseAction
                 addActionError(kkAppEng.getMsg("edit.customer.body.user.exists"));
                 return "ApplicationError";
             }
+
+            // Add a message to say all OK
+            addActionMessage(kkAppEng.getMsg("edit.customer.body.ok"));
 
             return SUCCESS;
 
@@ -218,23 +228,6 @@ public class EditCustomerSubmitAction extends BaseAction
     }
 
     /**
-     * @return the emailAddr
-     */
-    public String getEmailAddr()
-    {
-        return emailAddr;
-    }
-
-    /**
-     * @param emailAddr
-     *            the emailAddr to set
-     */
-    public void setEmailAddr(String emailAddr)
-    {
-        this.emailAddr = emailAddr;
-    }
-
-    /**
      * @return the telephoneNumber
      */
     public String getTelephoneNumber()
@@ -286,20 +279,20 @@ public class EditCustomerSubmitAction extends BaseAction
     }
 
     /**
-     * @return the customerCustom1
+     * @return the taxId
      */
-    public String getCustomerCustom1()
+    public String getTaxId()
     {
-        return customerCustom1;
+        return taxId;
     }
 
     /**
-     * @param customerCustom1
-     *            the customerCustom1 to set
+     * @param taxId
+     *            the taxId to set
      */
-    public void setCustomerCustom1(String customerCustom1)
+    public void setTaxId(String taxId)
     {
-        this.customerCustom1 = customerCustom1;
+        this.taxId = taxId;
     }
 
 }

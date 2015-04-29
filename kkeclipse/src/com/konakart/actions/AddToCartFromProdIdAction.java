@@ -41,8 +41,6 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
 
-        int value = Integer.parseInt(request.getParameter("id"));
-        
         try
         {
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
@@ -86,7 +84,7 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
             }
 
             // Common code for adding to cart
-            this.addToCart(kkAppEng, selectedProd, null,value);
+            this.addToCart(kkAppEng, selectedProd, null, 1);
 
             // Common code for setting messages
             this.setMsgs(kkAppEng);

@@ -31,6 +31,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
+import com.konakart.app.KKException;
 import com.konakart.app.PdfOptions;
 import com.konakart.app.PdfResult;
 import com.konakart.appif.OrderIf;
@@ -46,12 +47,26 @@ public class DownloadInvoiceAction extends BaseAction
     private static final long serialVersionUID = 1L;
 
     protected static final int DEFAULT_BUFFER_SIZE = 4096;
-    
+
     private String kkContentType;
 
     private InputStream kkInputName;
 
     private String kkContentDisposition;
+
+    private boolean extCall = false;
+
+    /**
+     * Typically called from a KonaKart tile not part of the standard storefront application
+     * 
+     * @return Returns a forward string
+     */
+    public String externalCall()
+    {
+        this.extCall = true;
+        execute();
+        return null;
+    }
 
     public String execute()
     {
@@ -65,7 +80,32 @@ public class DownloadInvoiceAction extends BaseAction
             int custId;
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
-            
+
+            if (this.extCall == true)
+            {
+                String sessionId = request.getParameter("sessionId");
+                if (sessionId == null)
+                {
+                    return null;
+                }
+
+                // Use the session of the logged in user to initialise kkAppEng
+                try
+                {
+                    kkAppEng.getEng().checkSession(sessionId);
+                } catch (KKException e)
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("DownloadInvoiceAction called with invalid session Id :"
+                                + sessionId);
+                    }
+                    return null;
+                }
+
+                kkAppEng.getCustomerMgr().loginBySession(sessionId);
+            }
+
             // Check to see whether the user is logged in
             custId = this.loggedIn(request, response, kkAppEng, "MyAccount");
             if (custId < 0)
@@ -100,6 +140,11 @@ public class DownloadInvoiceAction extends BaseAction
             // Get the order
             OrderIf order = kkAppEng.getEng().getOrder(kkAppEng.getSessionId(), orderId,
                     kkAppEng.getLangId());
+
+            if (order == null)
+            {
+                return "MyAccount";
+            }
 
             // Determine whether a pdf document exists on the file system. Otherwise we create it on
             // the fly.
@@ -227,9 +272,9 @@ public class DownloadInvoiceAction extends BaseAction
             return super.handleException(request, e);
         }
     }
-    
+
     /**
-    * Used to download when running as a portlet
+     * Used to download when running as a portlet
      * 
      * @return Returns a String
      */
@@ -312,17 +357,18 @@ public class DownloadInvoiceAction extends BaseAction
                 {
                     throw new KKAppException("Unable to create the PDF invoice");
                 }
-                
-                kkContentDisposition = "attachment;filename=\"" + pdfResult.getFileName() + "\"";
+
+                kkContentDisposition = "attachment;filename=\"" + "order_" + order.getId() + ".pdf"
+                        + "\"";
                 kkContentType = "application/pdf";
-                kkInputName =  new ByteArrayInputStream(pdfResult.getPdfBytes());
+                kkInputName = new ByteArrayInputStream(pdfResult.getPdfBytes());
             }
-            
+
             return SUCCESS;
 
         } catch (Exception e)
         {
-              return super.handleException(request, e);
+            return super.handleException(request, e);
         }
     }
 
@@ -336,7 +382,6 @@ public class DownloadInvoiceAction extends BaseAction
      */
     private PdfResult createInvoice(KKAppEng kkAppEng, OrderIf order) throws Exception
     {
-
         int langId = kkAppEng.getLangId();
 
         PdfOptions options = new PdfOptions();
@@ -362,7 +407,8 @@ public class DownloadInvoiceAction extends BaseAction
     }
 
     /**
-     * @param kkContentType the kkContentType to set
+     * @param kkContentType
+     *            the kkContentType to set
      */
     public void setKkContentType(String kkContentType)
     {
@@ -378,7 +424,8 @@ public class DownloadInvoiceAction extends BaseAction
     }
 
     /**
-     * @param kkContentDisposition the kkContentDisposition to set
+     * @param kkContentDisposition
+     *            the kkContentDisposition to set
      */
     public void setKkContentDisposition(String kkContentDisposition)
     {
@@ -394,7 +441,8 @@ public class DownloadInvoiceAction extends BaseAction
     }
 
     /**
-     * @param kkInputName the kkInputName to set
+     * @param kkInputName
+     *            the kkInputName to set
      */
     public void setKkInputName(InputStream kkInputName)
     {

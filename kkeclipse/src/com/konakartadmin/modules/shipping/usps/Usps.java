@@ -186,8 +186,8 @@ public class Usps extends ShippingModule
         configs[i++] = new KKConfiguration(
                 /* title */"Container Type",
                 /* key */"MODULE_SHIPPING_USPS_CONTAINER",
-                /* value */"RECTANGULAR",
-                /* description */"RECTANGULAR, NONRECTANGULAR, FLAT RATE BOX etc.",
+                /* value */"VARIABLE",
+                /* description */"VARIABLE, RECTANGULAR, NONRECTANGULAR, FLAT RATE BOX etc.",
                 /* groupId */groupId,
                 /* sort Order */i,
                 /* useFun */"",

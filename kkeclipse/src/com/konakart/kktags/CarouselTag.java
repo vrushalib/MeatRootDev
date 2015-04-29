@@ -1,5 +1,5 @@
 //
-// (c) 2012 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2014 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -40,109 +40,141 @@ public class CarouselTag extends BaseTag
 
     private String width;
 
-    // Required since we may show more than one carousel on the same page
-    private String rand = String.valueOf(new Random().nextInt(1000));
+    private String widthSmall;
+
+    private String breakpointSmall;
 
     public int doStartTag() throws JspException
     {
         try
         {
+            boolean debug = false;
             setEng((com.konakart.al.KKAppEng) pageContext.getSession().getAttribute("konakartKey"));
+            // Required since we may show more than one carousel on the same page
+            String rand = String.valueOf(new Random().nextInt(1000));
             if (prods != null && prods.length > 0)
             {
-                int numProdsInt = 5;
-                if (width != null)
-                {
-                    if (width.equalsIgnoreCase("wide"))
-                    {
-                        numProdsInt = 5;
-                    } else if (width.equalsIgnoreCase("narrow"))
-                    {
-                        numProdsInt = 4;
-                    }
-                }
-
                 JspWriter writer = pageContext.getOut();
 
                 StringBuffer sb = new StringBuffer();
 
-                sb.append("<script type=\"text/javascript\">");
-                sb.append("$(function() {");
-                sb.append("jQuery('#slider" + rand + "').jcarousel({");
-                sb.append("vertical: false,");
-                sb.append("scroll: " + numProdsInt + ",");
-                sb.append("initCallback: slider" + rand + "initCallback,");
-                sb.append("buttonNextCallback: slider" + rand + "nextCallback,");
-                sb.append("buttonPrevCallback: slider" + rand + "prevCallback,");
-                sb.append("visible:" + numProdsInt + ",");
-                sb.append("buttonNextHTML: null,");
-                sb.append("buttonPrevHTML: null");
-                sb.append("});");
-                sb.append("});");
+                append(sb, "<script type=\"text/javascript\">", debug);
 
-                sb.append("function slider" + rand + "initCallback(carousel) {");
-                sb.append("jQuery('#kk-forward-" + rand + "').bind('click', function() {");
-                sb.append("carousel.next();");
-                sb.append("return false;");
-                sb.append("});");
+                append(sb, "$(function() {", debug);
 
-                sb.append("jQuery('#kk-back-" + rand + "').bind('click', function() {");
-                sb.append("carousel.prev();");
-                sb.append("return false;");
-                sb.append("});");
-                sb.append("};");
+                append(sb, "var jc" + rand + " = $('#jc" + rand + "');", debug);
+                append(sb, "jc" + rand, debug);
+                append(sb, ".on('jcarousel:reload jcarousel:create', function () {", debug);
+                append(sb, "var itemWidth =  " + width + ";", debug);
+                append(sb, "var width = jc" + rand + ".width();", debug);
+                append(sb, "if (width < " + breakpointSmall + "){", debug);
+                append(sb, "itemWidth =  " + widthSmall + ";", debug);
+                append(sb, "}", debug);
+                append(sb, "var numItems = Math.floor(width / itemWidth);", debug);
+                append(sb, "if (numItems == 0) {", debug);
+                append(sb, "numItems = 1;", debug);
+                append(sb, "jc" + rand + ".jcarousel('items').css('width', itemWidth + 'px');",
+                        debug);
+                append(sb, "} else {", debug);
+                append(sb, "var extra = width - (numItems*itemWidth);", debug);
+                append(sb, "var extraPerItem  = extra / numItems;", debug);
+                append(sb, "rightMargin = Math.ceil(extraPerItem/2);", debug);
+                append(sb, "var leftMargin = Math.floor(extraPerItem/2);", debug);
+                append(sb, "jc" + rand + ".jcarousel('items').css('width', itemWidth + 'px');",
+                        debug);
+                append(sb, "jc" + rand
+                        + ".jcarousel('items').css('margin-left', leftMargin + 'px');", debug);
+                append(sb, "jc" + rand
+                        + ".jcarousel('items').css('margin-right', rightMargin + 'px');", debug);
+                append(sb, "}", debug);
+                append(sb, "jc" + rand + ".jcarousel('scroll', 0, true, function(scrolled) {",
+                        debug);
+                append(sb, "setControls(jc" + rand + ",$('#jc" + rand + "-prev'),$('#jc" + rand
+                        + "-next'));", debug);
+                append(sb, "})", debug);
 
-                sb.append("function slider" + rand + "nextCallback(carousel,control,flag) {");
-                sb.append("if (flag) {");
-                sb.append("jQuery('#kk-forward-" + rand
-                        + "').addClass(\"next-items\").removeClass(\"next-items-inactive\");");
-                sb.append("} else {");
-                sb.append("jQuery('#kk-forward-" + rand
-                        + "').addClass(\"next-items-inactive\").removeClass(\"next-items\");");
-                sb.append("}");
-                sb.append("};");
+                append(sb, "})", debug);
 
-                sb.append("function slider" + rand + "prevCallback(carousel,control,flag) {");
-                sb.append("if (flag) {");
-                sb.append("jQuery('#kk-back-"
-                        + rand
-                        + "').addClass(\"previous-items\").removeClass(\"previous-items-inactive\");");
-                sb.append("} else {");
-                sb.append("jQuery('#kk-back-"
-                        + rand
-                        + "').addClass(\"previous-items-inactive\").removeClass(\"previous-items\");");
-                sb.append("}");
-                sb.append("};");
-                sb.append("</script>");
+                append(sb, ".jcarousel({wrap: null});", debug);
 
-                sb.append("<div class=\"item-area " + width + " rounded-corners\">");
-                sb.append("<div class=\"item-area-header\">");
-                sb.append("<h2 class=\"item-area-title\">");
-                sb.append(title);
-                sb.append("</h2>");
+                append(sb, "$('#jc" + rand + "-prev').jcarouselControl({", debug);
+                append(sb, "method: function() {", debug);
+                append(sb, "jc" + rand + ".jcarousel('scroll', '-='+jc" + rand
+                        + ".jcarousel('visible').length, true, function(scrolled) {", debug);
+                append(sb, "setControls(jc" + rand + ",$('#jc" + rand + "-prev'),$('#jc" + rand
+                        + "-next'));", debug);
+                append(sb, "})} ", debug);
+                append(sb, "}); ", debug);
 
-                sb.append("<div class=\"item-area-navigation\">");
-                sb.append("<span id=\"kk-back-" + rand + "\" class=\"item-arrow\"></span>");
-                sb.append("<span class=\"separator\"></span>");
-                sb.append("<span id=\"kk-forward-" + rand + "\" class=\"item-arrow\"></span>");
-                sb.append("</div>");
-                sb.append("</div>");
+                append(sb, "$('#jc" + rand + "-next').jcarouselControl({", debug);
+                append(sb, "method: function() {", debug);
+                append(sb, "jc" + rand + ".jcarousel('scroll', '+='+jc" + rand
+                        + ".jcarousel('visible').length, true, function(scrolled) {", debug);
+                append(sb, "setControls(jc" + rand + ",$('#jc" + rand + "-prev'),$('#jc" + rand
+                        + "-next'));", debug);
+                append(sb, "})} ", debug);
+                append(sb, "}); ", debug);
 
-                sb.append("<div id=\"slider" + rand + "\" class=\"items jcarousel-skin-kk\">");
-                sb.append("<ul>");
+                // Swipe
+                append(sb, "jc" + rand + ".swipe({", debug);
+                append(sb,
+                        "swipeRight: function(event, direction, distance, duration, fingerCount) {",
+                        debug);
+                append(sb, "jc" + rand + ".jcarousel('scroll', '-='+jc" + rand
+                        + ".jcarousel('visible').length, true, function(scrolled) {", debug);
+                append(sb, "setControls(jc" + rand + ",$('#jc" + rand + "-prev'),$('#jc" + rand
+                        + "-next'));", debug);
+                append(sb, "}) ", debug);
+                append(sb, "},", debug);
+                append(sb,
+                        "swipeLeft: function(event, direction, distance, duration, fingerCount) {",
+                        debug);
+                append(sb, "jc" + rand + ".jcarousel('scroll', '+='+jc" + rand
+                        + ".jcarousel('visible').length, true, function(scrolled) {", debug);
+                append(sb, "setControls(jc" + rand + ",$('#jc" + rand + "-prev'),$('#jc" + rand
+                        + "-next'));", debug);
+                append(sb, "}) ", debug);
+                append(sb, "}", debug);
+                append(sb, "});", debug);
+                append(sb, "});", debug);
+
+                append(sb, "</script>", debug);
+
+                /*
+                 * Start of HTML
+                 */
+
+                append(sb, "<div class=\"item-area wide rounded-corners\">", debug);
+                append(sb, "<div class=\"item-area-header\">", debug);
+                append(sb, "<h2 class=\"item-area-title\">", debug);
+                append(sb, title, debug);
+                append(sb, "</h2>", debug);
+
+                append(sb, "<div class=\"item-area-navigation jcarousel-wrapper\">", debug);
+                append(sb, "<a href=\"#\" id=\"jc" + rand
+                        + "-prev\" class=\"jcarousel-control-prev jcarousel-border-prev\"></a>",
+                        debug);
+                append(sb, "<a href=\"#\" id=\"jc" + rand
+                        + "-next\" class=\"jcarousel-control-next jcarousel-border-next\"></a>",
+                        debug);
+                append(sb, "</div>", debug);
+                append(sb, "</div>", debug);
+
+                append(sb, "<div id=\"jc" + rand + "\" class=\"jcarousel\">", debug);
+                append(sb, "<ul>", debug);
                 for (int j = 0; j < prods.length; j++)
                 {
                     ProductIf prod = prods[j];
-                    sb.append("<li>");
+                    append(sb, "<li>", debug);
                     ProdTileTag ptt = new ProdTileTag();
                     ptt.init(eng, prod, this.pageContext);
                     ptt.renderTag(sb);
-                    sb.append("</li>");
+                    append(sb, "</li>", debug);
                 }
-                sb.append("</ul>");
-                sb.append("</div>");
+                append(sb, "</ul>", debug);
+                append(sb, "</div>", debug);
 
-                sb.append("</div>");
+                append(sb, "</div>", debug);
 
                 writer.write(sb.toString());
             }
@@ -206,6 +238,40 @@ public class CarouselTag extends BaseTag
     public void setWidth(String width)
     {
         this.width = width;
+    }
+
+    /**
+     * @return the widthSmall
+     */
+    public String getWidthSmall()
+    {
+        return widthSmall;
+    }
+
+    /**
+     * @param widthSmall
+     *            the widthSmall to set
+     */
+    public void setWidthSmall(String widthSmall)
+    {
+        this.widthSmall = widthSmall;
+    }
+
+    /**
+     * @return the breakpointSmall
+     */
+    public String getBreakpointSmall()
+    {
+        return breakpointSmall;
+    }
+
+    /**
+     * @param breakpointSmall
+     *            the breakpointSmall to set
+     */
+    public void setBreakpointSmall(String breakpointSmall)
+    {
+        this.breakpointSmall = breakpointSmall;
     }
 
 }

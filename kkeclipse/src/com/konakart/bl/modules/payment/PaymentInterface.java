@@ -18,9 +18,10 @@ package com.konakart.bl.modules.payment;
 import com.konakart.app.KKException;
 import com.konakart.app.Order;
 import com.konakart.app.PaymentDetails;
+import com.konakart.appif.NameValueIf;
 
 /**
- * Payment modules must implement this interface 
+ * Payment modules must implement this interface
  */
 public interface PaymentInterface
 {
@@ -31,6 +32,17 @@ public interface PaymentInterface
      * @throws Exception
      */
     public PaymentDetails getPaymentDetails(Order order, PaymentInfo info) throws Exception;
+
+    /**
+     * Method used to return any custom information required from the payment module.
+     * 
+     * @param sessionId
+     * @param parameters
+     * @return Returns information in a PaymentDetails object
+     * @throws Exception
+     */
+    public PaymentDetails getPaymentDetailsCustom(String sessionId, NameValueIf[] parameters)
+            throws Exception;
 
     /**
      * Is the payment module available?

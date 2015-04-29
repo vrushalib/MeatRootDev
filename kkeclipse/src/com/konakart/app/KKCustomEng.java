@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -153,6 +153,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      private GetPaymentGateway _getPaymentGateway = null;
      private GetPaymentDetails _getPaymentDetails = null;
      private GetPaymentDetailsPerOrder _getPaymentDetailsPerOrder = null;
+     private GetPaymentDetailsCustom _getPaymentDetailsCustom = null;
      private SaveOrder _saveOrder = null;
      private GetStatusText _getStatusText = null;
      private UpdateOrder _updateOrder = null;
@@ -184,6 +185,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      private SetEndpoint _setEndpoint = null;
      private InsertDigitalDownload _insertDigitalDownload = null;
      private GetDigitalDownloads _getDigitalDownloads = null;
+     private GetDigitalDownloadsWithOptions _getDigitalDownloadsWithOptions = null;
      private UpdateDigitalDownloadCount _updateDigitalDownloadCount = null;
      private UpdateDigitalDownloadCountById _updateDigitalDownloadCountById = null;
      private GetTempCustomerId _getTempCustomerId = null;
@@ -251,6 +253,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      private DeleteReservedPoints _deleteReservedPoints = null;
      private FreeReservedPoints _freeReservedPoints = null;
      private SetRewardPointReservationId _setRewardPointReservationId = null;
+     private GetRewardPointsWithOptions _getRewardPointsWithOptions = null;
      private GetRewardPoints _getRewardPoints = null;
      private InsertSubscription _insertSubscription = null;
      private UpdateSubscription _updateSubscription = null;
@@ -295,6 +298,14 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      private InsertKKEvent _insertKKEvent = null;
      private GetKKEvents _getKKEvents = null;
      private ProcessKKEvents _processKKEvents = null;
+     private ValidatePassword _validatePassword = null;
+     private GetCouponsPerCode _getCouponsPerCode = null;
+     private GetCouponPerId _getCouponPerId = null;
+     private GetPromotionsPerCoupon _getPromotionsPerCoupon = null;
+     private GetContent _getContent = null;
+     private GetContents _getContents = null;
+     private GetContentType _getContentType = null;
+     private GetContentTypes _getContentTypes = null;
 
    /**
     * Constructor
@@ -326,6 +337,25 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
         kkEng = new KKEng(engConfig);
     }
 
+   /**
+    * Common code to manage exceptions in the KKEng engine
+    * 
+    * @param e
+    * @return a new KKException if the exception specified is not already a KKException
+    */
+    protected KKException manageThrowable(Throwable e)
+    {
+        if (log.isDebugEnabled())
+        {
+             log.debug("KKEng threw an exception:", e);
+        }
+        if (e.getClass().getName().equals("com.konakart.app.KKException"))
+        {
+            return (com.konakart.app.KKException) (e);
+        }
+        return new KKException(e);
+    }
+
     /**
      * Returns an array of Language classes containing all of the languages that satisfy the search
      * criteria.
@@ -345,9 +375,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getLanguages.getLanguages(search);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -370,9 +400,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllLanguages.getAllLanguages();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -395,9 +425,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDefaultLanguage.getDefaultLanguage();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -419,9 +449,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getLanguagePerCode.getLanguagePerCode(code);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -443,9 +473,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getLanguagePerId.getLanguagePerId(languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -484,9 +514,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCategoryTree.getCategoryTree(languageId, getNumProducts);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -522,9 +552,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCategoryTreeWithOptions.getCategoryTreeWithOptions(options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -544,8 +574,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -602,7 +634,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -627,9 +659,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerCategory.getProductsPerCategory(sessionId, dataDesc, categoryId, searchInSubCats, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -653,8 +685,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -711,7 +745,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -738,9 +772,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerCategoryWithOptions.getProductsPerCategoryWithOptions(sessionId, dataDesc, categoryId, searchInSubCats, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -760,8 +794,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -818,7 +854,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -842,9 +878,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerCategoryPerManufacturer.getProductsPerCategoryPerManufacturer(sessionId, dataDesc, categoryId, manufacturerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -868,8 +904,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -926,7 +964,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -952,9 +990,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerCategoryPerManufacturerWithOptions.getProductsPerCategoryPerManufacturerWithOptions(sessionId, dataDesc, categoryId, manufacturerId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -974,8 +1012,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1032,7 +1072,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -1054,9 +1094,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerManufacturer.getProductsPerManufacturer(sessionId, dataDesc, manufacturerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1080,8 +1120,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1138,7 +1180,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * </ul>
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Used to control the data offset, limit the number of items returned and set the
      *            sort order
@@ -1162,9 +1204,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsPerManufacturerWithOptions.getProductsPerManufacturerWithOptions(sessionId, dataDesc, manufacturerId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1194,9 +1236,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProduct.getProduct(sessionId, productId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1211,7 +1253,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * exist for the product.
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param productId
      *            The numeric id of the product
      * @param languageId
@@ -1232,9 +1274,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductWithOptions.getProductWithOptions(sessionId, productId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1259,9 +1301,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCategoriesPerManufacturer.getCategoriesPerManufacturer(manufacturerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1286,9 +1328,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCategoriesPerProduct.getCategoriesPerProduct(productId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1313,9 +1355,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getManufacturersPerCategory.getManufacturersPerCategory(categoryId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1375,9 +1417,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getManufacturers.getManufacturers(dataDesc, search, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1402,9 +1444,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllManufacturers.getAllManufacturers();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1429,9 +1471,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getManufacturerPerProduct.getManufacturerPerProduct(productId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1456,9 +1498,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getManufacturer.getManufacturer(manufacturerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1484,9 +1526,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCategory.getCategory(categoryId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1507,8 +1549,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1590,9 +1634,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSpecialsPerCategory.getSpecialsPerCategory(sessionId, dataDesc, categoryId, searchInSubCats, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1612,8 +1656,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1690,9 +1736,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllSpecials.getAllSpecials(sessionId, dataDesc, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1712,8 +1758,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1790,9 +1838,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllProducts.getAllProducts(sessionId, dataDesc, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1816,8 +1864,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -1896,9 +1946,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllProductsWithOptions.getAllProductsWithOptions(sessionId, dataDesc, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1956,9 +2006,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getReviewsPerProduct.getReviewsPerProduct(dataDesc, productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -1981,9 +2031,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getReview.getReview(reviewId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2038,9 +2088,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllReviews.getAllReviews(dataDesc);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2105,9 +2155,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getReviews.getReviews(dataDesc, search);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2128,8 +2178,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -2180,9 +2232,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>DataDescConstants.ORDER_BY_CUSTOM1DEC_ASCENDING</li>
      * <li>DataDescConstants.ORDER_BY_CUSTOM1DEC_DESCENDING</li>
      * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_ASCENDING</li>
-     * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_DESCENDING</li> *
-     * <li>DataDescConstants.ORDER_BY_SCORE_ASCENDING - When using Solr search engine</li> *
-     * <li>DataDescConstants.ORDER_BY_SCORE_DESCENDING - When using Solr search engine</li> *
+     * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_DESCENDING</li>
+     * <li>DataDescConstants.ORDER_BY_SCORE_ASCENDING - When using Solr search engine</li>
+     * <li>DataDescConstants.ORDER_BY_SCORE_DESCENDING - When using Solr search engine</li>
      * </ul>
      * </li>
      * </ul>
@@ -2210,9 +2262,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForProducts.searchForProducts(sessionId, dataDesc, prodSearch, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2238,8 +2290,10 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>The offset which defaults to zero. This is useful when there are many Product objects, in
      * order to return them using multiple calls to this method.</li>
      * <li>Whether or not to return invisible products.</li>
-     * <li>Whether or not to add an array of custom products.</li>
+     * <li>Whether or not to add an array of custom attributes.</li>
      * <li>Whether or not to add an array of miscellaneous items.</li>
+     * <li>Whether or not to add the product description.</li>
+     * <li>Whether or not to add the product options.</li>
      * <li>Criteria on the custom attributes. If a custom attribute is set then only products with a
      * matching custom attribute value are returned.</li>
      * <li>The Products may be sorted by :
@@ -2290,7 +2344,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * <li>DataDescConstants.ORDER_BY_CUSTOM1DEC_ASCENDING</li>
      * <li>DataDescConstants.ORDER_BY_CUSTOM1DEC_DESCENDING</li>
      * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_ASCENDING</li>
-     * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_DESCENDING</li> *
+     * <li>DataDescConstants.ORDER_BY_CUSTOM2DEC_DESCENDING</li>
      * </ul>
      * </li>
      * </ul>
@@ -2320,9 +2374,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForProductsWithOptions.searchForProductsWithOptions(sessionId, dataDesc, prodSearch, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2351,9 +2405,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _registerCustomer.registerCustomer(custReg);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2395,9 +2449,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _forceRegisterCustomer.forceRegisterCustomer(custReg);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2419,9 +2473,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllCountries.getAllCountries();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2446,9 +2500,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _login.login(emailAddr, password);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2469,9 +2523,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _logout.logout(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2495,9 +2549,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAddressesPerCustomer.getAddressesPerCustomer(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2519,9 +2573,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAddressesPerManufacturer.getAddressesPerManufacturer(manufacturerId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2543,9 +2597,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAddressesPerProduct.getAddressesPerProduct(productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2568,9 +2622,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAddressesPerStore.getAddressesPerStore(addressStoreId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2593,9 +2647,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDefaultAddressPerCustomer.getDefaultAddressPerCustomer(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2620,9 +2674,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _setDefaultAddressPerCustomer.setDefaultAddressPerCustomer(sessionId, addressId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2651,9 +2705,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addAddressToCustomer.addAddressToCustomer(sessionId, addr);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2680,9 +2734,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteAddressFromCustomer.deleteAddressFromCustomer(sessionId, addressId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2711,9 +2765,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editCustomerAddress.editCustomerAddress(sessionId, addr);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2736,9 +2790,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomer.getCustomer(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2788,9 +2842,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editCustomer.editCustomer(sessionId, cust);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2810,9 +2864,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getKonakartTimeStamp.getKonakartTimeStamp();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2845,9 +2899,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _writeReview.writeReview(sessionId, review);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2871,9 +2925,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _checkSession.checkSession(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2913,9 +2967,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addToBasket.addToBasket(sessionId, customerId, item);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2962,9 +3016,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addToBasketWithOptions.addToBasketWithOptions(sessionId, customerId, item, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -2992,9 +3046,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _mergeBaskets.mergeBaskets(sessionId, customerFromId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3027,9 +3081,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _mergeBasketsWithOptions.mergeBasketsWithOptions(sessionId, customerFromId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3070,9 +3124,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateBasket.updateBasket(sessionId, customerId, item);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3118,9 +3172,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateBasketWithOptions.updateBasketWithOptions(sessionId, customerId, item, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3154,9 +3208,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _removeFromBasket.removeFromBasket(sessionId, customerId, item);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3185,9 +3239,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _removeBasketItemsPerCustomer.removeBasketItemsPerCustomer(sessionId, customerId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3222,9 +3276,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBasketItemsPerCustomer.getBasketItemsPerCustomer(sessionId, customerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3263,9 +3317,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBasketItemsPerCustomerWithOptions.getBasketItemsPerCustomerWithOptions(sessionId, customerId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3286,9 +3340,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDefaultCurrency.getDefaultCurrency();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3308,9 +3362,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllCurrencies.getAllCurrencies();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3331,9 +3385,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurations.getConfigurations();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3357,9 +3411,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfiguration.getConfiguration(key);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3383,9 +3437,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValue.getConfigurationValue(key);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3410,9 +3464,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValueAsInt.getConfigurationValueAsInt(key);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3439,9 +3493,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValueAsIntWithDefault.getConfigurationValueAsIntWithDefault(key, def);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3466,9 +3520,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValueAsBigDecimal.getConfigurationValueAsBigDecimal(key);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3495,9 +3549,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValueAsBigDecimalWithDefault.getConfigurationValueAsBigDecimalWithDefault(key, def);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3523,9 +3577,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigurationValueAsBool.getConfigurationValueAsBool(key, def);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3555,9 +3609,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editConfiguration.editConfiguration(key, value);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3584,9 +3638,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _changePassword.changePassword(sessionId, currentPassword, newPassword);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3616,9 +3670,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductNotificationsPerCustomer.getProductNotificationsPerCustomer(sessionId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3654,9 +3708,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductNotificationsPerCustomerWithOptions.getProductNotificationsPerCustomerWithOptions(sessionId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3680,9 +3734,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _addProductNotificationToCustomer.addProductNotificationToCustomer(sessionId, productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3706,9 +3760,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteProductNotificationFromCustomer.deleteProductNotificationFromCustomer(sessionId, productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3734,9 +3788,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateProductViewedCount.updateProductViewedCount(productId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3770,9 +3824,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBestSellers.getBestSellers(dataDesc, categoryId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3812,9 +3866,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBestSellersWithOptions.getBestSellersWithOptions(dataDesc, categoryId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3845,9 +3899,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrdersPerCustomer.getOrdersPerCustomer(dataDesc, sessionId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3909,9 +3963,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForOrdersPerCustomer.searchForOrdersPerCustomer(sessionId, dataDesc, orderSearch, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3939,9 +3993,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrder.getOrder(sessionId, orderId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3963,9 +4017,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCurrency.getCurrency(currencyCode);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -3999,9 +4053,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _createOrder.createOrder(sessionId, basketItemArray, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4021,7 +4075,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * One available option is to automatically copy all of the <code>basket</code> custom fields to
      * the <code>orderProduct</code> custom fields which are generated from the basket items.
      * <p>
-     * Another option allows you to leave the seesionId null and to use a default customer. This
+     * Another option allows you to leave the sessionId null and to use a default customer. This
      * default customer needs to be setup using the Admin App and is used to create a temporary
      * order even before the customer logs in or registers, so that he can view the order totals in
      * the window that shows him the cart details. These order totals give an indication of the
@@ -4033,6 +4087,11 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * A further option is to use the shipping address retrieved from a wish list if the wish list
      * id of any one of the basket items is set to a valid wish list. This is useful in the case of
      * gift registries to ship the gifts directly to the owner of the registry.
+     * <p>
+     * The <code>options</code> object contains a number of attributes to control whether the
+     * returned order includes an array of available payment modules and shipping quotes and if so
+     * which one to use as the selected module or quote. The population of order total modules may
+     * also be enabled. The Javadoc of <code>CreateOrderOptionsIf</code> provides more details.
      * 
      * @param sessionId
      *            The session id of the logged in user
@@ -4056,9 +4115,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _createOrderWithOptions.createOrderWithOptions(sessionId, basketItemArray, options, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4088,9 +4147,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrderHistory.getOrderHistory(dataDesc, sessionId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4126,9 +4185,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrderHistoryWithOptions.getOrderHistoryWithOptions(dataDesc, sessionId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4163,9 +4222,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAlsoPurchased.getAlsoPurchased(sessionId, dataDesc, productId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4206,9 +4265,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAlsoPurchasedWithOptions.getAlsoPurchasedWithOptions(sessionId, dataDesc, productId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4267,9 +4326,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getRelatedProducts.getRelatedProducts(sessionId, dataDesc, productId, relationType, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4338,9 +4397,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getRelatedProductsWithOptions.getRelatedProductsWithOptions(sessionId, dataDesc, productId, relationType, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4364,9 +4423,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCountryPerName.getCountryPerName(countryName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4389,9 +4448,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCountry.getCountry(countryId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4418,9 +4477,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getShippingQuotes.getShippingQuotes(order, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4448,9 +4507,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getShippingQuote.getShippingQuote(order, moduleName, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4477,9 +4536,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _changeDeliveryAddress.changeDeliveryAddress(sessionId, order, deliveryAddress);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4507,9 +4566,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTaxRate.getTaxRate(countryId, zoneId, taxClassId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4538,9 +4597,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTax.getTax(cost, countryId, zoneId, taxClassId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4570,9 +4629,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addTax.addTax(cost, countryId, zoneId, taxClassId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4598,9 +4657,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrderTotals.getOrderTotals(order, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4619,7 +4678,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * @param languageId
      *            The id for the language that will be used. Value of -1 selects the default
      *            language.
-     * @return Return an array of PaymentDetail objects
+     * @return Return an array of PaymentDetails objects
      * @throws KKException
      */
      public PaymentDetailsIf[] getPaymentGateways(OrderIf order, int languageId) throws KKException
@@ -4632,9 +4691,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPaymentGateways.getPaymentGateways(order, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4650,14 +4709,14 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      *            The order object
      * @param moduleName
      *            This is the name of the payment module. The name must match the class name except
-     *            that the first letter doesn't have to be in Caps. e.g. CyberSource,
+     *            that the first letter doesn't have to be in Caps. e.g. CyberSourceSA,
      *            CommideaVanguard, authorizenet, BarclaycardSmartPayApi etc. The moduleName can be
      *            the module name on its own or it can be "moduleName~~moduleSubCode" if the module
      *            has a subCode.
      * @param languageId
      *            The id for the language that will be used. Value of -1 selects the default
      *            language.
-     * @return Return a PaymentDetail object
+     * @return Return a PaymentDetails object
      * @throws KKException
      */
      public PaymentDetailsIf getPaymentGateway(OrderIf order, String moduleName, int languageId) throws KKException
@@ -4670,9 +4729,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPaymentGateway.getPaymentGateway(order, moduleName, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4696,7 +4755,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * @param languageId
      *            The id for the language that will be used. Value of -1 selects the default
      *            language.
-     * @return Return an array of PaymentDetail objects
+     * @return Return a PaymentDetails object
      * @throws KKException
      */
      public PaymentDetailsIf getPaymentDetails(String sessionId, String moduleCode, int orderId, String hostAndPort, int languageId) throws KKException
@@ -4709,9 +4768,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPaymentDetails.getPaymentDetails(sessionId, moduleCode, orderId, hostAndPort, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4734,7 +4793,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * @param languageId
      *            The id for the language that will be used. Value of -1 selects the default
      *            language.
-     * @return Return an array of PaymentDetail objects
+     * @return Return a PaymentDetails object
      * @throws KKException
      */
      public PaymentDetailsIf getPaymentDetailsPerOrder(String sessionId, String moduleCode, OrderIf order, String hostAndPort, int languageId) throws KKException
@@ -4747,9 +4806,39 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPaymentDetailsPerOrder.getPaymentDetailsPerOrder(sessionId, moduleCode, order, hostAndPort, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Method used to return any custom information required from the payment module.
+     * 
+     * @param sessionId
+     *            The session id of the logged in user
+     * @param moduleCode
+     *            This is the name of the payment module in lower case. Examples are cod, paypal,
+     *            usaepay, worldpay etc.
+     * @param parameters
+     *            An array of parameters used by the payment module to determine what it needs to
+     *            return.
+     * @return Return a PaymentDetails object
+     * @throws KKException
+     */
+     public PaymentDetailsIf getPaymentDetailsCustom(String sessionId, String moduleCode, NameValueIf[] parameters) throws KKException
+     {
+         try
+         {
+            if (_getPaymentDetailsCustom == null)
+            {
+                _getPaymentDetailsCustom = new GetPaymentDetailsCustom(kkEng);
+            }
+
+            return _getPaymentDetailsCustom.getPaymentDetailsCustom(sessionId, moduleCode, parameters);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
          }
      }
 
@@ -4783,9 +4872,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _saveOrder.saveOrder(sessionId, order, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4811,9 +4900,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getStatusText.getStatusText(statusId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4846,9 +4935,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateOrder.updateOrder(sessionId, orderId, status, customerNotified, comments, updateOrder);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4881,9 +4970,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _changeOrderStatus.changeOrderStatus(sessionId, orderId, status, customerNotified, comments);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4910,9 +4999,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateInventory.updateInventory(sessionId, orderId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4945,9 +5034,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateInventoryWithOptions.updateInventoryWithOptions(sessionId, orderId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -4977,9 +5066,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _sendNewPassword.sendNewPassword(emailAddr, subject, countryCode);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5037,9 +5126,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _sendNewPassword1.sendNewPassword1(emailAddr, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5070,9 +5159,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _sendWelcomeEmail.sendWelcomeEmail(customerId, mailSubject, countryCode);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5128,9 +5217,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _sendWelcomeEmail1.sendWelcomeEmail1(customerId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5161,9 +5250,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _sendOrderConfirmationEmail.sendOrderConfirmationEmail(sessionId, orderId, mailSubject, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5220,9 +5309,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _sendOrderConfirmationEmail1.sendOrderConfirmationEmail1(sessionId, orderId, langIdForOrder, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5243,9 +5332,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSecretKeyForOrderId.getSecretKeyForOrderId(orderId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5271,9 +5360,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrderIdFromSecretKey.getOrderIdFromSecretKey(secretKey);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5295,9 +5384,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteOrderIdForSecretKey.deleteOrderIdForSecretKey(secretKey);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5324,9 +5413,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _saveIpnHistory.saveIpnHistory(sessionId, ipnHistory);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5353,9 +5442,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateManufacturerViewedCount.updateManufacturerViewedCount(manufacturerId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5377,9 +5466,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getZonesPerCountry.getZonesPerCountry(countryId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5400,9 +5489,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForZones.searchForZones(search);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5422,9 +5511,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateCachedConfigurations.updateCachedConfigurations();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5448,9 +5537,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _doesCustomerExistForEmail.doesCustomerExistForEmail(emailAddr);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5472,9 +5561,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _isEmailValid.isEmailValid(emailAddr);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5503,9 +5592,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _updateBasketWithStockInfo.updateBasketWithStockInfo(basketItems);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5539,9 +5628,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _updateBasketWithStockInfoWithOptions.updateBasketWithStockInfoWithOptions(basketItems, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5577,9 +5666,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductQuantity.getProductQuantity(encodedProductId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5620,9 +5709,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductQuantityWithOptions.getProductQuantityWithOptions(encodedProductId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5671,9 +5760,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _createAndSaveOrder.createAndSaveOrder(emailAddr, password, custReg, basketItemArray, shippingModule, paymentModule, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5699,9 +5788,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSku.getSku(orderProd);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5725,9 +5814,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _setEndpoint.setEndpoint(wsEndpoint);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5757,15 +5846,16 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _insertDigitalDownload.insertDigitalDownload(sessionId, productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
     /**
      * Returns an array of Digital Download objects for the customer identified by the
-     * <code>sessionId</code> parameter.
+     * <code>sessionId</code> parameter. The product attribute of the Digital Download objects is
+     * not populated.
      * <p>
      * If the DD_DELETE_ON_EXPIRATION configuration variable is set to "true", then the objects read
      * from the database that have expired, are automatically deleted. This avoids having to
@@ -5787,9 +5877,49 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDigitalDownloads.getDigitalDownloads(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Returns an array of Digital Download objects for the customer identified by the
+     * <code>sessionId</code> parameter. The <code>ddOptions</code> parameter allows you to define
+     * whether the product attribute of the returned Digital Download objects is populated.
+     * <p>
+     * If the DD_DELETE_ON_EXPIRATION configuration variable is set to "true", then the objects read
+     * from the database that have expired, are automatically deleted. This avoids having to
+     * maintain the database table. Regardless of the setting of DD_DELETE_ON_EXPIRATION, only valid
+     * (not expired) objects are ever returned.
+     * 
+     * @param sessionId
+     *            The session id of the logged in user
+     * @param languageId
+     *            The id for the language that will be used for the digital download products. Value
+     *            of -1 selects the default language.
+     * @param ddOptions
+     *            Options object that allows you to define whether the product attribute of the
+     *            returned Digital Download objects is populated. It may be set to null.
+     * @param prodOptions
+     *            An object containing options for the digital download products. It may be set to
+     *            null.
+     * @return Returns an array of DigitalDownload objects
+     * @throws KKException
+     */
+     public DigitalDownloadIf[] getDigitalDownloadsWithOptions(String sessionId, int languageId, FetchDigitalDownloadOptionsIf ddOptions, FetchProductOptionsIf prodOptions) throws KKException
+     {
+         try
+         {
+            if (_getDigitalDownloadsWithOptions == null)
+            {
+                _getDigitalDownloadsWithOptions = new GetDigitalDownloadsWithOptions(kkEng);
+            }
+
+            return _getDigitalDownloadsWithOptions.getDigitalDownloadsWithOptions(sessionId, languageId, ddOptions, prodOptions);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
          }
      }
 
@@ -5815,9 +5945,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _updateDigitalDownloadCount.updateDigitalDownloadCount(sessionId, productId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5844,9 +5974,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _updateDigitalDownloadCountById.updateDigitalDownloadCountById(sessionId, digitalDownloadId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5868,9 +5998,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTempCustomerId.getTempCustomerId();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5894,9 +6024,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllCustomerGroups.getAllCustomerGroups(languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5920,9 +6050,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerGroup.getCustomerGroup(customerGroupId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -5964,9 +6094,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _sendTemplateEmailToCustomer.sendTemplateEmailToCustomer(customerId, templateName, message, countryCode);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6026,9 +6156,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _sendTemplateEmailToCustomer1.sendTemplateEmailToCustomer1(customerId, message, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6058,9 +6188,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _loginByAdmin.loginByAdmin(adminSession, customerId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6092,9 +6222,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _custom.custom(input1, input2);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6128,9 +6258,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _customSecure.customSecure(sessionId, input1, input2);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6161,9 +6291,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTagGroupsPerCategory.getTagGroupsPerCategory(categoryId, getProdCount, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6197,9 +6327,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTagGroupsPerCategoryWithOptions.getTagGroupsPerCategoryWithOptions(categoryId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6227,9 +6357,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTagsPerCategory.getTagsPerCategory(categoryId, getProdCount, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6258,9 +6388,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTagGroup.getTagGroup(tagGroupId, getProdCount, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6287,9 +6417,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getTag.getTag(tagId, getProdCount, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6317,9 +6447,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDefaultCustomer.getDefaultCustomer();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6357,9 +6487,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getStoreIds.getStoreIds();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6395,9 +6525,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _setCreditCardDetailsOnOrder.setCreditCardDetailsOnOrder(sessionId, orderId, card);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6433,9 +6563,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addToWishList.addToWishList(sessionId, wishListItem);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6477,9 +6607,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addToWishListWithOptions.addToWishListWithOptions(sessionId, wishListItem, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6510,9 +6640,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _createWishList.createWishList(sessionId, wishList);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6547,9 +6677,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _createWishListWithOptions.createWishListWithOptions(sessionId, wishList, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6574,9 +6704,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editWishList.editWishList(sessionId, wishList);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6603,9 +6733,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editWishListWithOptions.editWishListWithOptions(sessionId, wishList, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6630,9 +6760,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteWishList.deleteWishList(sessionId, wishListId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6662,9 +6792,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteWishListWithOptions.deleteWishListWithOptions(sessionId, wishListId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6697,9 +6827,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishListWithItems.getWishListWithItems(sessionId, wishListId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6741,9 +6871,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishListWithItemsWithOptions.getWishListWithItemsWithOptions(sessionId, wishListId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6770,9 +6900,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishList.getWishList(sessionId, wishListId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6802,9 +6932,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishListWithOptions.getWishListWithOptions(sessionId, wishListId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6862,9 +6992,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishListItemsWithOptions.getWishListItemsWithOptions(sessionId, dataDesc, wishListId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6915,9 +7045,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getWishListItems.getWishListItems(sessionId, dataDesc, wishListId, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6943,9 +7073,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _removeFromWishList.removeFromWishList(sessionId, wishListItemId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -6974,9 +7104,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _removeFromWishListWithOptions.removeFromWishListWithOptions(sessionId, wishListItemId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7004,9 +7134,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _mergeWishListsWithOptions.mergeWishListsWithOptions(sessionId, customerFromId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7060,9 +7190,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForWishLists.searchForWishLists(sessionId, dataDesc, customerSearch);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7082,9 +7212,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getStore.getStore();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7112,9 +7242,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _addCustomDataToSession.addCustomDataToSession(sessionId, data, position);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7141,9 +7271,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomDataFromSession.getCustomDataFromSession(sessionId, position);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7176,9 +7306,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _setCookie.setCookie(cookie);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7206,9 +7336,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCookie.getCookie(customerUuid, attrId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7234,9 +7364,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllCookies.getAllCookies(customerUuid);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7260,9 +7390,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteCookie.deleteCookie(customerUuid, attrId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7286,9 +7416,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getGeoZonesPerZone.getGeoZonesPerZone(zone);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7321,9 +7451,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _insertCustomerTag.insertCustomerTag(sessionId, tag);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7357,9 +7487,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _insertCustomerTagForGuest.insertCustomerTagForGuest(customerId, tag);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7393,9 +7523,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _addToCustomerTag.addToCustomerTag(sessionId, tagName, tagValue);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7429,9 +7559,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _addToCustomerTagForGuest.addToCustomerTagForGuest(customerId, tagName, tagValue);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7461,9 +7591,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTag.getCustomerTag(sessionId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7492,9 +7622,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTagForGuest.getCustomerTagForGuest(customerId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7521,9 +7651,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTagValue.getCustomerTagValue(sessionId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7551,9 +7681,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTagValueForGuest.getCustomerTagValueForGuest(customerId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7577,9 +7707,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteCustomerTag.deleteCustomerTag(sessionId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7603,9 +7733,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteCustomerTagForGuest.deleteCustomerTagForGuest(customerId, tagName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7630,9 +7760,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTags.getCustomerTags(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7657,9 +7787,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getCustomerTagsForGuest.getCustomerTagsForGuest(customerId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7688,9 +7818,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _evaluateExpression.evaluateExpression(sessionId, expressionId, expressionName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7719,9 +7849,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _evaluateExpressionForGuest.evaluateExpressionForGuest(customerId, expressionId, expressionName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7754,9 +7884,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getExpression.getExpression(sessionId, expressionId, expressionName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7788,9 +7918,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getExpressionForGuest.getExpressionForGuest(customerId, expressionId, expressionName);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7813,9 +7943,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _pointsAvailable.pointsAvailable(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7844,9 +7974,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _addPoints.addPoints(sessionId, points, code, description);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7875,9 +8005,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _deletePoints.deletePoints(sessionId, points, code, description);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7905,9 +8035,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _reservePoints.reservePoints(sessionId, points);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7938,9 +8068,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteReservedPoints.deleteReservedPoints(sessionId, reservationId, code, description);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7967,9 +8097,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _freeReservedPoints.freeReservedPoints(sessionId, reservationId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -7992,9 +8122,39 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _setRewardPointReservationId.setRewardPointReservationId(sessionId, orderId, reservationId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Gets an array of reward point objects for a customer identified by the <code>sessionId</code>
+     * parameter. The most recent objects are returned first. The options object allows you to
+     * define whether to return expired points.
+     * 
+     * @param sessionId
+     *            The session id of the logged in user
+     * @param dataDesc
+     *            Used to control the data offset and limit the number of items returned
+     * @param options
+     *            Allows you to define whether to return expired points
+     * @return Returns a RewardPoints object
+     * @throws KKException
+     */
+     public RewardPointsIf getRewardPointsWithOptions(String sessionId, DataDescriptorIf dataDesc, FetchRewardPointOptionsIf options) throws KKException
+     {
+         try
+         {
+            if (_getRewardPointsWithOptions == null)
+            {
+                _getRewardPointsWithOptions = new GetRewardPointsWithOptions(kkEng);
+            }
+
+            return _getRewardPointsWithOptions.getRewardPointsWithOptions(sessionId, dataDesc, options);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
          }
      }
 
@@ -8019,9 +8179,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getRewardPoints.getRewardPoints(sessionId, dataDesc);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8064,9 +8224,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _insertSubscription.insertSubscription(sessionId, subscription);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8102,9 +8262,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _updateSubscription.updateSubscription(sessionId, subscription);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8127,9 +8287,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPaymentSchedule.getPaymentSchedule(id);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8152,9 +8312,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSubscriptionsPerCustomer.getSubscriptionsPerCustomer(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8213,9 +8373,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _searchForSubscriptionsPerCustomer.searchForSubscriptionsPerCustomer(sessionId, dataDesc, subscriptionSearch);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8227,7 +8387,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * the options and product quantities are populated.
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param sku
      *            The product SKU
      * @param languageId
@@ -8248,9 +8408,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductPerSkuWithOptions.getProductPerSkuWithOptions(sessionId, sku, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8262,7 +8422,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * the options and product quantities are populated.
      * 
      * @param sessionId
-     *            The session id of the logged in user
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param sku
      *            The product SKU
      * @param languageId
@@ -8281,9 +8441,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductPerSku.getProductPerSku(sessionId, sku, languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8308,9 +8468,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getIpnHistory.getIpnHistory(sessionId, orderId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8335,9 +8495,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPdf.getPdf(sessionId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8363,9 +8523,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getDigitalDownloadById.getDigitalDownloadById(sessionId, digitalDownloadId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8389,9 +8549,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _editDigitalDownload.editDigitalDownload(sessionId, digitalDownload);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8419,9 +8579,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getMsgValue.getMsgValue(key, type, locale);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8447,9 +8607,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getMessages.getMessages(type, locale);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8473,9 +8633,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _postMessageToQueue.postMessageToQueue(sessionId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8502,9 +8662,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _readMessageFromQueue.readMessageFromQueue(sessionId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8531,9 +8691,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _insertCustomerEvent.insertCustomerEvent(event);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8560,9 +8720,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSuggestedSearchItems.getSuggestedSearchItems(sessionId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8589,9 +8749,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSuggestedSpellingItems.getSuggestedSpellingItems(sessionId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8602,7 +8762,7 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
      * such as determining where to read the price and quantity information from.
      * 
      * @param sessionId
-     *            the sessionId which may be left null if the customer isn't logged in
+     *            The session id of the logged in user; use null if the customer isn't logged in.
      * @param dataDesc
      *            Can be used to add sort by information and to set whether to return the
      *            description of the products.
@@ -8626,9 +8786,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductsFromIdsWithOptions.getProductsFromIdsWithOptions(sessionId, dataDesc, prodIdArray, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8665,9 +8825,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBookingsPerProduct.getBookingsPerProduct(dataDesc, productId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8704,9 +8864,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBookingsPerCustomer.getBookingsPerCustomer(sessionId, dataDesc, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8736,9 +8896,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _insertBooking.insertBooking(sessionId, booking, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8768,9 +8928,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBookableProductConflict.getBookableProductConflict(sessionId, bookableProd, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8795,9 +8955,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getOrderStatus.getOrderStatus(sessionId, orderId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8820,9 +8980,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllOrderStatuses.getAllOrderStatuses(languageId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8844,9 +9004,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _saveSSOToken.saveSSOToken(token);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8872,9 +9032,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getSSOToken.getSSOToken(secretKey, deleteToken);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8902,9 +9062,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _enableCustomer.enableCustomer(secretKey);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8939,9 +9099,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _checkCoupon.checkCoupon(couponCode);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -8964,9 +9124,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAllPromotions.getAllPromotions();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9017,9 +9177,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPromotionsPerProducts.getPromotionsPerProducts(sessionId, customerId, products, promotions, couponCodes, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9046,9 +9206,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getConfigData.getConfigData(sessionId, key);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9068,9 +9228,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getKonaKartVersion.getKonaKartVersion();
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9103,9 +9263,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getPunchOutMessage.getPunchOutMessage(sessionId, order, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9139,9 +9299,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _addCustomerNotifications.addCustomerNotifications(options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9175,9 +9335,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _deleteCustomerNotifications.deleteCustomerNotifications(options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9201,9 +9361,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getAddressFormatTemplate.getAddressFormatTemplate(templateId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9255,9 +9415,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBundlesThatProductBelongsTo.getBundlesThatProductBelongsTo(sessionId, dataDesc, productId, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9313,9 +9473,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getBundlesThatProductsBelongTo.getBundlesThatProductsBelongTo(sessionId, dataDesc, productIds, exactMatch, languageId, options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9347,9 +9507,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getProductImages.getProductImages(options);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9373,9 +9533,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _insertKKEvent.insertKKEvent(sessionId, event);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9411,9 +9571,9 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             return _getKKEvents.getKKEvents(sessionId, search, desc);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
          }
      }
 
@@ -9433,9 +9593,264 @@ public class KKCustomEng implements com.konakart.appif.KKEngIf
             }
 
             _processKKEvents.processKKEvents(sessionId);
-         } catch (Exception e)
+         } catch (Throwable e)
          {
-            throw new KKException(e);
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * This method validates the password of a logged in customer and can be used to force the
+     * customer to enter his password before allowing certain actions like the modification of the
+     * customer's email address.
+     * <p>
+     * The method returns true if the password validates against the session. If either the session
+     * is invalid or the password and session don't match, then the method returns false.
+     * 
+     * @param sessionId
+     * @param password
+     * @return Returns true if the password validates
+     * @throws KKException
+     */
+     public boolean validatePassword(String sessionId, String password) throws KKException
+     {
+         try
+         {
+            if (_validatePassword == null)
+            {
+                _validatePassword = new ValidatePassword(kkEng);
+            }
+
+            return _validatePassword.validatePassword(sessionId, password);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Returns an array of coupons for the coupon code passed in as a parameter.
+     * <p>
+     * The options object allows you to specify that only active coupons should be returned.
+     * 
+     * @param couponCode
+     *            The code of the coupon
+     * @param options
+     *            Allows you to specify that only active coupons should be returned
+     * @return Returns an array of coupons. An empty array is returned if no coupons are available.
+     * @throws KKException
+     */
+     public CouponIf[] getCouponsPerCode(String couponCode, CouponOptionsIf options) throws KKException
+     {
+         try
+         {
+            if (_getCouponsPerCode == null)
+            {
+                _getCouponsPerCode = new GetCouponsPerCode(kkEng);
+            }
+
+            return _getCouponsPerCode.getCouponsPerCode(couponCode, options);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Returns a coupon for the coupon id passed in as a parameter.
+     * <p>
+     * The options object allows you to specify that only active coupons should be returned.
+     * 
+     * @param couponId
+     *            The unique numeric id of the coupon
+     * @param options
+     *            Allows you to specify that only active coupons should be returned
+     * @return Returns a coupon object or null if a coupon isn't available.
+     * @throws KKException
+     */
+     public CouponIf getCouponPerId(int couponId, CouponOptionsIf options) throws KKException
+     {
+         try
+         {
+            if (_getCouponPerId == null)
+            {
+                _getCouponPerId = new GetCouponPerId(kkEng);
+            }
+
+            return _getCouponPerId.getCouponPerId(couponId, options);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * This method is used to return an array of promotions associated with the coupon(s) identified
+     * by the input parameters. The method will either use the couponCode or the couponId parameter.
+     * The couponCode is used if not null, otherwise couponId is used. Note that multiple coupons
+     * may share the same coupon code.
+     * <p>
+     * The PromotionOptions may be used to control whether or not to use expired coupons and whether
+     * or not to return expired promotions. The default is to not check whether coupons or
+     * promotions have expired.
+     * <p>
+     * If no promotions are found, an empty array is returned.
+     * 
+     * @param couponCode
+     *            The code of the coupon
+     * @param couponId
+     *            The unique numeric id of the coupon
+     * @param options
+     *            A PromotionOptions object to control whether or not to use expired coupons and
+     *            whether or not to return expired promotions
+     * @return Returns an array of promotions
+     * @throws KKException
+     */
+     public PromotionIf[] getPromotionsPerCoupon(String couponCode, int couponId, PromotionOptionsIf options) throws KKException
+     {
+         try
+         {
+            if (_getPromotionsPerCoupon == null)
+            {
+                _getPromotionsPerCoupon = new GetPromotionsPerCoupon(kkEng);
+            }
+
+            return _getPromotionsPerCoupon.getPromotionsPerCoupon(couponCode, couponId, options);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Get the latest (last to be inserted) enabled Content record with the specified contentId for
+     * the specified languageId. Content Dates are not checked.
+     * 
+     * @param contentId
+     * @param languageId
+     *            the languageId of the Content to return (Content Descriptions are
+     *            language-specific). If KKConstants.DEFAULT_LANGUAGE_ID is used the default
+     *            languageId is used).
+     * @return a ContentIf object or a null if no matching content could be found.
+     * @throws KKException
+     */
+     public ContentIf getContent(int contentId, int languageId) throws KKException
+     {
+         try
+         {
+            if (_getContent == null)
+            {
+                _getContent = new GetContent(kkEng);
+            }
+
+            return _getContent.getContent(contentId, languageId);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Retrieve Content records using the specified search criteria
+     * 
+     * @param sessionId
+     *            the sessionId of the customer. This may be used to look up the customer in order
+     *            to evaluate expressions to determine the required content. Set to null if the
+     *            customer isn't logged in.
+     * @param search
+     *            the content search criteria
+     * @param dd
+     *            the data descriptor object. In the DataDescriptor there is an attribute called
+     *            limit where you define the maximum number of records to return from the database.
+     *            Note that expressions are evaluated after the records are retrieved so fewer
+     *            records than the maximum requested may be returned if your content is linked to
+     *            expressions, you choose to evaluate them and some evaluate to false.
+     *            <p>
+     *            You can set the OrderBy attribute on the DataDescriptor to define the order that
+     *            the content records will be returned. Options are:
+     *            <ul>
+     *            <li>DataDescConstants.ORDER_BY_ID (the default)</li>
+     *            <li>DataDescConstants.ORDER_BY_ID_DESCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_ID_ASCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CONTENT_TYPE_ID_ASCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CONTENT_TYPE_ID_DESCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CUSTOM1_ASCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CUSTOM1_DESCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CUSTOM2_ASCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_CUSTOM2_DESCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_LAST_MODIFIED_ASCENDING</li>
+     *            <li>DataDescConstants.ORDER_BY_LAST_MODIFIED_DESCENDING</li>
+     *            </ul>
+     * @return search results in a ContentSearchResultIf object
+     * @throws KKException
+     */
+     public ContentSearchResultIf getContents(String sessionId, ContentSearchIf search, DataDescriptorIf dd) throws KKException
+     {
+         try
+         {
+            if (_getContents == null)
+            {
+                _getContents = new GetContents(kkEng);
+            }
+
+            return _getContents.getContents(sessionId, search, dd);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Return the ContentType for the specified language and contentTypeId
+     * 
+     * @param contentTypeId
+     *            the ContentTypeId
+     * @param languageId
+     *            the languageId of the ContentType to return (Content Type Descriptions are
+     *            language-specific). If KKConstants.DEFAULT_LANGUAGE_ID is used the default
+     *            languageId is used).
+     * @return a ContentTypeIf object
+     * @throws KKException
+     */
+     public ContentTypeIf getContentType(int contentTypeId, int languageId) throws KKException
+     {
+         try
+         {
+            if (_getContentType == null)
+            {
+                _getContentType = new GetContentType(kkEng);
+            }
+
+            return _getContentType.getContentType(contentTypeId, languageId);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
+         }
+     }
+
+    /**
+     * Return all the ContentTypes for the specified language
+     * 
+     * @param languageId
+     *            the languageId of the ContentTypes to return (Content Type Descriptions are
+     *            language-specific). If KKConstants.DEFAULT_LANGUAGE_ID is used the default
+     *            languageId is used).
+     * @return an array of ContenttypeIf objects; An empty array may be returned but never a null.
+     * @throws KKException
+     */
+     public ContentTypeIf[] getContentTypes(int languageId) throws KKException
+     {
+         try
+         {
+            if (_getContentTypes == null)
+            {
+                _getContentTypes = new GetContentTypes(kkEng);
+            }
+
+            return _getContentTypes.getContentTypes(languageId);
+         } catch (Throwable e)
+         {
+            throw manageThrowable(e);
          }
      }
 

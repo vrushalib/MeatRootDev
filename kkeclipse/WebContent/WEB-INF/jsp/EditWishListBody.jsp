@@ -42,12 +42,12 @@
 	    				<table>
 	    					<thead>
 	    						<tr>
-	    							<td class="narrow-col"><kk:msg  key="common.item"/></td>
-	    							<td class="item-col"></td>
-	    							<td class="priority-col"><kk:msg  key="edit.wishlist.body.priority"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
-	    							<td class="narrow-col center"></td>
-	    							<td class="narrow-col center"></td>
+	    							<td id= "image-col-wishlist" class="narrow-col"><kk:msg  key="common.item"/></td>
+	    							<td id= "item-col" class="item-col"></td>
+	    							<td class="priority-col-wishlist"><kk:msg  key="edit.wishlist.body.priority"/></td>
+	    							<td id= "price-col" lass="narrow-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
+	    							<td id= "add-to-cart-col" class="wide-col center"></td>
+	    							<td id="remove-col" class="narrow-col center"></td>
 	    						</tr>
 	    					</thead>
 	    					<tbody>
@@ -57,7 +57,7 @@
 					               <input type="hidden" name="itemList[<%=k%>].wishListItemId" value="<%=item.getWishListItemId()%>"/>
 					               <input type="hidden" name="itemList[<%=k%>].quantityDesired" value="<%=item.getQuantityDesired()%>"/>
 		    						<tr>
-		    							<td>
+		    							<td class="product-image-td">
 		    							    <img class="product-image" src="<%=item.getProdImage()%>" border="0" alt="<%=item.getProdName()%>" title=" <%=item.getProdName()%> ">
 		    							</td>
 		    							<td>		    								
@@ -88,11 +88,12 @@
 		    							</td>	    							
 		    							<td class="center">
 											<%if (kkEng.getQuotaMgr().canAddToBasket(item.getProdId(), null) > 0){ %>
-												<a href='<%="EditWishListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="button-small small-rounded-corners"><kk:msg  key="common.add.to.cart"/></a>
+												<a href='<%="EditWishListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="button-small small-rounded-corners add-to-cart-text"><kk:msg  key="common.add.to.cart"/></a>
+												<a href='<%="EditWishListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="fa fa-shopping-cart button-small small-rounded-corners add-to-cart-icon" ></a>	
 											<% } %>
 		    							</td>
 		    							<td class="center">
-		    								<a href='<%="EditWishListSubmit.action?action=r&wid="+id+"&id="+item.getWishListItemId()%>' class="has-tooltip" title='<%=kkEng.getMsg("common.remove.item")%>'><img src="<%=kkEng.getImageBase()%>/x-button.png" border="0"></a>
+		    								<a class="remove fa fa-times-circle" href='<%="EditWishListSubmit.action?action=r&wid="+id+"&id="+item.getWishListItemId()%>' title='<%=kkEng.getMsg("common.remove.item")%>'></a>
 		    							</td>
 		    					    </tr>
 		    					    <% k++; %>	

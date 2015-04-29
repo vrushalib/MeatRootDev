@@ -44,13 +44,14 @@
 	    				<table>
 	    					<thead>
 	    						<tr>
-	    							<td class="narrow-col"><kk:msg  key="common.item"/></td>
+	    							<td class="image-col"><kk:msg  key="common.item"/></td>
 	    							<td class="item-col"></td>
 	    							<td class="priority-col"><kk:msg  key="edit.wishlist.body.priority"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.q.desired"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.q.received"/></td>
-	    							<td class="narrow-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
-	    							<td class="narrow-col center"></td>
+	    							<td class="q-desired-col"><kk:msg  key="edit.wishlist.body.q.desired"/></td>
+	    							
+	    							<td class="price-col right"><kk:msg  key="edit.wishlist.body.price"/></td>
+	    							<td class="add-to-cart-col center"></td>
+
 	    						</tr>
 	    					</thead>
 	    					<tbody>
@@ -59,7 +60,7 @@
 									<%com.konakart.al.WishListUIItem item = iterator.next();%>
 					               <input type="hidden" name="itemList[<%=k%>].wishListItemId" value="<%=item.getWishListItemId()%>"/>
 		    						<tr>
-		    							<td>
+		    							<td class="product-image-td">
 		    							    <img class="product-image" src="<%=item.getProdImage()%>" border="0" alt="<%=item.getProdName()%>" title=" <%=item.getProdName()%> ">
 		    							</td>
 		    							<td>		    								
@@ -85,12 +86,11 @@
 												<kk:msg  key="common.highest"/>
 											<%  }%>
 		    							</td>
-		    							<td class="right">
-		    								<%=item.getQuantityDesired() %>	
+		    							<td>
+											<span class="qty-desired"><span class="qty-desired-label"><kk:msg  key="show.giftregistry.items.body.desired"/>:</span> <%=item.getQuantityDesired() %></span>
+		    					    		<span class="qty-received"><span class="qty-received-label"><kk:msg  key="show.giftregistry.items.body.received"/>:</span> <%=item.getQuantityReceived() %></span>
 		    							</td>
-		    							<td class="right">
-											<%=item.getQuantityReceived() %>		    							
-										</td>
+
 		    							<td class="right">
 											<%if (kkEng.displayPriceWithTax()){%>
 												<%=kkEng.formatPrice(item.getTotalPriceIncTax() )%>
@@ -98,9 +98,10 @@
 												<%=kkEng.formatPrice(item.getTotalPriceExTax())%>
 											<%}%>		    																		
 		    							</td>	    							
-		    							<td class="center">
+		    							<td class="right">
 											<% if (item.getQuantityReceived() < item.getQuantityDesired() && kkEng.getQuotaMgr().canAddToBasket(item.getProdId(), null) > 0){%>
-												<a href='<%="GiftRegistryListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="button-small small-rounded-corners"><kk:msg  key="common.add.to.cart"/></a>								
+												<a href='<%="GiftRegistryListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="button-small small-rounded-corners add-to-cart-text"><kk:msg  key="common.add.to.cart"/></a>		
+												<a href='<%="GiftRegistryListSubmit.action?action=a&wid="+id+"&id="+item.getWishListItemId()%>' class="fa fa-shopping-cart button-small small-rounded-corners add-to-cart-icon" ></a>								
 											<%}%>
 		    							</td>
 		    					    </tr>

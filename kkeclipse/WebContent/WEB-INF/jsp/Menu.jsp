@@ -20,38 +20,15 @@
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
-<script type="text/javascript">
-    // Space out menu evenly
-	$(function() {
-		var total=0;
-		var itemArray = new Array();
-		$("#main-menu a").each(function(index){
-			var margin = $(this).css("margin-right");
-			var marginInt = parseInt(margin.substring(0, margin.length-2)); // remove px
-			total += ($(this).width()+marginInt);
-			itemArray[index]=$(this).width();
-		});		
-		//var width =  $("#page").css("width");
-		
-		//var widthInt = parseInt(width.substring(0, width.length-2)); // remove px	
-		
-		//var extra = widthInt-total;
-		//extra = Math.floor((extra / itemArray.length));
-		//$("#main-menu a").each(function(index){$(this).width(itemArray[index]+extra);});		
-	});				
-</script>
-
 <div id="main-menu">
-	<%for (int i = 0; i <3; i++) {%>
-	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
-	<%String menuClass; %>
-	<%if (i == catMgr.getCats().length-1){ %>
-	<% menuClass = "menu-item rounded-corners last-child"; %>
-	<% } else { %>
-	<% menuClass = "menu-item rounded-corners"; %>
-	<% } %>
-	<a href='<%="SelectCat.action?catId="+cat.getId()%>'
-		class="<%=menuClass%>"
-		style="border-right: 1px solid #b5b38a;width:312px;"><%=cat.getName()%></a>
-	<% } %>
+	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
+		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
+		<%String menuClass; %>
+		<%if (i == catMgr.getCats().length-1){ %>
+			<% menuClass = "menu-item rounded-corners last-child"; %>
+		<% } else { %>
+			<% menuClass = "menu-item rounded-corners"; %>
+		<% } %>
+		<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a>
+	<% } %>					
 </div>

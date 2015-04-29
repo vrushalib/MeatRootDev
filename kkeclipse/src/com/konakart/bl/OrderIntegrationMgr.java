@@ -20,8 +20,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +44,7 @@ import com.konakart.app.Subscription;
 import com.konakart.appif.BookingIf;
 import com.konakart.appif.CouponIf;
 import com.konakart.appif.CustomerIf;
+import com.konakart.appif.EngineConfigIf;
 import com.konakart.appif.ExportOrderOptionsIf;
 import com.konakart.appif.ExportOrderResponseIf;
 import com.konakart.appif.KKEngIf;
@@ -50,13 +52,17 @@ import com.konakart.appif.LanguageIf;
 import com.konakart.appif.MqOptionsIf;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.OrderProductIf;
+import com.konakart.appif.OrderStatusHistoryIf;
+import com.konakart.appif.OrderTotalIf;
 import com.konakart.appif.OrderUpdateIf;
 import com.konakart.appif.PaymentScheduleIf;
 import com.konakart.appif.ProductIf;
 import com.konakart.appif.SubscriptionIf;
+import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
 import com.konakart.blif.AdminEngineMgrIf;
 import com.konakart.blif.BillingMgrIf;
 import com.konakart.blif.OrderMgrIf;
+import com.konakart.blif.OrderTotalMgrIf;
 import com.konakart.blif.ProductMgrIf;
 import com.konakart.blif.PromotionMgrIf;
 import com.konakart.db.KKBasePeer;
@@ -75,6 +81,12 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 {
     /** the log */
     protected static Log log = LogFactory.getLog(OrderIntegrationMgr.class);
+
+    /** Mutex for synchronising population of the tax module Hash */
+    private static String mutex = "taxModuleMapMutex";
+
+    /** HashMap to lookup Module names by their code */
+    private static HashMap<String, TaxModuleData> taxModuleMap;
 
     /**
      * Constructor
@@ -149,8 +161,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             // Uncomment to export the order for shipping
             // createOrderExportForShipping(order);
 
-            // Uncomment if using TaxCloud
-            // manageTaxCloud(order);
+            // Uncomment if using a Tax Module (such as TaxCloud, Avalara etc)
+            // manageTax(order);
 
             // Uncomment if using Bookable Products
             // manageBookings(order);
@@ -196,8 +208,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 // Post the order to the order message queue for processing by some other system
                 // postOrderToQueue(order);
 
-                // Uncomment if using TaxCloud
-                // manageTaxCloud(order);
+                // Uncomment if using a Tax Module (such as TaxCloud, Avalara etc)
+                // manageTax(order);
 
                 // Uncomment if using Bookable Products
                 // manageBookings(order);
@@ -365,7 +377,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                         KKCriteria selectC = getNewCriteria();
                         selectC.add(BaseProductsPeer.PRODUCTS_ID, op.getProductId());
                         selectC.addSelectColumn(BaseProductsPeer.PRODUCTS_ORDERED);
-                        List<Record> rows = (List<Record>) KKBasePeer.select(selectC);
+                        List<Record> rows = KKBasePeer.select(selectC);
                         if (rows.isEmpty())
                         {
                             return;
@@ -596,7 +608,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
         try
         {
-            Boolean enableGiftRegistry = getConfigMgr().getConfigurationValueAsBool(false, 
+            Boolean enableGiftRegistry = getConfigMgr().getConfigurationValueAsBool(false,
                     ConfigConstants.ENABLE_GIFT_REGISTRY, false);
 
             if (enableGiftRegistry)
@@ -788,7 +800,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
         try
         {
-            KKConfiguration conf = getConfigMgr().getConfiguration(false, 
+            KKConfiguration conf = getConfigMgr().getConfiguration(false,
                     ConfigConstants.ENABLE_REWARD_POINTS);
 
             if (conf != null && conf.getValue() != null && conf.getValue().equalsIgnoreCase("true"))
@@ -1116,48 +1128,76 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
     @SuppressWarnings("unused")
     private void manageTaxCloud(OrderIf order)
     {
+        // Use manageTax instead.
+        
         if (log.isDebugEnabled())
         {
             log.debug("Entered manageTaxCloud()");
         }
-        try
+
+    }
+
+    /**
+     * The order details are sent to the defined set of tax services.
+     * 
+     * @param order
+     */
+    @SuppressWarnings("unused")
+    private void manageTax(OrderIf order)
+    {
+        if (log.isDebugEnabled())
         {
-            KKConfiguration conf = getConfigMgr().getConfiguration(false, 
-                    "MODULE_ORDER_TOTAL_TAX_CLOUD_STATUS");
+            log.debug("Entered manageTax()");
+        }
 
-            if (conf != null && conf.getValue() != null && conf.getValue().equalsIgnoreCase("true"))
+        if (order.getOrderTotals() == null)
+        {
+            // No OrderTotals... that's unexpected
+            log.warn("Order " + order.getId() + " has no order totals");
+            return;
+        }
+        // Cycle through the Order totals looking for module codes in our tax module map
+
+        for (OrderTotalIf ot : order.getOrderTotals())
+        {
+            TaxModuleData tmd = taxModuleMap.get(ot.getClassName());
+
+            if (tmd != null)
             {
-                // Call TaxCloud to authorize and capture the transaction
-                net.taxcloud.service.AuthorizedService authorizedService = new net.taxcloud.service.AuthorizedService();
-                String apiLoginId = getConfigMgr().getConfigurationValue(false, 
-                        "MODULE_ORDER_TOTAL_TAX_CLOUD_API_LOGIN_ID");
-                String apiKey = getConfigMgr().getConfigurationValue(false, 
-                        "MODULE_ORDER_TOTAL_TAX_CLOUD_API_LOGIN_KEY");
-                String customerId = String.valueOf(order.getCustomerId());
-                String cartId = order.getLifecycleId(); // Unique ID for cart generated when order
-                // was created
-                String orderId = String.valueOf(order.getId()); // Unique ID for order
-                Calendar dateAuthorized = Calendar.getInstance();
-                boolean authorized = authorizedService.authorized(apiLoginId, apiKey, customerId,
-                        cartId, orderId, dateAuthorized);
-                if (log.isDebugEnabled())
-                {
-                    log.debug("Authorized returned: " + authorized + " for\n customerId = "
-                            + customerId + "\n cartId = " + cartId + "\n orderId = " + orderId);
-                }
+                String moduleName = tmd.getModuleName();
+                String commitConfKey = tmd.getCommitConfigKey();
 
-                if (authorized)
+                try
                 {
-                    net.taxcloud.service.CapturedService capturedService = new net.taxcloud.service.CapturedService();
-                    boolean captured = capturedService.captured(apiLoginId, apiKey, orderId);
-                    log.debug("Captured returned: " + captured + " for orderId = " + orderId);
+                    boolean checkReturnByApi = false;
+                    boolean doCommit = getConfigMgr().getConfigurationValueAsBool(checkReturnByApi,
+                            commitConfKey, false /* default is false */);
+
+                    if (doCommit)
+                    {
+                        // Call Tax Service Module to commit the order
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Create the " + moduleName + " tax module");
+                        }
+                        OrderTotalMgrIf otm = getOrderTotalMgr();
+                        OrderTotalInterface module = otm.getOrderTotalModuleForName(moduleName);
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Commit order (id " + order.getId() + ") to " + moduleName);
+                        }
+                        module.commitOrder(order);
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Committed order (id " + order.getId() + ") to " + moduleName);
+                        }
+                    }
+                } catch (Exception e)
+                {
+                    log.warn("Problem committing order (id " + order.getId() + ") to " + moduleName);
+                    e.printStackTrace();
                 }
             }
-
-        } catch (Exception e)
-        {
-            log.warn("Problem authorizing / captuing TaxCloud transaction");
-            e.printStackTrace();
         }
     }
 
@@ -1218,4 +1258,153 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
     }
 
+    /**
+     * Utility method that gets the vendor orders for the parent order and adds the latest state
+     * change of the parent order to the vendor orders.
+     * 
+     * @param order
+     */
+    @SuppressWarnings("unused")
+    private void addParentStatusChangeToVendorOrders(OrderIf order)
+    {
+        if (log.isDebugEnabled())
+        {
+            log.debug("Entered manageChildren()");
+        }
+        
+        EngineConfigIf conf = getEng().getEngConf();
+        if (conf == null)
+        {
+            return;
+        }
+        
+        String mainStoreId = conf.getStoreId();
+
+        // Get latest status history object from the parent order
+        if (order.getStatusTrail() == null || order.getStatusTrail().length == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            // Find children
+            KKCriteria selectC = getNewCriteria(/* AllStores */true);
+            selectC.add(BaseOrdersPeer.PARENT_ID, order.getId());
+            selectC.addSelectColumn(BaseOrdersPeer.ORDERS_ID);
+            selectC.addSelectColumn(BaseOrdersPeer.STORE_ID);
+            List<Record> rows = KKBasePeer.select(selectC);
+            if (rows.isEmpty())
+            {
+                return;
+            }
+
+            OrderStatusHistoryIf latestStatus = order.getStatusTrail()[order.getStatusTrail().length - 1];
+
+            // Change the state for each child
+            for (Iterator<Record> iterator = rows.iterator(); iterator.hasNext();)
+            {
+                Record rec = iterator.next();
+                int childId = rec.getValue(1).asInt();
+                String storeId = rec.getValue(2).asString();
+                conf.setStoreId(storeId);
+                KKEng eng = new KKEng(conf);
+                OrderUpdateIf orderUpdate = new OrderUpdate();
+                orderUpdate.setUpdatedById(latestStatus.getUpdatedById());
+
+                eng.getMgrFactory()
+                        .getOrderMgr(/* createNew */true)
+                        .updateOrder(childId, latestStatus.getOrderStatusId(),
+                                latestStatus.isCustomerNotified(), latestStatus.getComments(),
+                                orderUpdate);
+            }
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            conf.setStoreId(mainStoreId);
+        }
+    }
+
+    /**
+     * @return the taxModuleMap
+     */
+    public HashMap<String, TaxModuleData> getTaxModuleMap()
+    {
+        if (taxModuleMap == null)
+        {
+            synchronized (mutex)
+            {
+                if (taxModuleMap == null)
+                {
+                    taxModuleMap = new HashMap<String, TaxModuleData>();
+
+                    // Populate the Map with all the tax modules that have a commitOrder
+                    // implementation. Not all Tax modules will have one and even if they do, you
+                    // may not wish to call them. If you don't want to call them, do not add them to
+                    // this HashMap.
+
+                    // Include a configuration variable to check and only call the module if this
+                    // configuration variable has a true value.
+
+                    TaxModuleData tmd = new TaxModuleData();
+                    tmd.setModuleName("Avalara");
+                    tmd.setCommitConfigKey("MODULE_ORDER_TOTAL_AVALARA_COMMIT_STATUS");
+                    taxModuleMap.put("ot_tax_avalara", tmd);
+
+                    tmd = new TaxModuleData();
+                    tmd.setModuleName("TaxCloud");
+                    tmd.setCommitConfigKey("MODULE_ORDER_TOTAL_TAX_CLOUD_STATUS");
+                    taxModuleMap.put("ot_tax_cloud", tmd);
+                }
+            }
+        }
+        return taxModuleMap;
+    }
+
+    /**
+     * Used to store the static data of this module
+     */
+    protected class TaxModuleData
+    {
+        private String moduleName;
+
+        private String commitConfigKey;
+
+        /**
+         * @return the moduleName
+         */
+        public String getModuleName()
+        {
+            return moduleName;
+        }
+
+        /**
+         * @param moduleName
+         *            the moduleName to set
+         */
+        public void setModuleName(String moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
+        /**
+         * @return the commitConfigKey
+         */
+        public String getCommitConfigKey()
+        {
+            return commitConfigKey;
+        }
+
+        /**
+         * @param commitConfigKey
+         *            the commitConfigKey to set
+         */
+        public void setCommitConfigKey(String commitConfigKey)
+        {
+            this.commitConfigKey = commitConfigKey;
+        }
+    }
 }

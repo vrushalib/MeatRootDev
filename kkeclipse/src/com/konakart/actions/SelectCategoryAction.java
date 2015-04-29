@@ -379,7 +379,6 @@ public class SelectCategoryAction extends BaseAction
         }
         // Get cat hierarchy from list to build the bread crumbs
         String url = "SelectCat.action?catId=";
-        
         for (int i = catList.size() - 1; i > -1; i--)
         {
             CategoryIf lcat1 = catList.get(i);
@@ -406,12 +405,12 @@ public class SelectCategoryAction extends BaseAction
         {
             kkAppEng.getProductMgr().fetchNewProductsArray(cat.getId(), /* fillDescription */false, /* forceRefresh */
             false);
+
             return "ShowCategories";
         }
 
         // If there are products then show products
         return "ShowProducts";
-
     }
 
     /**
