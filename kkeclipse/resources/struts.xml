@@ -12,7 +12,7 @@
  	<constant name="struts.xwork.chaining.copyMessages" value="true"/>  
 
     <package name="default" namespace="/" extends="struts-default">
-<!-- Portlet <package namespace="/" extends="struts-portlet-tiles-default" name="view"> -->
+<!-- Portlet <package namespace="/" extends="struts-portlet-tiles-default" name="view"> -->		
 		<result-types>
 			<result-type name="tiles"
 				class="org.apache.struts2.views.tiles.TilesResult" />
@@ -87,6 +87,10 @@
   			</param>
   			</result>
 		</action>
+		<action name="SuggestedArea" class="com.konakart.actions.SuggestedArea">
+			<result type="json">
+  			</result>
+		</action>
 		<action name="OnePageRefresh" class="com.konakart.actions.CheckoutOnePageRefreshAction">
 			<result type="json">
   			</result>
@@ -123,6 +127,20 @@
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.aboutus.page</result>
 		</action>
+		
+		<action name="Help" class="com.konakart.actions.HelpAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.help.page</result>
+		</action>
+		
+		<action name="TermsAndConditions" class="com.konakart.actions.TermsAndConditionsAction">
+			<result name="success" type="tiles">catalog.termsandconditions.page</result>
+		</action>
+		
+		<action name="PlacingOrder" class="com.konakart.actions.PlacingOrderAction">
+			<result name="success" type="tiles">catalog.placingorder.page</result>
+		</action>
+		
 		<action name="AddressBook" class="com.konakart.actions.AddressBookAction">
 			<result name="success" type="tiles">catalog.addressbook.page</result>
 		</action>
@@ -133,6 +151,11 @@
 		<action name="AdvancedSearch" class="com.konakart.actions.AdvancedSearchAction">
 			<result name="success" type="tiles">catalog.advancedsearch.page</result>
 		</action>	
+		
+		<action name="ContentChanges" class="com.konakart.actions.ContentChangesAction">
+			<result name="success" type="tiles">catalog.contentchanges.page</result>
+		</action>
+		
 		<action name="CatalogAfterLogin" class="com.konakart.actions.CatalogAfterLoginAction">
 			<result name="success" type="tiles">catalog.afterlogin.page</result>
 		</action>
@@ -168,6 +191,8 @@
 			<result name="Checkout" type="chain">Checkout</result>
 			<result name="CheckoutExternalPayment" type="tiles">catalog.external.payment.page</result>
 			<result name="CheckoutExternalPaymentFrame" type="tiles">catalog.external.payment.frame.page</result>
+			<result name="TransactionCancelled" type="tiles">catalog.transaction.cancel.page</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
 			<result name="CheckoutServerPayment" type="chain">CheckoutServerPayment</result>
 			<result name="WorldPayXMLRedirect" type="chain">WorldPayXMLRedirect</result>
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
@@ -177,6 +202,13 @@
 			<result name="Paymetric"  type="chain">Paymetric</result>
 			Paymetric end -->
 		</action>	
+		<action name="PayuResponse" class="com.konakart.actions.ipn.PayuAction">
+		 	<result name="redirect" type="chain">${action}</result>
+			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
+			<result name="Checkout" type="chain">Checkout</result>
+			<result name="LoginSubmitError"  type="tiles">catalog.login.page</result>
+		</action>
 		<action name="CheckoutNewDeliveryAddr" class="com.konakart.actions.CheckoutAction" method="newDeliveryAddr">
 			<result name="success" type="tiles">catalog.onepagecheckout.page</result>
 			<result name="ShowCartItems" type="chain">ShowCartItems</result>
@@ -202,6 +234,7 @@
 			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="usaepay" type="chain">USAePay</result>
 			<result name="BarclaycardSmartPayApi" type="chain">BarclaycardSmartPayApi</result>
+			<result name="CyberSource" type="chain">CyberSource</result>
 			<result name="authorizenet" type="chain">AuthorizeNet</result>
 			<result name="Netpayintl" type="chain">Netpayintl</result>
 			<result name="PayflowPro" type="chain">PayflowPro</result>
@@ -229,8 +262,9 @@
 			<result name="success" type="tiles">catalog.registercustomer.page</result>
 		</action>
 		<action name="CustomerRegistrationSubmit" class="com.konakart.actions.CustomerRegistrationSubmitAction">
-			<interceptor-ref name="forcePostStack"></interceptor-ref>
-			<result name="success" type="chain">CatalogAfterLogin</result>		
+			<interceptor-ref name="forcePostStack"></interceptor-ref>			
+			<result name="success" type="chain">CatalogAfterLogin</result>
+			<result name="ShowCartItems" type="chain">ShowCartItems</result>	
 			<result name="Checkout" type="chain">Checkout</result>		
 			<result name="ApplicationError" type="chain">CustomerRegistration</result>	
 			<result name="ChangedCountryForce" type="chain">
@@ -286,6 +320,10 @@
 			  <param name="bufferSize">1024</param>
 			</result>
 		</action>
+		<action name="DeliveryArea" class="com.konakart.actions.DeliveryAreaAction">
+			<result name="success" type="tiles">catalog.deliveryarea.page</result>
+		</action>		
+		
 		<action name="EditAddr" class="com.konakart.actions.EditAddrAction">
 			<result name="success"  type="tiles">catalog.editaddr.page</result>
 		</action>
@@ -378,16 +416,19 @@
 		<action name="GiftRegistrySearch" class="com.konakart.actions.GiftRegistrySearchAction">
 			<result name="success" type="tiles">catalog.gift.registry.search.page</result>
 		</action>
-		<action name="Help" class="com.konakart.actions.HelpAction">
-			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
-			<result name="success" type="tiles">catalog.help.page</result>
+		<action name="FAQ" class="com.konakart.actions.FAQAction">
+			<result name="success" type="tiles">catalog.faq.page</result>
 		</action>
+		
 		<action name="InitFromToken" class="com.konakart.actions.InitFromTokenSubmitAction">
 			<result name="success" type="chain">Checkout</result>
 		</action>
 		<action name="InternationalOrders" class="com.konakart.actions.InternationalOrdersAction">
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.internationalorders.page</result>
+		</action>
+		<action name="OrderTracking" class="com.konakart.actions.OrderTrackingAction">
+			<result name="success" type="tiles">catalog.ordertracking.page</result>
 		</action>
 		<action name="LogIn" class="com.konakart.actions.LoginAction">
 			<result name="success"  type="tiles">catalog.login.page</result>
@@ -450,7 +491,16 @@
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
-		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyNoticeAction">
+		<action name="CancellationPolicy" class="com.konakart.actions.CancellationPolicyAction">
+			<result name="success" type="tiles">catalog.cancellationpolicy.page</result>
+		</action>
+		<action name="DeliveryPolicy" class="com.konakart.actions.DeliveryPolicyAction">
+			<result name="success" type="tiles">catalog.deliverypolicy.page</result>
+		</action>
+		<action name="RefundPolicy" class="com.konakart.actions.RefundPolicyAction">
+			<result name="success" type="tiles">catalog.refundpolicy.page</result>
+		</action>
+		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyPolicyAction">
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.privacypolicy.page</result>
 		</action>
@@ -484,6 +534,9 @@
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.returns.page</result>
 		</action>
+		<action name="DeliveryDetails" class="com.konakart.actions.DeliveryDetailsAction">
+			<result name="success" type="tiles">catalog.deliverydetails.page</result>
+		</action>
 		<action name="RevPageSize" class="com.konakart.actions.RevPageSizeAction">
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
@@ -508,6 +561,9 @@
 		<action name="ShippingAndHandling" class="com.konakart.actions.ShippingAndHandlingAction">
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.shippingandhandling.page</result>
+		</action>
+		<action name="Payment" class="com.konakart.actions.PaymentAction">
+			<result name="success" type="tiles">catalog.payment.page</result>
 		</action>
 		<action name="ShowAllNewProds" class="com.konakart.actions.ShowAllNewProdsAction">
 			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
@@ -684,6 +740,9 @@
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
 		</action>
+		<action name="CyberSource" class="com.konakart.actions.gateways.CyberSourceAction">
+			<result name="PostToGateway" type="tiles">catalog.external.payment.page</result>
+		</action>
 		<action name="Netpayintl" class="com.konakart.actions.gateways.NetpayintlAction">
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
@@ -711,13 +770,13 @@
 		<action name="BluePay" class="com.konakart.actions.gateways.BluepayAction">
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
-		</action>		
-
-		<!-- =========================================== Gateways on a frame -->		
+		</action>
+		
+		<!-- =========================================== Gateways on a frame -->
+		
 		<action name="CatalogCheckoutExternalPaymentFromFramePage">
 			<result name="success" type="tiles">catalog.external.payment.from.frame.page</result>
 		</action>
-				
 	</package>
 
 </struts>

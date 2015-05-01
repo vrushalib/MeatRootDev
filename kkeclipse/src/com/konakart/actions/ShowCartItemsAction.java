@@ -58,10 +58,10 @@ public class ShowCartItemsAction extends BaseAction
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
 
-            custId = this.loggedIn(request, response, kkAppEng, null);
+            custId = this.loggedIn(request, response, kkAppEng, "ShowCartItems");
 
             // Force the user to login if configured to do so
-            if (custId < 0 && kkAppEng.isForceLogin())
+            if (custId < 0 )//&& kkAppEng.isForceLogin()
             {
                 return KKLOGIN;
             }
@@ -117,7 +117,6 @@ public class ShowCartItemsAction extends BaseAction
                 BasketIf[] items = kkAppEng.getEng().updateBasketWithStockInfoWithOptions(
                         kkAppEng.getCustomerMgr().getCurrentCustomer().getBasketItems(),
                         kkAppEng.getBasketMgr().getAddToBasketOptions());
-                
                 kkAppEng.getCustomerMgr().getCurrentCustomer().setBasketItems(items);
 
                 /*

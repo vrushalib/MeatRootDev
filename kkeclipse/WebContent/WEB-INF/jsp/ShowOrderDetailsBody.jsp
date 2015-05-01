@@ -34,25 +34,27 @@
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 									<%if (!isMultivendor){ %>
-										<div id="shipping-info-view" class="order-confirmation-area-content-select">
+									<%-- 	<div id="shipping-info-view" class="order-confirmation-area-content-select">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<p><%=order.getShippingMethod()%></p>
-										</div>
+										</div> --%>
 									<%}%>
 								</div>		    				
 			    			</div>
+			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">
 			    				<div class="heading-container">
 			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3>
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<div id="payment-method-view" class="order-confirmation-area-content-select">
+								<%-- 	<div id="payment-method-view" class="order-confirmation-area-content-select">
 										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
 										<p><%=order.getPaymentMethod()%></p>
-									</div>
+									</div>--%>
 								</div>		    				
 			    			</div>
+			    			<br>
 			    			<%if (order.getOrderShipments() != null && order.getOrderShipments().length > 0){ %>
 				    			<div id="shipments" class="order-confirmation-area">
 				    				<div class="heading-container">
@@ -240,7 +242,7 @@
 													<%String rowClass = "costs-and-promotions";%>
 													<%if (ot.getClassName().equals("ot_total")){ %>
 														<%rowClass = "shopping-cart-total";%>
-													<% } %>										
+													<% } %>	
 													<tr class="<%=rowClass%>">															
 														<%if (ot.getClassName().equals("ot_reward_points")){%>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	

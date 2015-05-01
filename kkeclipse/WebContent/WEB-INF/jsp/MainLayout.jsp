@@ -16,8 +16,10 @@
 // Lesser General Public License for more details.
 //
 --%>
+
 <%@include file="Taglibs.jsp" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -47,8 +49,9 @@
     <% } else { %>
 		<html>
 			<head>
-				<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
-				<title><%=kkEng.getPageTitle()%></title>
+			    <meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
+				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
+				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
 				<meta name="description" content="<%=kkEng.getMetaDescription()%>" />
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -97,6 +100,27 @@
 				%>
 				<base href="<%=base%>"/>										
 				<!--- KonaKart v7.4.0.1.12158 -->
+				
+				<script type="text/javascript">
+				$(window).bind("load", function(){
+					$("#page-container").css("overflow","hidden");
+				});
+				
+				 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+					  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+					  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+					  ga('create', 'UA-55023986-1', 'auto');
+					  ga('send', 'pageview');
+					  
+					  (function() {
+					      var a = document.createElement('script');a.type = 'text/javascript'; a.async = true;
+					      a.src=('https:'==document.location.protocol?'https://':'http://cdn.')+'chuknu.sokrati.com/15047/tracker.js';
+					      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
+					           })();
+
+				</script>
 			</head>
 			<%if (defName != null) {%>
 				<body id="<%=defName%>">

@@ -14,7 +14,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
-
 package com.konakart.actions;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +33,11 @@ public class HelpAction extends BaseAction
     private static final long serialVersionUID = 1L;
 
     private String helpContent;
-
     public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
-
+        
         try
         {
             int custId;
@@ -47,7 +45,7 @@ public class HelpAction extends BaseAction
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
 
             custId = this.loggedIn(request, response, kkAppEng, null);
-
+            
             // Force the user to login if configured to do so
             if (custId < 0 && kkAppEng.isForceLogin())
             {
@@ -86,15 +84,13 @@ public class HelpAction extends BaseAction
             return super.handleException(request, e);
         }
     }
-
     /**
      * @return the helpContent
      */
     public String getHelpContent()
     {
         return helpContent;
-    }
-
+}
     /**
      * @param helpContent
      *            the helpContent to set

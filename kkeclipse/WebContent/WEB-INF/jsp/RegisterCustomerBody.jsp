@@ -21,6 +21,7 @@
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.ZoneIf[] zoneArray = customerMgr.getSelectedZones();%>
+<% String[] cities = com.konakart.app.CustomAddressFields.getCities(); %>
 
 <%@include file="AddrValPopup.jsp" %>
 
@@ -167,33 +168,55 @@
 										<input type="hidden" name="suburb" value=""/>
 									<% } %>
 									<div class="form-input">
-										<label><kk:msg  key="register.customer.body.postcode"/></label>
-										<input type="text" value="<s:property value="postcode" />" id="postcode" name="postcode" />
+										<label><kk:msg  key="register.customer.body.city"/></label>
+									<%--	<input type="text" value="<s:property value="city" />" id="city" name="city" /> --%>
+									    <select id="city" name="city" >
+									    <% if( cities != null && cities.length != 0) { %>
+										    <% for(int i = 0; i < cities.length; i++){ %>
+										    	   <option  value="<%=cities[i]%>" selected="selected" ><%=cities[i]%></option>
+										    <% } %>
+										<% } %>
+									    </select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
 									</div>
 									<div class="form-input">
-										<label><kk:msg  key="register.customer.body.city"/></label>
-										<input type="text" value="<s:property value="city" />" id="city" name="city" />
+										<label><kk:msg  key="register.customer.body.postcode"/></label>
+										<select id="postcode" name="postcode" >
+										 	<s:if test="%{postcode != null && postcode != ''}">
+												<option value="<s:property value="postcode"/>" selected><s:property value="postcode" /></option>
+											</s:if>
+											<s:else>
+												<option style="display:none" value="">Select PIN Code</option> 
+											</s:else>
+											<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
+										    <% if( codes != null && codes.length != 0) { %>
+										    	<% java.util.Arrays.sort(codes); %>
+											    <% for(int i = 0; i < codes.length; i++){ %>
+											    	   <option  value="<%=codes[i]%>"  ><%=codes[i]%></option>
+											    <% } %>
+											<% } %>
+									    </select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
 									</div>
 									<%if (kkEng.getConfigAsBoolean("ACCOUNT_STATE",false)) { %>
 										<%if (zoneArray != null && zoneArray.length > 0){ %>	
-											<div class="form-input">
+											<div class="form-input" >
 												<label><kk:msg  key="register.customer.body.state"/></label>
-												<select id="state" name="state" class="state">
-													<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
+												<select id="state" name="state" class="state" >
+													<%--<option value="-1"><kk:msg  key="register.customer.body.select"/></option> --%>
 													<s:set scope="request" var="state"  value="state"/> 						
 													<% String state = ((String)request.getAttribute("state"));%> 
-													<% for (int i = 0; i < zoneArray.length; i++){ %>
+													<option  value="Maharashtra" selected="selected" >Maharashtra</option>
+												<%--	<% for (int i = 0; i < zoneArray.length; i++){ %>
 														<% com.konakart.appif.ZoneIf zone = zoneArray[i];%>
 														<%if (state != null && state.equals(zone.getZoneName())){ %>
 															<option  value="<%=zone.getZoneName()%>" selected="selected"><%=zone.getZoneName()%></option>
 														<% } else { %>
 															<option  value="<%=zone.getZoneName()%>"><%=zone.getZoneName()%></option>
-														<% } %>
-													<% } %>
+														<% } %> 
+													<% } %> --%>
 												</select>
 												<span class="required-icon required-blue"></span>
 												<span class="validation-msg"></span>
@@ -209,10 +232,11 @@
 									<% } else { %>
 										<input type="hidden" name="state" value="-----"/>
 									<% } %>
-									<div class="form-input">
+								  	<div class="form-input" style="display: none;">
 										<label><kk:msg  key="register.customer.body.country"/></label>
 											<select id="countryId" name="countryId" class="country" onchange="javascript:changeCountry();">
-												<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
+											<option value="99">India</option>
+											<%-- 	<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
 													<%com.konakart.appif.CountryIf selectedCountry = kkEng.getCustomerMgr().getSelectedCountry(); %>
 													<% com.konakart.appif.CountryIf[] countries = kkEng.getAllCountries();%>
 													<%if (countries != null){%>
@@ -224,14 +248,14 @@
 																<option value="<%=Integer.toString(country.getId())%>"><%=country.getName()%></option>
 															<% } %>														                 
 														<% } %>           
-													<% } %>																
+													<% } %>		--%>													
 											</select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
-									</div>
+									</div> 	
 								</div>
 							</div>
-							<div class="form-section">
+							<div class="form-section" >
 								<h3><kk:msg  key="register.customer.body.contact.info"/></h3>
 								<div class="form-section-fields">
 									<div class="form-section-divider"></div>
@@ -246,11 +270,11 @@
 										<input type="text" value="<s:property value="telephoneNumber1" />" id="telephoneNumber1" name="telephoneNumber1" />
 										<span class="validation-msg"></span>
 									</div>
-									<div class="form-input">
+								<%-- 	<div class="form-input">
 										<label><kk:msg  key="register.customer.body.fax.number"/></label>
 										<input type="text" value="<s:property value="faxNumber" />" id="faxNumber" name="faxNumber" />
 										<span class="validation-msg"></span>
-									</div>
+									</div> --%>
 								</div>
 							</div>
 							<div class="form-section">
@@ -259,7 +283,7 @@
 									<div class="form-section-divider"></div>
 									<div class="form-input">
 										<label><kk:msg  key="register.customer.body.newsletter"/></label>
-										<s:checkbox name="newsletterBool" theme="simple"/>
+										<s:checkbox name="newsletterBool" theme="simple" checked="true"/>
 									</div>
 								</div>
 							</div>

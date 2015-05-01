@@ -121,7 +121,7 @@ public class CheckoutAction extends BaseAction
             // Check to see whether the user is logged in unless it's punchout
             if (!punchout)
             {
-                custId = this.loggedIn(request, response, kkAppEng, "Checkout");
+                custId = this.loggedIn(request, response, kkAppEng, "ShowCartItems");
                 if (custId < 0)
                 {
                     // Uncomment to force checkout without registration

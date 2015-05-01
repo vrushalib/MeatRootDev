@@ -393,32 +393,32 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
         int custId;
         if (kkAppEng.getSessionCheckData().needToCheck())
         {
-            // If an exception is thrown, set the forward and return it
+        // If an exception is thrown, set the forward and return it
             if (log.isDebugEnabled())
             {
                 log.debug("Calling checkSession on KKEng");
             }
-            try
-            {
-                custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
+        try
+        {
+            custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
                 SessionCheckData scd = kkAppEng.getSessionCheckData();
                 scd.setCustId(custId);
                 scd.setCheckTime(System.currentTimeMillis());
-            } catch (KKException e)
+        } catch (KKException e)
+        {
+            log.debug(e.getMessage());
+            if (forwardAfterLogin != null)
             {
-                log.debug(e.getMessage());
-                if (forwardAfterLogin != null)
-                {
-                    kkAppEng.setForwardAfterLogin(forwardAfterLogin);
-                }
-
-                kkAppEng.getCustomerMgr().logout();
-
-                // Ensure that the guest customer is the one in the cookie
-                manageCookieLogout(request, response, kkAppEng);
-
-                return -1;
+                kkAppEng.setForwardAfterLogin(forwardAfterLogin);
             }
+
+            kkAppEng.getCustomerMgr().logout();
+
+            // Ensure that the guest customer is the one in the cookie
+            manageCookieLogout(request, response, kkAppEng);
+
+            return -1;
+        }
         } else
         {
             if (log.isDebugEnabled())
@@ -437,11 +437,15 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
             if (method != null && method.equalsIgnoreCase("POST"))
             {
                 String token = (xsrfToken != null) ? xsrfToken : request.getParameter("xsrf_token");
-                if (token == null || !token.equals(kkAppEng.getXsrfToken()))
-                {
-                    log.warn("Possible XSRF attack for customer with id = " + custId);
-                    return -1;
+                //Check if a request is from PayU
+                if(request.getParameter("udf1") != null && token == null){
+                	System.out.println("Payu response call login");
+                	return custId;
                 }
+                if(token == null || !token.equals(kkAppEng.getXsrfToken())){
+	                    log.warn("Possible XSRF attack for customer with id = " + custId);
+	                    return -1;
+	           }
             }
         }
 
@@ -1168,14 +1172,14 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
     {
         if (!kkAppEng.isPortlet())
         {
-            // Change the session
-            changeSession(request);
+        // Change the session
+        changeSession(request);
 
             // Set this session to null to avoid struts interceptors from throwing an exception
             // because
-            // the session is invalid
-            ActionContext context = ActionContext.getContext();
-            context.setSession(null);
+        // the session is invalid
+        ActionContext context = ActionContext.getContext();
+        context.setSession(null);
         }
 
         // Login and return the new session

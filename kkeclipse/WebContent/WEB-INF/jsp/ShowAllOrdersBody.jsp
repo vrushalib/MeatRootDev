@@ -53,14 +53,14 @@
 				    							<td class="status-col"><div class="label <%=statusClass%>"><%=order.getStatusText()%></div></td>
 				    							<td class="narrow-col"><a class="text-link" href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'><kk:msg  key="common.view"/></a></td>	
 				    							<td class="narrow-col"><a class="text-link" href='<%="RepeatOrder.action?orderId="+order.getId()%>'><kk:msg  key="common.repeat"/></a></td>	
-				    							<td class="narrow-col"><a class="text-link"><kk:msg  key="common.track"/></a></td>	
-												<%if (enableInvoice) {%>	
+				    							<%--<td class="narrow-col"><a class="text-link"><kk:msg  key="common.track"/></a></td>	--%>
+												<%-- <%if (enableInvoice) {
 													<%if (kkEng.isPortlet()){ %>
 														<td class="narrow-col"><a class="text-link" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 													<%} else {%>
 														<td class="narrow-col"><a class="text-link" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 													<%}%>
-												<% } %>
+												<% } %> --%>	
 			    							</tr>
 				    						<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>
 					    						<tr>
@@ -180,4 +180,5 @@
 						<a href="MyAccount.action" id="back-button" class="button small-rounded-corners"><span><kk:msg  key="common.back"/></span></a>
 					</div>
 		    	</div>
+
 
