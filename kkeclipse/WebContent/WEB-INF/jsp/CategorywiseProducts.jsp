@@ -17,7 +17,7 @@
 		        com.konakart.appif.ProductIf[] prods = products.getProductArray(); 
 		        if(prods != null && prods.length > 0 ){ 
 		               prods[0].setCategoryId(subCat.getId()); %>
-		       		   <kk:carousel prods="<%=prods%>" title="<%=subCat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
+		       		   <kk:carousel prods="<%=prods%>" title="<%=subCat.getName()%>" width="180" widthSmall="150" breakpointSmall="440"/>
        			<% } 
        		 } 
        	 } 
@@ -26,7 +26,7 @@
 	        com.konakart.appif.ProductIf[] prods = products.getProductArray(); 
 	        if(prods != null && prods.length > 0 ){ 
 	               prods[0].setCategoryId(cat.getId()); %>
-	               <kk:carousel prods="<%=prods%>" title="<%=cat.getName()%>" width="<%=kkEng.getContentClass()%>"/>
+	               <kk:carousel prods="<%=prods%>" title="<%=cat.getName()%>" width="180" widthSmall="150" breakpointSmall="440"/>
    			<% } 
        } 
     } 

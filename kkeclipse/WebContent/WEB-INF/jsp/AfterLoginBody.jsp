@@ -112,14 +112,14 @@
 					    							<td class="last-order-icons">
 					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
 					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
-					    								<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
+					    							<%--	<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
 													<%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
 														<%} else {%>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
-													<% } %>
+													<% } %> --%>
 													</td>
 					    						</tr>
 				    						</tbody>
@@ -165,14 +165,14 @@
 					    							<td class="last-order-icons">
 					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
 					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
-					    								<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
+					    						<%--		<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
 													<%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
 														<%} else {%>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
-													<% } %>
+													<% } %> --%>
 													</td>
 					    						</tr>
 				    						</tbody>

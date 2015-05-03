@@ -106,8 +106,8 @@
 
 <div id="header-container">
 	<div id="header">
+	<a href="Welcome.action"><img id="headerlogo" alt="MeatRoot" src="<%=kkEng.getImageBase()%>/headerLogo.jpg"></a>
 		<div id="logo">
-			<a href="Welcome.action">KonaKart</a>
 		</div>
 		<div id="search">
 			<%if (useSolr) { %>						

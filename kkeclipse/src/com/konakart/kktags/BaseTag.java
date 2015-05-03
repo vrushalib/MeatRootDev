@@ -349,7 +349,20 @@ public class BaseTag extends ComponentTagSupport
    	  	 }
    }
 
-    
+    protected StringBuffer getStartSelect(String select,String id,String className,String name){
+      	 StringBuffer sb = new StringBuffer();
+      	
+      	
+      	 sb.append("<select id="+D_QUOTE+id+D_QUOTE+" class=" + D_QUOTE + className + D_QUOTE + "name="+D_QUOTE+name+">");
+      	 for(int i=0;i<31;i++){
+      		 sb.append("<option value="+D_QUOTE+i+D_QUOTE+">"+i+"</option>");
+      	  	 }
+      	 sb.append("</select>");
+      	 
+      	 return sb;
+
+      }
+
     
     
    

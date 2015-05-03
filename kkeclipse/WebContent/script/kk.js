@@ -315,15 +315,10 @@ $(function() {
 			function() {
 				
 				var prodId = (this.id).split('-')[1];			
-				
-				 var id = $("#prodQuantityId_"+prodId).val();			
-				
+				var id = $("#prodQuantityId_"+prodId).val();			
 				callAction(new Array("prodId",prodId,"id",id), 
 						addToCartCallback,
 						"AddToCartFromProdId.action?id="+id);
-				
-				/*$("span#"+this.id).show();*/
-				
 				return false;
 			});
 	
@@ -763,3 +758,127 @@ var subscribeNewsletterCallback = function(result, textStatus, jqXHR) {
 var agreeToCookiesCallback = function(result, textStatus, jqXHR) {
 	 $("#cookie-container").slideUp();
 };
+/*
+ * Menu sizing algorithm on each browser width change
+ */
+
+$(window).resize(function() {
+	sizeMenu();
+});	
+	
+function sizeMenu() {
+
+	var width = $("#main-menu").width() - 2;
+
+	// reset width and unwrap items from extra divs
+	// calculate menuLineWidth
+	var menuLineWidth = 0
+	var numItems = 0;
+	var itemPadding = 14;
+	var itemMarginRight = 5;
+	$("#main-menu a").each(function(index) {
+		var item = $(this);
+		item.css('width', 'auto');
+		item.css('margin-right', itemMarginRight + 'px');
+		var widthPlusPadding = item.width() + itemPadding;
+		item.width(widthPlusPadding);
+		menuLineWidth += widthPlusPadding + itemMarginRight;
+		numItems++;
+		var parent = item.parent();
+		if (parent.hasClass('menu-line')) {
+			item.unwrap();
+		}
+	});
+
+	// Adjust for last item
+	menuLineWidth -= itemMarginRight;
+
+	if (numItems == 0) {
+		return;
+	}
+
+	var numLines = Math.ceil(menuLineWidth / width);
+	var itemsPerLine = Math.ceil(numItems / numLines);
+
+	// Create arrays of items and widths for each line
+	var total = 0;
+	var lineIndex = 0;
+	var itemCount = 0;
+	var itemArray = new Array();
+	var lineArray = new Array();
+	var widthArray = new Array();
+	$("#main-menu a").each(function(index) {
+		var item = $(this);
+		var w = item.width() + itemMarginRight;
+		itemCount++;
+
+		if (total + w - itemMarginRight > width || itemCount > itemsPerLine) {
+			total -= itemMarginRight;
+			widthArray[itemArray.length] = total;
+			total = w;
+			itemArray[itemArray.length] = lineArray;
+			lineArray = new Array();
+			lineIndex = 0;
+			lineArray[lineIndex++] = item;
+			itemCount = 1;
+		} else {
+			total += w;
+			lineArray[lineIndex++] = item;
+		}
+	});
+	if (lineArray.length > 0) {
+		total -= itemMarginRight;
+		widthArray[itemArray.length] = total;
+		itemArray[itemArray.length] = lineArray;
+	}
+
+	// Surround each line with a div
+	var index = 0;
+	for ( var i = 0; i < itemArray.length; i++) {
+		lineArray = itemArray[i];
+		$("#main-menu a").slice(index, index + lineArray.length).wrapAll(
+				'<div class="menu-line"></div>');
+		index = index + lineArray.length;
+	}
+
+	// Pad lines out to same width
+	for ( var i = 0; i < itemArray.length; i++) {
+		lineArray = itemArray[i];
+		var totalExtra = width - widthArray[i];
+		var singleExtra = Math.floor((totalExtra / itemArray[i].length));
+		var countExtra = 0;
+		for ( var j = 0; j < lineArray.length; j++) {
+			var widget = lineArray[j];
+			if (j == lineArray.length - 1) {
+				widget.css('margin-right', '0px');
+				var w = widget.width();
+				var extra = totalExtra - countExtra;
+				widget.width(w + extra);
+			} else {
+				var w = widget.width();
+				var extra = singleExtra;
+				widget.width(w + extra);
+			}
+			countExtra += singleExtra;
+		}
+	}
+}
+	
+
+/*
+ * Function for setting controls of horizontal carousel 
+ */
+function setControls(carousel, prev, next) {
+	var items = carousel.jcarousel('items');
+	var visible = carousel.jcarousel('visible');
+	if (items[0] == visible[0]) {
+		prev.removeClass('prev-items').addClass('prev-items-inactive');
+	} else {
+		prev.removeClass('prev-items-inactive').addClass('prev-items');
+	}
+	if (items[items.length - 1] == visible[visible.length - 1]) {
+		next.removeClass('next-items').addClass('next-items-inactive');
+	} else {
+		next.removeClass('next-items-inactive').addClass('next-items');
+	}
+}  

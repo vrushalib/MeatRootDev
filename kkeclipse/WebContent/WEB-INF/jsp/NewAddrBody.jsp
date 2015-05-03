@@ -141,6 +141,7 @@
 										<select id="postcode" name="postcode" >
 										<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
 									    <% if( codes != null && codes.length != 0) { %>
+									    <% java.util.Arrays.sort(codes); %>
 										    <% for(int i = 0; i < codes.length; i++){ %>
 										    	   <option  value="<%=codes[i]%>" selected="selected" ><%=codes[i]%></option>
 										    <% } %>

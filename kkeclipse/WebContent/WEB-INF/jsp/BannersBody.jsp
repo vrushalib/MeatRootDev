@@ -28,22 +28,20 @@
 <%@page import="com.konakart.app.Content"%>
 <%@page import="com.konakart.app.ContentDescription"%>
 <%@page import="com.konakart.appif.ContentIf"%>
-<%@ page import="java.util.List" %>
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
-
+<% boolean hideRow1 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row1", false);%>
+<% boolean hideRow2 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row2", false);%>
 <% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 <% com.konakart.app.EngineConfig engineConfig = new com.konakart.app.EngineConfig(); %>
 <% com.konakart.appif.KKEngIf engine = new com.konakart.app.KKEng(engineConfig); %>
-<% boolean hideRow1 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row1", false);%>
-<% boolean hideRow2 =  kkEng.getPropertyAsBoolean("main.page.hide.banner.row2", false);%>
 <% boolean contentEnabled = kkEng.getContentMgr().isEnabled();%>
 <% String contentDir = kkEng.getContentImagesDir();%>
 
 <%if (!hideRow1) { %>
-	<% ContentIf banner = null;%>
+<%--	<% ContentIf banner = null;%>
 
-<%if (contentEnabled) { %>
+	<%if (contentEnabled) { %>
 		<% ContentIf[] topBanners = kkEng.getContentMgr().getContentForType(2, 1);%>
 		<%if (topBanners.length >= 1) { %>
 			<% int idx = new Random().nextInt(topBanners.length);%>
@@ -51,9 +49,32 @@
 		<% } %> 
 	<% } %> 
 
-<div id="slideshow" class="rounded-corners">
+	<%if (banner == null) { %>
+		<% banner = new Content();%>
+		<% banner.setDescription(new ContentDescription());%>
+		<% banner.getDescription().setName1("home_kindle-fire-hd.jpg");%>
+		<% banner.getDescription().setName2("home_kindle-fire-hd-medium.jpg");%>
+		<% banner.getDescription().setName3("home_kindle-fire-hd-small.jpg");%>
+		<% banner.getDescription().setTitle("Kindle fire");%>
+		<% banner.setClickUrl("SelectProd.action?prodId=34");%>
+	<% } %> 
+
+	<div id="slideshow"  class="rounded-corners" >
+	<a href="<%=banner.getClickUrl()%>">
+		<picture id="slide-1" class="slide rounded-corners">
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner.getDescription().getName1()%>" media="(min-width: 750px)">
+			<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner.getDescription().getName2()%>" media="(min-width: 440px)">
+			<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner.getDescription().getName3()%>" >
+			<!--[if IE 9]></video><![endif]-->
+			<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner.getDescription().getName1()%>" alt="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner.getDescription().getTitle()%>">
+		</picture>
+	</a>
+	</div> --%>
+	
+	 <div id="slideshow" class="rounded-corners">
 		<div id="uiv2-slideshow">
-			<div class="uiv2-slides">
+			<div class="uiv2-slides"> 
 				<ul style="width: 940px; height: 255px;">
 	<% for (int i = 0; i <catMgr.getCats().length; i++) {%>
 	    <%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
@@ -64,7 +85,8 @@
 	        <% menuClass = "menu-item rounded-corners"; %>
 	    <% } %>
 	    <%if(cat.getName().contains("Fresh")) {%>
-					<li style="width:940px; height: 255px;" id="uiv2-slide-one"><div
+					<li style="width:940px; height: 255px;" id="uiv2-slide-one">
+								<div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.jpg') center left no-repeat; background-size: 100% 100%;">
 								<div class="button2"><span>Tender, healthier and tastier<br/> meat straight from the farms!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
@@ -91,7 +113,7 @@
 								</div></li>
 								
 				</ul>
-			</div>
+			</div> 
 		
 	     <ul class="uiv2-slides-nav">
 			<li class="on
@@ -106,34 +128,35 @@
 
 			<li class=""><span class="arrow  caption-four"></span><a
 					href="#uiv2-slide-four"></a><span>Delivery Area</span></li>
-			</ul>
+			</ul> 
 		</div>
-	</div>
+	</div> 
 <% } %> 
 
-<%if (!hideRow2) { %>
+<%--<%if (!hideRow2) { %>
 	<% ContentIf banner1 = null;%>
 	<% ContentIf banner2 = null;%>
 	<% ContentIf banner3 = null;%>
 	<% ContentIf banner4 = null;%>
 
-	<%if (contentEnabled) { %>
-		<% ContentIf[] subBanners = kkEng.getContentMgr().getContentForType(6, 2);%>
-		<%if (subBanners.length >= 5) { %>
-			<% banner1 = subBanners[0];%>
-			<% banner2 = subBanners[1];%>
-			
-			<% banner3 = null;%>
-			<%if ((int) (Math.random() * 100) > 50) { %>
-				<% banner3 = subBanners[2];%>
-			<% } else { %>
-				<% banner3 = subBanners[3];%>
-			<% } %> 
-			
-			<% banner4 = subBanners[4];%>
-		<% } %> 
+	<div id="banners">
+	<%if (banner1 != null) { %>
+		<a href="<%=banner1.getClickUrl()%>"><img id="banner-1" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner1.getDescription().getName1()%>"/></a>
 	<% } %> 
-
-
+	<%if (banner2 != null) { %>
+		<a href="<%=banner2.getClickUrl()%>"><img id="banner-2" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner2.getDescription().getName1()%>"/></a>
+	<% } %> 
+	<%if (banner3 != null) { %>
+		<a href="<%=banner3.getClickUrl()%>"><img id="banner-3" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner3.getDescription().getName1()%>"/></a>
+	<% } %> 
+	<%if (banner4 != null) { %>
+		<a href="<%=banner4.getClickUrl()%>"><img id="banner-4" class="banner-small rounded-corners last-child" 
+			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner4.getDescription().getName1()%>"/></a>
+	<% } %> 
+	</div> 
+<% } %> --%>
 
 

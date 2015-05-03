@@ -29,7 +29,6 @@
 <% String sortBy = revMgr.getDataDesc().getOrderBy();%>
 <% String title = "";%>
 
-
 <%if (!kkEng.isPortlet()){%>
 	<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.proddetails.js"></script>	
 <% } %>
@@ -44,7 +43,7 @@
 	<%int rating = (prod.getRating()==null)?0:prod.getRating().setScale(0, java.math.BigDecimal.ROUND_HALF_UP).intValue();  %>
 	<%String ratingDecStr = (prod.getRating()==null)?"0":(prod.getRating().setScale(1, java.math.BigDecimal.ROUND_HALF_UP)).toPlainString();  %>
 	<%com.konakart.appif.ReviewSearchIf search = revMgr.getRevSearch();%>
-	
+
 	<script type="text/javascript">
 //Variable used for Sokrati tracking
 var _sokParams = {
@@ -66,7 +65,6 @@ var _sokParams = {
 	    "event" : "viewproduct" 
 };
 </script>
-	
 	
    		<h1 id="page-title"><%=prod.getName()%></h1>
     	<div id="product-area" class="rounded-corners">
@@ -105,16 +103,15 @@ var _sokParams = {
 	    			<div id="product-content-tabs">
 		    			<div id="product-description-tab" class="<%=revMgr.isShowTab()?"":"selected-product-content-tab"%> product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.product.description"/></div>		
     			    	<div class="product-content-tab-spacer"></div>
-		    			<div id="product-specifications-tab" class="product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.specifications"/></div>
+		    		<%--	<div id="product-specifications-tab" class="product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.specifications"/></div> --%>
 		    			<div class="product-content-tab-spacer"></div>
 				    	<div id="product-reviews-tab" class="<%=revMgr.isShowTab()?"selected-product-content-tab":""%> product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.reviews"/> (<%=prod.getNumberReviews()%>)</div>
 		    			<div class="product-content-tab-filler"></div>
-		    			<%revMgr.setShowTab(false);%>
 		    		</div>
 	    			<div id="product-description">
 	    				<p style="clear:both"><%=prod.getDescription()%></p>		    			
 	    			</div>
-					<div id="product-specifications">	
+				<%--	<div id="product-specifications">	
 						<%if (prod.getCustomAttrArray() != null && prod.getCustomAttrArray().length > 0){ %>
 							<table>
 		    					<thead>
@@ -130,9 +127,9 @@ var _sokParams = {
 	    						</tbody>
 	    					</table>	
 							<% } else { %>
-								<%-- <p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>--%>
+								<p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>
 							<%}%>												
-	    			</div>    			
+	    			</div>    	 --%>		
  	    			<div id="product-reviews">
  	    			<%if (prod.getNumberReviews() > 0){ %>
 	    				<div id="average-customer-reviews">
@@ -216,6 +213,7 @@ var _sokParams = {
 					<% } else { %>
 						<p style="clear:both"><a href='<%="WriteReview.action?prodId="+prod.getId()%>' class="text-link"><kk:msg  key="show.reviews.body.be.first"/></a></p>
 					<% } %>		
+	    							
 	    			</div>	  
 	    		</div>
 	    		<div id="product-content-mobile" class="<%=revMgr.isShowTab()?"accordion-show-reviews":""%>">
@@ -225,7 +223,7 @@ var _sokParams = {
 	    				<p style="clear:both"><%=prod.getDescription()%></p>		    			
 	    			</div>
 					<span class="header"><kk:msg  key="product.details.body.specifications"/></span>
-	    			<div id="product-specifications">	
+	    		<%--	<div id="product-specifications">	
 						<%if (prod.getCustomAttrArray() != null && prod.getCustomAttrArray().length > 0){ %>
 							<table>
 		    					<thead>
@@ -243,7 +241,7 @@ var _sokParams = {
 							<% } else { %>
 								<p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>
 							<%}%>												
-	    			</div>  
+	    			</div>   --%>
 	    			<span class="header"><kk:msg  key="product.details.body.reviews"/> (<%=prod.getNumberReviews()%>)</span>
 
  	    			

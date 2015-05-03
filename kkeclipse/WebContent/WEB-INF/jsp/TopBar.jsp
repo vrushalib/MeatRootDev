@@ -33,8 +33,7 @@
 	<%}%>		
 <%}%>		
 
-
-<!-- <script type="text/javascript">	
+<script type="text/javascript">	
 $(function() {
 	$('#lang-select').selectBoxIt({
 		downArrowIcon: "selectboxit-down-arrow"
@@ -124,7 +123,7 @@ $(function() {
 <% } %>	
 
 });
-</script> -->
+</script>
 
 <div id="top-bar-container">
 	<div id="slide-out-search">
@@ -150,42 +149,42 @@ $(function() {
 		<span id="close-search" class="fa fa-times" title='<kk:msg  key="common.close"/>'></span>
 	</div>
   	<div id="top-bar">
-  	    <div id="area-message">
+  		<div id="area-message">
 		Free Home Delivery All Across Pune!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Next Day Delivery between 7-10am! &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Order Placement/Inquiry : +91-9765197365
         </div>
-		<div id="search-container">
+  		<div id="search-container">
 	  		<div id="top-bar-search" class="top-bar-menu-item">
 			  	<span id="open-search" class="fa fa-search top-bar-menu-icon" title="<kk:msg  key='suggested.search.search'/>"></span> 
 			</div>
 		</div>
-		<div id="selections-container">
+		<%--<div id="selections-container">
 			<div id="selections">
 		  		<div id="language-selector" class="top-bar-menu-item">
 		  			<form action="SetLocale.action" method="post">  
 		  				<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-					<%--	<select id="lang-select" name="locale"  onchange="submit()">
+					 <select id="lang-select" name="locale"  onchange="submit()">
 							<option  value="en_GB" data-icon="flag flag-en-GB" <%=kkEng.getLocale().equals("en_GB")?"selected=\"selected\"":""%>>English</option>
 							<option  value="de_DE" data-icon="flag flag-de-DE"  <%=kkEng.getLocale().equals("de_DE")?"selected=\"selected\"":""%>>Deutsch</option>
 							<option  value="es_ES" data-icon="flag flag-es-ES"  <%=kkEng.getLocale().equals("es_ES")?"selected=\"selected\"":""%>>Español</option>
 							<option  value="pt_BR" data-icon="flag flag-pt-BR"  <%=kkEng.getLocale().equals("pt_BR")?"selected=\"selected\"":""%>>Português</option>
-						</select> --%>
+						</select> -
 					</form>									
 		  		</div>
 		  		<div id="currency-selector"  class="top-bar-menu-item">
 					<form action="SelectCurrency.action" method="post">  
 						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-					<%--	<select id="currency-select" name="currencyCode"  onchange="submit()">
+					 	<select id="currency-select" name="currencyCode"  onchange="submit()">
 							<% for (int i = 0; i < kkEng.getCurrencies().length; i++){ %>
 								<% com.konakart.appif.CurrencyIf currency = kkEng.getCurrencies()[i];%>
 								<% if (currency != null) { %>
 									<option  value="<%=currency.getCode()%>"><%=currency.getTitle()%></option>
 								<% } %>
 							<% } %>
-						</select> --%>
+						</select>
 					</form>										  			
 		  		</div>
 		  	</div>
-		  </div>
+		  </div>--%>
 		 <div id="options-container">
 	  		<div id="options">		
 

@@ -255,6 +255,7 @@
 	<definition name="catalog.internationalorders.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.internationalorders.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/InternationalOrdersBody.jsp"/>
+	</definition>
 	<definition name="catalog.help.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.help.page"/>
 		<put-attribute name="body1" value="/WEB-INF/jsp/HelpBody.jsp"/>

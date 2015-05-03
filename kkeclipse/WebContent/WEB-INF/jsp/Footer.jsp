@@ -21,9 +21,41 @@
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
+<script>
+function onBlur(el) {
+    if (el.value == '') {
+        el.value = el.defaultValue;
+    }
+}
+function onFocus(el) {
+    if (el.value == el.defaultValue) {
+        el.value = '';
+    }
+}
+
+$(function() {
+	$("#newsletter-input").keydown(function (e){
+	    if(e.keyCode == 13){
+	    	submitNewsletterForm();
+	    }
+	});
+});		
+</script>
 
 <div id="footer-area" class="footer-area wide rounded-corners" >
 <div id="kkfooter">
+    <%--<div id="contact-info" class="footer-area narrow">
+    	KonaKart<br />
+		020 7946 0000<br />
+		<a href ="#">info@konakart.com</a>
+    </div>
+   	<div id="newsletter" class="footer-area wide">
+   		<kk:msg  key="footer.subscribe"/><br />
+ 		<input type="text" id="newsletter-input" class="rounded-corners-left" onblur="onBlur(this)" onfocus="onFocus(this)" value="<kk:msg  key="footer.your.email"/>">
+		<a id="newsletter-button" class="rounded-corners-right"><kk:msg  key="footer.signup"/></a>
+		<div id="newsletter-msg"></div>
+   	</div> --%>
+
 	<div id="links-1" class="footer-area narrow">
 	<h3 class="title">Popular Categories</h3>	
    	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
