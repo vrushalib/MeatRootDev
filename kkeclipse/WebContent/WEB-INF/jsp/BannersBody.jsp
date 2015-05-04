@@ -74,7 +74,7 @@
 	
 	 <div id="slideshow" class="rounded-corners">
 		<div id="uiv2-slideshow">
-			<div class="uiv2-slides"> 
+			<div class="uiv2-slides" style="height: 255px;"> 
 				<ul style="width: 940px; height: 255px;">
 	<% for (int i = 0; i <catMgr.getCats().length; i++) {%>
 	    <%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
