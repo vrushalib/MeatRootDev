@@ -85,7 +85,7 @@
 	        <% menuClass = "menu-item rounded-corners"; %>
 	    <% } %>
 	    <%if(cat.getName().contains("Fresh")) {%>
-					<li style="width:940px; height: 255px;" id="uiv2-slide-one">
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-one">
 								<div
 								class="uiv2-slider-block-one"
 								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.jpg') center left no-repeat; background-size: 100% 100%;">
@@ -105,12 +105,10 @@
 		<% } %>
 	<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four">
-								<div class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/DeliveryArea.png') center left no-repeat; background-size: 100% 100%;">
-								<div class="button2" id="pincode_area"><input type="text" id="pincode" class="deliveryarea" placeholder="Add your Pincode to help us scale" /><input type="button" class="gobutton" value="Go" id="go"/> </div>
-								<div class="button2" id="email_area" style="display:none;"><input type="text" id="emailId" class="deliveryarea" placeholder="Please help us with your email" /><input type="button" class="gobutton" value="Done" id="done"/> </div>
-								<div class="button2" id="message_area" style="display:none;"><span class="deliveryarea" id="success_message" style="display:none;">Thank you for your valuable input</span><span class="deliveryarea" id="error_message" style="display:none;">Please enter valid pincode/emailId</span><input type="button" class="gobutton" value="Back" id="back"/> </div>
-								</div></li>
+					
+					<div onclick="location.href='SelectCat.action?catId=46'" class="uiv2-slider-block-one"
+                                                                style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/Zorabian3.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
+								 </div></li>
 								
 				</ul>
 			</div> 
@@ -127,7 +125,7 @@
 				href="#uiv2-slide-three"></a><span>Processed</span></li>
 
 			<li class=""><span class="arrow  caption-four"></span><a
-					href="#uiv2-slide-four"></a><span>Delivery Area</span></li>
+					href="#uiv2-slide-four"></a><span>Special Offers</span></li>
 			</ul> 
 		</div>
 	</div> 

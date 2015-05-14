@@ -22,13 +22,13 @@
 
 <script type="text/javascript">
     // Space out menu evenly
-	$(function() {
+/*	$(function() {
 		var total=0;
 		var itemArray = new Array();
 		$("#main-menu a").each(function(index){
 			var margin = $(this).css("margin-right");
 			var marginInt = parseInt(margin.substring(0, margin.length-2)); // remove px
-			total += ($(this).width()+marginInt);
+			total += ($(this).width()+ 2) ;//marginInt);
 			itemArray[index]=$(this).width();
 		});		
 		//var width =  $("#page").css("width");
@@ -38,7 +38,7 @@
 		//var extra = widthInt-total;
 		//extra = Math.floor((extra / itemArray.length));
 		//$("#main-menu a").each(function(index){$(this).width(itemArray[index]+extra);});		
-	});				
+	});			*/	
 </script>
 
 

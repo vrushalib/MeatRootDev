@@ -49,12 +49,7 @@ $(function() {
 		020 7946 0000<br />
 		<a href ="#">info@konakart.com</a>
     </div>
-   	<div id="newsletter" class="footer-area wide">
-   		<kk:msg  key="footer.subscribe"/><br />
- 		<input type="text" id="newsletter-input" class="rounded-corners-left" onblur="onBlur(this)" onfocus="onFocus(this)" value="<kk:msg  key="footer.your.email"/>">
-		<a id="newsletter-button" class="rounded-corners-right"><kk:msg  key="footer.signup"/></a>
-		<div id="newsletter-msg"></div>
-   	</div> --%>
+   --%>
 
 	<div id="links-1" class="footer-area narrow">
 	<h3 class="title">Popular Categories</h3>	
@@ -110,13 +105,20 @@ $(function() {
 		<a href ="RefundPolicy.action"><kk:msg  key="footer.refund.policy"/></a><br />
 		<a href ="PrivacyPolicy.action"><kk:msg  key="footer.privacy.policy"/></a><br />
 		<a href ="TermsAndConditions.action"><kk:msg  key="footer.terms.and.conditions"/></a><br />
-   	</div>
-   	
-   	<div id="social" class="footer-area narrow last-child">
-   	<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
-   	<a href ="Help.action"><kk:msg  key="footer.help"/></a><br />
+		<a href ="TermsOfUse.action"><kk:msg  key="footer.terms.of.use"/></a><br />
+	   	<a href ="Help.action"><kk:msg  key="footer.help"/></a><br />
 		<a href ="FAQ.action"><kk:msg  key="footer.faq"/></a><br />
 		<a href ="ContactUs.action"><kk:msg  key="footer.contact.us"/></a><br />
+   	</div>
+   	
+   	
+   	<div id="newsletter" class="footer-area narrow last-child">
+   		<kk:msg  key="footer.subscribe"/><br />
+ 		<input type="text" id="newsletter-input" class="rounded-corners-left" onblur="onBlur(this)" onfocus="onFocus(this)" value="<kk:msg  key="footer.your.email"/>">
+		<a id="newsletter-button" class="rounded-corners-right"><kk:msg  key="footer.signup"/></a>
+		<div id="newsletter-msg"></div>
+   	</div> 
+   	<div id="social" class="footer-area narrow last-child">
    	<h4 class="title" style="margin-top: 6px;">Payment Methods</h4>
    	
   			 	<ul>
