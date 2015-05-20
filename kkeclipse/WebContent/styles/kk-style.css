@@ -1013,7 +1013,7 @@ display: table;
 
 .item-over-container{
 	border: 1px solid #bfc2c4;
-	margin: -1px 9px -1px -1px;
+	/*margin: -1px 9px -1px -1px;*/
 }
 
 .carousel-item .item-over-container{
@@ -1814,11 +1814,7 @@ display: table;
 }
 
 .select-qty{
-	font-size: 12px;
-	float: left;
-	margin:	0 1em 0.5em 0;
-	padding: 2px 1px;
-	width: auto !important;
+	padding: 1px 0px;
 }
 
 .update-button{

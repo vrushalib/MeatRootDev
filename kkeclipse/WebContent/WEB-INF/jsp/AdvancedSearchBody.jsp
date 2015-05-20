@@ -32,7 +32,7 @@
 		    if(e.keyCode == 13){
 		    	formValidate('form1');
 		    }
-		})	
+		});	
 	
 	});
 </script>
@@ -102,6 +102,8 @@
 										<label><kk:msg  key="advanced.search.body.date.to"/></label>
 										<input type="text" id="datepickerto" name="dateAddedTo" />
 									</div>-->
+									</div>
+									</div>
 							<div class="form-buttons">
 								<a onclick="javascript:formValidate('form1');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="advanced.search.body.search"/></span></a>
 							</div>

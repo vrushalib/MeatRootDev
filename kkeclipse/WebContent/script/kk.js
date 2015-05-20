@@ -315,10 +315,10 @@ $(function() {
 			function() {
 				
 				var prodId = (this.id).split('-')[1];			
-				var id = $("#prodQuantityId_"+prodId).val();			
-				callAction(new Array("prodId",prodId,"id",id), 
+				var qty = $("#prodQuantityId_"+prodId).val();			
+				callAction(new Array("prodId",prodId,"qty",qty), 
 						addToCartCallback,
-						"AddToCartFromProdId.action?id="+id);
+						"AddToCartFromProdId.action");
 				return false;
 			});
 	
@@ -772,10 +772,10 @@ function sizeMenu() {
 
 	// reset width and unwrap items from extra divs
 	// calculate menuLineWidth
-	var menuLineWidth = 0
+	var menuLineWidth = 0;
 	var numItems = 0;
 	var itemPadding = 14;
-	var itemMarginRight = 5;
+	var itemMarginRight = 0;
 	$("#main-menu a").each(function(index) {
 		var item = $(this);
 		item.css('width', 'auto');

@@ -150,7 +150,9 @@ $(function() {
 	</div>
   	<div id="top-bar">
   		<div id="area-message">
-		Free Home Delivery All Across Pune!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Next Day Delivery between 7-10am! &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Order Placement/Inquiry : +91-9765197365
+		
+		Free Home Delivery All Across Pune!&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
+		Next Day Delivery between 7-10am! 
         </div>
   		<div id="search-container">
 	  		<div id="top-bar-search" class="top-bar-menu-item">

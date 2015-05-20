@@ -168,7 +168,7 @@ public class ProdTileTag extends BaseTag
             sb.append(getStartDiv("item-buttons centered"));
             sb.append(getStartDiv("product-buttons"));
             
-            sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"select-qty","prodQuantity"));
+            sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"add-to-cart-qty select-qty","prodQuantity"));
           
             if (eng.getQuotaMgr().canAddToBasket(prod, null) > 0)
             {            	

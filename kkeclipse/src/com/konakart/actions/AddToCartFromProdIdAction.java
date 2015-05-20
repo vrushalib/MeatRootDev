@@ -35,8 +35,10 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
     private static final long serialVersionUID = 1L;
     
     private String xsrf_token;
+    
+    protected int qty = 1;
 
-    public String execute()
+	public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
@@ -82,9 +84,13 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
                 setRedirectURL(Integer.toString(getProdId()));
                 return SUCCESS;
             }
+            
+            if(getQty() != -1){
+            	qty = getQty();
+            }
 
             // Common code for adding to cart
-            this.addToCart(kkAppEng, selectedProd, null, 1);
+            this.addToCart(kkAppEng, selectedProd, null, qty);
 
             // Common code for setting messages
             this.setMsgs(kkAppEng);
@@ -301,4 +307,11 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
         this.xsrf_token = xsrf_token;
     }
 
+    public int getQty() {
+		return qty;
+	}
+
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
 }

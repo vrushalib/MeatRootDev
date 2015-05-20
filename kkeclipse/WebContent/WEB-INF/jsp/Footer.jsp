@@ -129,7 +129,7 @@ $(function() {
                       <li><img src="<%=kkEng.getImageBase()%>/icons/cashOnDel2.jpg" alt="" /></li>
                 </ul><br/>
  		<b><kk:msg  key="footer.connect"/>:&nbsp;&nbsp;</b>
-	 	<a href="http://www.twitter.com" target="_blank" class="twitter-grey social-icon"></a>
+	 	<a href="https://twitter.com/MeatRoot" target="_blank" class="twitter-grey social-icon"></a>
 		<a href="https://www.facebook.com/MeatRootOnline" target="_blank" class="facebook-grey social-icon"></a>
 		<a href="http://www.pinterest.com" target="_blank" class="pinterest-grey social-icon"></a>
 		<a href="https://plus.google.com/100100965031894922635"  rel="publisher" target="_blank" class="google-grey social-icon"></a>
