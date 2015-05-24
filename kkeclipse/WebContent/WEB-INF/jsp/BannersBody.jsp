@@ -156,5 +156,28 @@
 	<% } %> 
 	</div> 
 <% } %> --%>
+<%--
+<%if (true) { %>
+	<div id="banners">
+	
+		<a href="ShowSpecials.action"><img id="banner-1" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale.jpg"/></a>
+			
+			<a href="SelectCat.action?catId=24"><img id="banner-2" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/banners/home-page/windows-8.jpg"/></a>
+			
+			<a href="ShowSpecials.action"><img id="banner-3" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale-2.jpg"/></a>
+			
+			<a href="SelectProd.action?prodId=35"><img id="banner-4" class="banner-small rounded-corners last-child" 
+			src="<%=kkEng.getImageBase()%>/banners/home-page/iphone-5.jpg"/></a>
+	
+
+		<%if ((int) (Math.random() * 100) > 50) { %>
+		<% } else { %>
+		<% } %> 
+
+	</div>
+<% } %>  --%>
 
 
