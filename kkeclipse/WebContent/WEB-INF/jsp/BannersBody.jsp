@@ -137,47 +137,70 @@
 	<% ContentIf banner3 = null;%>
 	<% ContentIf banner4 = null;%>
 
-	<div id="banners">
+	 <div class="container">
+	 <div class="row">
+	
+	<div class="col-sm-3 col-md-3 col-lg-3">
 	<%if (banner1 != null) { %>
-		<a href="<%=banner1.getClickUrl()%>"><img id="banner-1" class="banner-small rounded-corners" 
+		<a href="<%=banner1.getClickUrl()%>"><img id="banner-1"   
 			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner1.getDescription().getName1()%>"/></a>
 	<% } %> 
+	</div>
+	<div class="col-sm-3 col-md-3 col-lg-3">
 	<%if (banner2 != null) { %>
-		<a href="<%=banner2.getClickUrl()%>"><img id="banner-2" class="banner-small rounded-corners" 
+		<a href="<%=banner2.getClickUrl()%>"><img id="banner-2"   
 			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner2.getDescription().getName1()%>"/></a>
 	<% } %> 
+	</div>
+	<div class="col-sm-3 col-md-3 col-lg-3">
 	<%if (banner3 != null) { %>
-		<a href="<%=banner3.getClickUrl()%>"><img id="banner-3" class="banner-small rounded-corners" 
+		<a href="<%=banner3.getClickUrl()%>"><img id="banner-3"   
 			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner3.getDescription().getName1()%>"/></a>
 	<% } %> 
+	</div>
+	<div class="col-sm-3 col-md-3 col-lg-3">
 	<%if (banner4 != null) { %>
-		<a href="<%=banner4.getClickUrl()%>"><img id="banner-4" class="banner-small rounded-corners last-child" 
+		<a href="<%=banner4.getClickUrl()%>"><img id="banner-4" 
 			src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=banner4.getDescription().getName1()%>"/></a>
 	<% } %> 
-	</div> 
+	</div>
+	</div>
+	</div>
+	<!-- </div> --> 
 <% } %> --%>
-<%--
+
 <%if (true) { %>
-	<div id="banners">
+	 <div class="container">
+	 <div class="row">
+	<div class="col-sm-3 col-md-3 col-lg-3">
 	
-		<a href="ShowSpecials.action"><img id="banner-1" class="banner-small rounded-corners" 
+		<a href="ShowSpecials.action"><img id="banner-1" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale.jpg"/></a>
+		</div>
+		<div class="col-sm-3 col-md-3 col-lg-3">
 			
-			<a href="SelectCat.action?catId=24"><img id="banner-2" class="banner-small rounded-corners" 
+			<a href="SelectCat.action?catId=24"><img id="banner-2" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/windows-8.jpg"/></a>
+		</div>
+		<div class="col-sm-3 col-md-3 col-lg-3">
 			
-			<a href="ShowSpecials.action"><img id="banner-3" class="banner-small rounded-corners" 
+			<a href="ShowSpecials.action"><img id="banner-3" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/electronics-sale-2.jpg"/></a>
+		</div>
+		<div class="col-sm-3 col-md-3 col-lg-3">
 			
-			<a href="SelectProd.action?prodId=35"><img id="banner-4" class="banner-small rounded-corners last-child" 
+			<a href="SelectProd.action?prodId=35"><img id="banner-4" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/iphone-5.jpg"/></a>
+		</div>
 	
 
 		<%if ((int) (Math.random() * 100) > 50) { %>
 		<% } else { %>
 		<% } %> 
-
+</div>
 	</div>
-<% } %>  --%>
+	<!-- </div> -->
+	
+<% } %>  
 
 

@@ -3658,7 +3658,7 @@ td.center {
 		display: none;
 	}
 	#banner-4 {
-		display: none;
+		/* display: none; */
 	}
 	#banner-3 {
 		float: right;
@@ -3909,7 +3909,7 @@ td.center {
 		max-width: 50px !important;
 	}
 	#banner-3 {
-		display: none;
+		/* display: none; */
 	}
 	#banner-2 {
 		float: right;

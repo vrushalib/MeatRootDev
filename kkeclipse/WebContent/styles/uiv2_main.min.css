@@ -4058,28 +4058,21 @@ a.facebook-center {
 	cursor: pointer
 }
 
-nav {
-	background: #f8f8f9;
-	position: absolute;
-	z-index: 999;
-	width: 188px;
-	display: none;
-	box-shadow: 0 4px 5px #ccc
-}
+ 
 
 nav ul {
 	margin: 0
 }
 
 nav ul li {
-	border-bottom: 1px solid #dcdbdb;
+	border-right: 1px solid #dcdbdb;
 	margin: 0
 }
 
 nav ul li a,.touch nav ul li.top-category {
 	color: #555;
 	width: 100%;
-	font: 600 10px/29px Lato, sans-serif;
+	/*font: 600 10px/29px Lato, sans-serif; */
 	display: block;
 	background: url(../images/arrow_sub_nav.png) no-repeat 163px center;
 	padding: 0 7px 0 18px

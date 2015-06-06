@@ -1,0 +1,49 @@
+@CHARSET "ISO-8859-1";
+ .navbar-inverse {
+background-color:#B22222 !important;
+border-color:#090909;
+}
+.navbar-nav {
+  float: left;
+  margin: 0;
+  margin-left: 0px !important;
+  color: white !important;
+ }
+ ol, ul {
+  margin-top: 0;
+  margin-bottom: 10px;
+   
+  }
+  .navbar-inverse .navbar-nav>li>a {
+   color: white !important;
+  padding-left: 50px !important;
+  
+}
+
+  @media screen and (max-width: 599px) {
+  .navbar-nav {
+  float: left;
+  margin: 0;
+  margin-left: 0px !important;
+  color: white !important;
+  
+  
+}
+@media (min-width: 1200px)
+{ 
+.col-lg-3 {  
+ 
+	width:20% !important;
+           }
+           .col-md-3 {  
+ 
+	width:20% !important;
+           }
+           
+           .col-sm-3 {  
+ 
+	width:20% !important;
+           }
+           
+
+}
