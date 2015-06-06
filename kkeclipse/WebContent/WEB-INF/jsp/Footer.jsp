@@ -53,25 +53,26 @@ $(function() {
 
 	<div id="links-1" class="footer-area narrow">
 	<h3 class="title">Popular Categories</h3>	
-   	<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
+	<% int noOfCategories =  catMgr.getCats().length;%>
+   	<%for (int i = 0; i < noOfCategories; i++) {%>
+   	<%String menuClass = "menu-item rounded-corners"; %>
 		<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
-		<%String menuClass = "menu-item rounded-corners"; %>
 		<%if(cat.getChildren() != null && cat.getChildren().length > 0){ //If a category has a subcategory
-   			for(int j = 0; j < cat.getChildren().length ; j++){
+			int noOfSubcategories = cat.getChildren().length;
+   			for(int j = 0; j < noOfSubcategories ; j++){
    			 	com.konakart.appif.CategoryIf subCat = cat.getChildren()[j]; 
-	   			if (i == catMgr.getCats().length-1 && j == cat.getChildren().length-1){ 
+	   			if (i == noOfCategories - 1 && j == noOfSubcategories - 1){ 
 					 menuClass = "menu-item rounded-corners last-child"; 
 			    }%>
 			    <a href='<%="SelectCat.action?catId="+subCat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=subCat.getName()%></a><br />
    		    <%}
    		  }else{ %>
-			<% if (i == catMgr.getCats().length-1){ %>
+			<% if (i == noOfCategories - 1){ %>
 				<% menuClass = "menu-item rounded-corners last-child"; %>
 			<% } %>
 			<a href='<%="SelectCat.action?catId="+cat.getId()%>' class="<%=menuClass%>" style="width: auto;"><%=cat.getName()%></a><br />
 		<% } %>
 	<% } %>				
-		
    	</div>
 
     <% com.konakart.appif.ProductIf[] prods = kkEng.getProductMgr().getCustomProducts1(); %>
