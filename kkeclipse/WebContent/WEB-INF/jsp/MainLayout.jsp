@@ -61,7 +61,10 @@
 				<link type='text/css' rel='stylesheet' href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600,700'  >		
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/jcarousel.css" />				
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/kk-style.css" />
-
+				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/desktop.css" />
+				<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+ 			 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 		 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
 				<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>				
 				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>

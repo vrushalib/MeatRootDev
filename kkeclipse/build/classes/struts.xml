@@ -22,6 +22,9 @@
 		<interceptors>
 			<interceptor name="logging" class="com.konakart.actions.interceptors.LoggingInterceptor"/>
 			<interceptor name="json" class="org.apache.struts2.json.JSONInterceptor"/>
+			<interceptor name="forcePost" class="com.konakart.actions.interceptors.ForceAPostInterceptor"/>
+			<!-- May be used to force browser not to cache a page -->
+			<interceptor name="noCache" class="com.konakart.actions.interceptors.NoCacheInterceptor"/>
 			<!-- Removed validation and workflow from default stack -->
 			<interceptor-stack name="kkDefaultStack">
 				<interceptor-ref name="exception"/>
@@ -38,20 +41,31 @@
 				<interceptor-ref name="staticParams"/>
 				<interceptor-ref name="actionMappingParams"/>
 				<interceptor-ref name="params">
-                    <param name="excludeParams">^class\[.*,^class\..*,^dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,^parameters\..*,^action:.*,^method:.*</param>
+                    <param name="excludeParams">(.*\.|^|.*|\[('|"))(c|C)lass(\.|('|")]|\[).*,^dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,^parameters\..*,^action:.*,^method:.*</param>
 				</interceptor-ref>
 			 	<interceptor-ref name="conversionError"/> 
 				<interceptor-ref name="debugging"/>
+				<interceptor-ref name="json" />
+				<interceptor-ref name="logging" />
 			</interceptor-stack>
 			
-			<interceptor-stack name="loggingStack">
-				<interceptor-ref name="logging" />
-				<interceptor-ref name="json" />
+			<interceptor-stack name="standardStack">
+				<interceptor-ref name="kkDefaultStack" />
+				<interceptor-ref name="noCache"/>
+			</interceptor-stack>
+			
+			<interceptor-stack name="forcePostStack">
+				<interceptor-ref name="forcePost" />
+				<interceptor-ref name="kkDefaultStack" />
+				<interceptor-ref name="noCache"/>
+			</interceptor-stack>
+			
+			<interceptor-stack name="allowCacheStack">
 				<interceptor-ref name="kkDefaultStack" />
 			</interceptor-stack>
 			
 		</interceptors>
-		<default-interceptor-ref name="loggingStack"></default-interceptor-ref>
+		<default-interceptor-ref name="standardStack"></default-interceptor-ref>
 		
 		
 		<!--  Default Action -->
@@ -71,6 +85,10 @@
 			<param name="root">
     			srArray
   			</param>
+  			</result>
+		</action>
+		<action name="SuggestedArea" class="com.konakart.actions.SuggestedArea">
+			<result type="json">
   			</result>
 		</action>
 		<action name="OnePageRefresh" class="com.konakart.actions.CheckoutOnePageRefreshAction">
@@ -106,7 +124,17 @@
 		<!-- ************************ KK ***************************************** -->
 		
 		<action name="AboutUs" class="com.konakart.actions.AboutUsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.aboutus.page</result>
+		</action>
+		
+		<action name="Help" class="com.konakart.actions.HelpAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.help.page</result>
+		</action>
+		
+		<action name="TermsAndConditions" class="com.konakart.actions.TermsAndConditionsAction">
+			<result name="success" type="tiles">catalog.termsandconditions.page</result>
 		</action>
 		
 		<action name="PlacingOrder" class="com.konakart.actions.PlacingOrderAction">
@@ -141,6 +169,7 @@
 			<result name="success" type="tiles">catalog.changepassword.page</result>
 		</action>
 		<action name="ChangePasswordSubmit" class="com.konakart.actions.ChangePasswordSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">MyAccount</result>	
 			<result name="Error" type="tiles">catalog.changepassword.page</result>
 		</action>
@@ -156,16 +185,30 @@
 			<result name="CheckoutFinished" type="tiles">catalog.checkoutfinishedawaitbanktransfer.page</result>
 		</action>
 		<action name="CheckoutConfirmationSubmit" class="com.konakart.actions.CheckoutConfirmationSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="ShowCartItems" type="chain">ShowCartItems</result>
 			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
 			<result name="Checkout" type="chain">Checkout</result>
 			<result name="CheckoutExternalPayment" type="tiles">catalog.external.payment.page</result>
 			<result name="CheckoutExternalPaymentFrame" type="tiles">catalog.external.payment.frame.page</result>
+			<result name="TransactionCancelled" type="tiles">catalog.transaction.cancel.page</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
 			<result name="CheckoutServerPayment" type="chain">CheckoutServerPayment</result>
 			<result name="WorldPayXMLRedirect" type="chain">WorldPayXMLRedirect</result>
 			<result name="CommideaVanguard" type="chain">CommideaVanguard</result>
 			<result name="GlobalCollect"  type="chain">GlobalCollect</result>
+			<result name="AuthorizenetDPM" type="chain">AuthorizenetDPM</result>
+			<!-- Paymetric start
+			<result name="Paymetric"  type="chain">Paymetric</result>
+			Paymetric end -->
 		</action>	
+		<action name="PayuResponse" class="com.konakart.actions.ipn.PayuAction">
+		 	<result name="redirect" type="chain">${action}</result>
+			<result name="CheckoutFinished" type="chain">CheckoutFinished</result>
+			<result name="TransactionFailed" type="tiles">catalog.transaction.fail.page</result>
+			<result name="Checkout" type="chain">Checkout</result>
+			<result name="LoginSubmitError"  type="tiles">catalog.login.page</result>
+		</action>
 		<action name="CheckoutNewDeliveryAddr" class="com.konakart.actions.CheckoutAction" method="newDeliveryAddr">
 			<result name="success" type="tiles">catalog.onepagecheckout.page</result>
 			<result name="ShowCartItems" type="chain">ShowCartItems</result>
@@ -178,6 +221,7 @@
 			<result name="success" type="tiles">catalog.checkoutfinished.page</result>
 		</action>
 		<action name="CheckoutFinishedSubmit" class="com.konakart.actions.CheckoutFinishedSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">MyAccount</result>
 		</action>
 		<action name="CheckoutPaymentError" class="com.konakart.actions.CheckoutPaymentErrorAction">
@@ -187,6 +231,7 @@
 			<result name="success" type="tiles">catalog.checkoutcreditcard.page</result>
 		</action>
 		<action name="CheckoutServerPaymentSubmit" class="com.konakart.actions.CheckoutServerPaymentSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="usaepay" type="chain">USAePay</result>
 			<result name="BarclaycardSmartPayApi" type="chain">BarclaycardSmartPayApi</result>
 			<result name="CyberSource" type="chain">CyberSource</result>
@@ -194,19 +239,20 @@
 			<result name="Netpayintl" type="chain">Netpayintl</result>
 			<result name="PayflowPro" type="chain">PayflowPro</result>
 			<result name="payjunction" type="chain">PayJunction</result>
-			<result name="yourpay" type="chain">YourPay</result>
 			<result name="elink" type="chain">Elink</result>
 			<result name="eway_au" type="chain">Eway_au</result>
 			<result name="caledon" type="chain">Caledon</result>
 			<result name="bluepay" type="chain">BluePay</result>
 		</action>
 		<action name="ContactUs" class="com.konakart.actions.ContactUsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.contactus.page</result>
 		</action>
 		<action name="CreateGiftRegistry" class="com.konakart.actions.CreateGiftRegistryAction">
 			<result name="success" type="tiles">catalog.create.gift.registry.page</result>
 		</action>
 		<action name="CreateGiftRegistrySubmit" class="com.konakart.actions.CreateGiftRegistrySubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">
 			    <param name="actionName">EditGiftRegistry</param>
 			    <param name="wishListId">${wishListId}</param>
@@ -216,7 +262,9 @@
 			<result name="success" type="tiles">catalog.registercustomer.page</result>
 		</action>
 		<action name="CustomerRegistrationSubmit" class="com.konakart.actions.CustomerRegistrationSubmitAction">
-			<result name="success" type="chain">CatalogAfterLogin</result>		
+			<interceptor-ref name="forcePostStack"></interceptor-ref>			
+			<result name="success" type="chain">CatalogAfterLogin</result>
+			<result name="ShowCartItems" type="chain">ShowCartItems</result>	
 			<result name="Checkout" type="chain">Checkout</result>		
 			<result name="ApplicationError" type="chain">CustomerRegistration</result>	
 			<result name="ChangedCountryForce" type="chain">
@@ -231,6 +279,7 @@
 			<result name="success" type="chain">MyAccount</result>
 		</action>
 		<action name="Default" class="com.konakart.actions.DefaultAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="SelectProd" type="chain">SelectProd</result>
 			<result name="SelectCat" type="chain">SelectCat</result>
 			<result name="ShowSearchByManufacturerResultsByLink" type="chain">ShowSearchByManufacturerResultsByLink</result>
@@ -246,6 +295,8 @@
 		<action name="DigitalDownload" class="com.konakart.actions.DigitalDownloadAction">
 			<result name="MyAccount" type="chain">MyAccount</result>
 		</action>
+		<action name="DigitalDownloadExt" class="com.konakart.actions.DigitalDownloadAction" method="externalCall">
+		</action>
 		<action name="DigitalDownloadPortlet" class="com.konakart.actions.DigitalDownloadAction"  method="executePortlet">
 			<result name="MyAccount" type="chain">MyAccount</result>
 			<result name="success" type="stream">
@@ -257,6 +308,8 @@
 		</action>
 		<action name="DownloadInvoice" class="com.konakart.actions.DownloadInvoiceAction">
 			<result name="MyAccount" type="chain">MyAccount</result>
+		</action>
+		<action name="DownloadInvoiceExt" class="com.konakart.actions.DownloadInvoiceAction" method="externalCall">
 		</action>
 		<action name="DownloadInvoicePortlet" class="com.konakart.actions.DownloadInvoiceAction"  method="executePortlet">
 			<result name="MyAccount" type="chain">MyAccount</result>
@@ -275,6 +328,7 @@
 			<result name="success"  type="tiles">catalog.editaddr.page</result>
 		</action>
 		<action name="EditAddrSubmit" class="com.konakart.actions.EditAddrSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="AddressBook" type="chain">AddressBook</result>		
 			<result name="OnePageCheckout" type="chain">CheckoutNoReset</result>		
 			<result name="ApplicationError" type="chain">EditAddr</result>	
@@ -288,26 +342,38 @@
 			<result name="success" type="tiles">catalog.editcustomer.page</result>
 		</action>
 		<action name="EditCustomerSubmit" class="com.konakart.actions.EditCustomerSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">MyAccount</result>
 			<result name="ApplicationError" type="tiles">catalog.editcustomer.page</result>
+		</action>
+		<action name="EditEmail" class="com.konakart.actions.EditEmailAction">
+			<result name="success" type="tiles">catalog.editemail.page</result>
+		</action>
+		<action name="EditEmailSubmit" class="com.konakart.actions.EditEmailSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
+			<result name="success" type="chain">MyAccount</result>
+			<result name="ApplicationError" type="tiles">catalog.editemail.page</result>
 		</action>
 		<action name="EditGiftRegistry" class="com.konakart.actions.EditGiftRegistryAction">
 			<result name="MyAccount" type="chain">MyAccount</result>
 			<result name="success" type="tiles">catalog.edit.gift.registry.page</result>
 		</action>
 		<action name="EditGiftRegistrySubmit" class="com.konakart.actions.EditGiftRegistrySubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">MyAccount</result>
 		</action>
 		<action name="EditNewsletter" class="com.konakart.actions.EditNewsletterAction">
 			<result name="success"  type="tiles">catalog.editnewsletter.page</result>
 		</action>
 		<action name="EditNewsletterSubmit" class="com.konakart.actions.EditNewsletterSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">CatalogAfterLogin</result>		
 		</action>
 		<action name="EditNotifiedProducts" class="com.konakart.actions.EditNotifiedProductsAction">
 			<result name="success"  type="tiles">catalog.EditNotifiedProducts.page</result>
 		</action>
 		<action name="EditNotifiedProductsSubmit" class="com.konakart.actions.EditNotifiedProductsSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">EditNotifiedProducts</result>
 		</action>
 		<action name="EditWishListSubmit" class="com.konakart.actions.EditWishListSubmitAction">
@@ -317,24 +383,30 @@
 			<result name="welcome" type="chain">Welcome</result>
 		</action>
 		<action name="FilterRev" class="com.konakart.actions.FilterReviewAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="FilterSearchByTags" class="com.konakart.actions.FilterSearchByTagsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success"  type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="FilterSearchByCategory" class="com.konakart.actions.FilterSearchByCategoryAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success"  type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="FilterSearchByManufacturer" class="com.konakart.actions.FilterSearchByManufacturerAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success"  type="tiles">catalog.showprods.page</result>
 		</action>	
 		<action name="FilterSearchByPrice" class="com.konakart.actions.FilterSearchByPriceAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success"  type="tiles">catalog.showprods.page</result>
 		</action>	
 		<action name="ForgotPassword" class="com.konakart.actions.ForgotPasswordAction">
 			<result name="success" type="tiles">catalog.forgotpassword.page</result>
 		</action>
 		<action name="ForgotPasswordSubmit" class="com.konakart.actions.ForgotPasswordSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result  name="success"  type="chain">LogIn</result>	
 			<result  name="Error" type="tiles">catalog.forgotpassword.page</result>
 		</action>			
@@ -351,6 +423,10 @@
 		<action name="InitFromToken" class="com.konakart.actions.InitFromTokenSubmitAction">
 			<result name="success" type="chain">Checkout</result>
 		</action>
+		<action name="InternationalOrders" class="com.konakart.actions.InternationalOrdersAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.internationalorders.page</result>
+		</action>
 		<action name="OrderTracking" class="com.konakart.actions.OrderTrackingAction">
 			<result name="success" type="tiles">catalog.ordertracking.page</result>
 		</action>
@@ -362,6 +438,7 @@
 			<result name="success"  type="tiles">catalog.logout.page</result>			
 		</action>
 		<action name="LoginSubmit" class="com.konakart.actions.LoginSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 		 	<result name="redirect" type="chain">${action}</result>
 			<result name="success" type="chain">CatalogAfterLogin</result>
 			<result name="LoginSubmitError"  type="tiles">catalog.login.page</result>
@@ -380,12 +457,15 @@
 			<result name="success" type="tiles">catalog.showallorders.page</result>
 		</action>
 		<action name="NavigateGiftRegistryItems" class="com.konakart.actions.NavigateGiftRegistryItemsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showgiftregistryitems.noedit.page</result>		
 		</action>
 		<action name="NavigateProd" class="com.konakart.actions.NavigateProductAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success"  type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="NavigateRev" class="com.konakart.actions.NavigateReviewAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="NavigateRewardPoints" class="com.konakart.actions.NavigateRewardPointsAction">
@@ -398,6 +478,7 @@
 			<result name="success"  type="tiles">catalog.newaddr.page</result>
 		</action>
 		<action name="NewAddrSubmit" class="com.konakart.actions.NewAddrSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="chain">AddressBook</result>		
 			<result name="OnePageCheckout" type="chain">CheckoutNoReset</result>		
 			<result name="ApplicationError" type="chain">NewAddr</result>	
@@ -407,10 +488,21 @@
 			<result name="success" type="tiles">catalog.showallorders.page</result>
 		</action>
 		<action name="PreSelectProd" class="com.konakart.actions.ShowProductDetailsAction" method="preSelect">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="CancellationPolicy" class="com.konakart.actions.CancellationPolicyAction">
 			<result name="success" type="tiles">catalog.cancellationpolicy.page</result>
+		</action>
+		<action name="DeliveryPolicy" class="com.konakart.actions.DeliveryPolicyAction">
+			<result name="success" type="tiles">catalog.deliverypolicy.page</result>
+		</action>
+		<action name="RefundPolicy" class="com.konakart.actions.RefundPolicyAction">
+			<result name="success" type="tiles">catalog.refundpolicy.page</result>
+		</action>
+		<action name="PrivacyPolicy" class="com.konakart.actions.PrivacyPolicyAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.privacypolicy.page</result>
 		</action>
 		<action name="ProdPageSize" class="com.konakart.actions.ProdPageSizeAction">
 			<result name="success" type="tiles">catalog.showprods.page</result>
@@ -438,6 +530,10 @@
 		<action name="ResetNotification" class="com.konakart.actions.ResetNotificationAction"> 
 			<result name="success"  type="tiles">catalog.showprod.details.page</result>
 		</action>
+		<action name="Returns" class="com.konakart.actions.ReturnsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.returns.page</result>
+		</action>
 		<action name="DeliveryDetails" class="com.konakart.actions.DeliveryDetailsAction">
 			<result name="success" type="tiles">catalog.deliverydetails.page</result>
 		</action>
@@ -445,6 +541,7 @@
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="SelectCat" class="com.konakart.actions.SelectCategoryAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="ShowCategories" type="tiles">catalog.showcats.page</result>
 			<result name="ShowProducts" type="tiles">catalog.showprods.page</result>
 		</action>		
@@ -458,18 +555,25 @@
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>		
 		<action name="SelectProd" class="com.konakart.actions.ShowProductDetailsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
+		</action>
+		<action name="ShippingAndHandling" class="com.konakart.actions.ShippingAndHandlingAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
+			<result name="success" type="tiles">catalog.shippingandhandling.page</result>
 		</action>
 		<action name="Payment" class="com.konakart.actions.PaymentAction">
 			<result name="success" type="tiles">catalog.payment.page</result>
 		</action>
 		<action name="ShowAllNewProds" class="com.konakart.actions.ShowAllNewProdsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="ShowAllOrders" class="com.konakart.actions.ShowAllOrdersAction">
 			<result name="success" type="tiles">catalog.showallorders.page</result>
 		</action>
 		<action name="ShowAllSpecials" class="com.konakart.actions.ShowAllSpecialsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="ShowCartItems" class="com.konakart.actions.ShowCartItemsAction">
@@ -479,9 +583,11 @@
 			<result name="success" type="tiles">catalog.showgiftregistryitems.noedit.page</result>
 		</action>
 		<action name="ShowGiftRegistrySearchResults" class="com.konakart.actions.GiftRegistrySearchSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="tiles">catalog.showgiftregistries.page</result>
 		</action>		
 		<action name="ShowHomepage" class="com.konakart.actions.ShowHomepageAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showhomepage.page</result>
 		</action>
 		<action name="ShowOrderDetails" class="com.konakart.actions.ShowOrderDetailsAction">
@@ -492,15 +598,19 @@
 			<result name="success" type="tiles">catalog.showrewardpoints.page</result>
 		</action>
 		<action name="ShowProductsForManufacturer" class="com.konakart.actions.ShowProductsForManufacturerAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="ShowSearchByManufacturerResultsByLink" class="com.konakart.actions.SearchByManufacturerByLinkSubmitAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="ShowSearchResults" class="com.konakart.actions.AdvancedSearchSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>		
 		<action name="ShowSpecials" class="com.konakart.actions.ShowSpecialsAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="ShowWishListItems" class="com.konakart.actions.ShowWishListItemsAction">
@@ -511,27 +621,33 @@
 			<result name="success" type="tiles">catalog.showgiftregistryitems.noedit.page</result>
 		</action>
 		<action name="SortProd" class="com.konakart.actions.SortProductAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprods.page</result>
 		</action>
 		<action name="SortRev" class="com.konakart.actions.SortReviewAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="TermsOfUse" class="com.konakart.actions.TermsOfUseAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.termsofuse.page</result>
 		</action>
 		<action name="Welcome" class="com.konakart.actions.CatalogMainPageAction">
+			<interceptor-ref name="allowCacheStack"></interceptor-ref>			
 			<result name="success" type="tiles">catalog.main.page</result>
 		</action>
 		<action name="WriteReview" class="com.konakart.actions.WriteReviewAction">
 			<result name="success" type="tiles">catalog.writereview.page</result>
 		</action>
 		<action name="WriteReviewSubmit" class="com.konakart.actions.WriteReviewSubmitAction">
+			<interceptor-ref name="forcePostStack"></interceptor-ref>
 			<result name="success" type="tiles">catalog.showprod.details.page</result>
 		</action>
 		<action name="XMLOverHTTP" class="com.konakart.actions.XMLOverHTTPAction">
 			<result name="success">/WEB-INF/jsp/XMLOverHTTPResponse.jsp</result>
 		</action>
 		<!-- =========================================== IPN Callbacks -->
+		<action name="AuthNetCallback" class="com.konakart.actions.ipn.AuthorizeNetCallbackAction"/>
 		<action name="BarclaycardSmartPayApiNotification" class="com.konakart.actions.ipn.BarclaycardSmartPayApiNotificationAction"/>
 		<action name="BarclaycardSmartPayHostedNotification" class="com.konakart.actions.ipn.BarclaycardSmartPayHostedNotificationAction"/>
 		<action name="ChronoPayCallback" class="com.konakart.actions.ipn.ChronoPayAction"/>
@@ -554,6 +670,17 @@
 			<result name="CheckoutError" type="chain">CheckoutPaymentError</result>
 			<result name="CheckoutExternalPaymentFrame" type="tiles">catalog.external.payment.frame.page</result>	
 		</action>
+		<action name="AuthorizenetDPM" class="com.konakart.actions.gateways.AuthorizeNetDPM1Action">
+			<result name="success" type="tiles">catalog.authnetcreditcard.page</result>			
+		</action>
+		<action name="AuthorizeNetManageCreditCards" class="com.konakart.actions.gateways.AuthorizeNetManageCreditCardsAction">
+			<result name="success" type="chain">CatalogAfterLogin</result>	
+		</action>		
+		<!-- Paymetric start
+		<action name="Paymetric" class="com.konakart.actions.gateways.PaymetricAction">
+			<result name="success" type="tiles">catalog.paymetric.page</result>
+		</action>
+		Paymetric end -->
 
 		<!-- =========================================== Gateway Redirect Responses -->
 		<action name="CommideaVanguard1" class="com.konakart.actions.gateways.CommideaVanguard1Action">
@@ -578,11 +705,7 @@
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
 		</action>
-		<action name="CyberSourceResponse" class="com.konakart.actions.gateways.CyberSourceResponseAction">
-			<result name="Approved" type="chain">CheckoutFinished</result>
-			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
-		</action>
-		<action name="CyberSourceHOPResponse" class="com.konakart.actions.gateways.CyberSourceHOPResponseAction">
+		<action name="CyberSourceSAResponse" class="com.konakart.actions.gateways.CyberSourceSAResponseAction">
 			<result name="redirect" type="redirect">${url}</result>
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="CheckoutError" type="chain">CheckoutPaymentError</result>
@@ -592,6 +715,16 @@
 			<result name="CheckoutError" type="chain">CheckoutPaymentError</result>
 			<result name="CheckoutAwaitBankTransfer" type="chain">CheckoutAwaitBankTransfer</result>
 		</action>
+		<action name="AuthorizeNetCIMPay" class="com.konakart.actions.gateways.AuthorizeNetCIMPayAction">
+			<result name="Approved" type="chain">CheckoutFinished</result>
+			<result name="TryAgain" type="chain">AuthorizenetDPM</result>
+		</action>		
+		
+		<!-- Paymetric start
+		<action name="PaymetricResponse" class="com.konakart.actions.gateways.PaymetricResponseAction">
+			<result name="success" type="chain">CheckoutFinished</result>
+		</action>
+		Paymetric end -->
 
 		<!-- =========================================== Server Side Gateways -->
 		<action name="USAePay" class="com.konakart.actions.gateways.UsaepayAction">
@@ -623,10 +756,6 @@
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
 		</action>
 		<action name="PayJunction" class="com.konakart.actions.gateways.PayjunctionAction">
-			<result name="Approved" type="chain">CheckoutFinished</result>
-			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
-		</action>
-		<action name="YourPay" class="com.konakart.actions.gateways.YourpayAction">
 			<result name="Approved" type="chain">CheckoutFinished</result>
 			<result name="TryAgain" type="chain">CheckoutServerPayment</result>
 		</action>

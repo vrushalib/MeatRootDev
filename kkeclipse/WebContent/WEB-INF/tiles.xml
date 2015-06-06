@@ -25,6 +25,7 @@
 	</definition>
 	<!-- Catalog Main Page -->
 	<definition name="catalog.main.page" extends="main.layout">
+	<put-attribute name="header3" value="/WEB-INF/jsp/Menu.jsp"/>
 		<put-attribute name="defName" value="catalog.main.page"/>
 	    <put-attribute name="body1" value="/WEB-INF/jsp/BannersBody.jsp"/>
 		<put-attribute name="body2" value="/WEB-INF/jsp/NewProductsBody.jsp"/>

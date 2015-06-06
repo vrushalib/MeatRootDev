@@ -41,10 +41,25 @@
 	});			*/	
 </script>
 
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+	 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+     
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+         
+      
 
-
-<div id="main-menu" >
+ 
+	 
 	<% 	for (int i = 0; i < catMgr.getCats().length; i++) {%>
+
 	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
     <% if(cat.getCustom1() == null){ //category is not invisible. custom1 value for invisible categories is "i".%>
 		<%String menuClass; %>
@@ -54,10 +69,18 @@
 		else { %>
 			<% menuClass = "menu-item rounded-corners"; %>
 		<% } %>
-		<a href='<%="SelectCat.action?catId="+cat.getId()%>'
+		<li><a href='<%="SelectCat.action?catId="+cat.getId()%>'
 			class="<%=menuClass%>">
-			<%=cat.getName()%></a>
+			<%=cat.getName()%></a></li>
 		<% } %>
+		
 	<% } %>
-</div>
 
+
+
+
+ </ul>
+       
+    </div>
+  </div>
+</nav>
