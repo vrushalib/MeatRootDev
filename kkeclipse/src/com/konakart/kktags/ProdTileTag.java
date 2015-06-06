@@ -18,6 +18,7 @@ package com.konakart.kktags;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.servlet.jsp.JspException;
@@ -26,7 +27,12 @@ import javax.servlet.jsp.PageContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
+import com.konakart.al.ProdOption;
+import com.konakart.al.ProdOptionContainer;
+import com.konakart.al.ProductMgr;
+import com.konakart.app.KKException;
 import com.konakart.app.NameValue;
+import com.konakart.app.Option;
 import com.konakart.appif.ProductIf;
 import com.konakart.appif.PromotionIf;
 import com.konakart.appif.PromotionResultIf;
@@ -122,6 +128,8 @@ public class ProdTileTag extends BaseTag
             getImageLink(sb, KKAppEng.IMAGE_SMALL, /*addLink*/true);
             // Title
             getTitleLink(sb);
+            // Product Options
+            getProductOptions(sb);
             // Reviews
             getReviews(sb);
             // Prices
@@ -207,6 +215,9 @@ public class ProdTileTag extends BaseTag
             // Title
             getTitleLink(sb);
 
+            // Product Options
+            getProductOptions(sb);
+            
             // Reviews
             getReviews(sb);
 
@@ -329,6 +340,54 @@ public class ProdTileTag extends BaseTag
         if (prod.getNumberReviews() > 0)
         {
             sb.append(END_A);
+        }
+        sb.append(END_DIV);
+    }
+    
+    private void getProductOptions(StringBuffer sb)
+    {
+        ProductMgr prodMgr = eng.getProductMgr();
+        sb.append(getStartDiv("product-options"));
+        if (prod.getOpts() != null && prod.getOpts().length > 0){
+            try {
+                int i=0;
+                prodMgr.fetchSelectedProduct(prod.getId());
+                for(Iterator<ProdOptionContainer> iterator = prodMgr.getSelectedProductOptions().iterator();iterator.hasNext();) {
+                    ProdOptionContainer optContainer =  iterator.next();
+                    sb.append("<input type=\"hidden\" name=\"optionId[" + i+"]\" value=\"" + optContainer.getId() + "\"/>");
+                    sb.append("<input type=\"hidden\" name=\"type[" + i+"]\" value=\"" + optContainer.getType() + "\"/>");
+                    
+                    if (Integer.parseInt(optContainer.getType()) == Option.TYPE_SIMPLE){
+                        sb.append(getStartDiv("product-option"));
+                        sb.append(getStartSpan(optContainer.getName()));
+                        sb.append(":"+END_SPAN);
+                        
+                        sb.append("<select name=\"valueId[" + i +"]\">");
+                        for (Iterator<ProdOption> iterator1 =  optContainer.getOptValues().iterator(); iterator1.hasNext();) {
+                            ProdOption option =  iterator1.next();
+                            if (eng.displayPriceWithTax()){
+                                sb.append("<option value=" + option.getId()+"\">" + option.getFormattedValueIncTax() +"</option>");
+                            } else {
+                                sb.append("<option value=" + option.getId()+"\">" + option.getFormattedValueExTax() +"</option>");
+                            }
+                        }
+                        sb.append("</select>");
+                        sb.append(END_DIV);
+                    }
+                    i++;
+                }
+                sb.append("<input type=\"hidden\" name=\"numOptions\" value=\""+new Integer(i).toString()+"\"/>");
+            } catch (NumberFormatException e) {
+                // TODO Log error
+                e.printStackTrace();
+            } catch (KKException e) {
+                // TODO Log error
+                e.printStackTrace();
+            } catch (KKAppException e) {
+                // TODO Log error
+                e.printStackTrace();
+            }
+            
         }
         sb.append(END_DIV);
     }
