@@ -201,6 +201,9 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             if (newStatus == OrderMgr.PAYMENT_RECEIVED_STATUS)
             {
+            	//Code to send SMS on Successful order
+            	sendSMS(order);
+            	
                 manageDigitalDownloads(order);
                 manageGiftCertificates(order);
                 manageGiftRegistries(order);
@@ -226,7 +229,37 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
     }
 
-    /**
+    private void sendSMS(OrderIf order) {
+    	String mobileNumber = order.getCustomerTelephone().replaceAll("+", "").replaceAll(" ", "").replaceAll("-", "");
+    	if (mobileNumber.length() == 10 ) {
+    		mobileNumber = "91" + mobileNumber;
+    	}
+    	
+    	if (mobileNumber.length() != 12 || mobileNumber.matches("[a-zA-Z]")) {
+    		log.warn("Invalid Customer Mobile Number Provided : " + order.getCustomerTelephone() + "Processed : " + mobileNumber);
+    		return;
+    	}
+    	
+    	//Sending SMS using Http Client
+    	String message  = "This is a test message";
+    	//String message = "Your order is placed successfully";
+    	CloseableHttpClient httpclient = HttpClients.createDefault();
+    	String URL = "http://enterprise.smsgupshup.com/GatewayAPI/rest?method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000122945&auth_scheme=plain&password=ol5IyP9oI&v=1.1&format=text";
+    	URL = String.format(URL, mobileNumber, message);
+    	HttpGet httpGet = new HttpGet(URL);
+    	try {
+			CloseableHttpResponse response1 = httpclient.execute(httpGet);
+			log.info("SMS Sending Response :  " + response1.getStatusLine());
+		} catch (ClientProtocolException e) {
+			log.error("Exception Occured while Sending SMS : " + e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			log.error("Exception Occured while Sending SMS : " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	/**
      * Called just before a subscription is inserted. This method gives the opportunity to modify
      * any detail of the subscription before it is inserted. If null is returned, then no action is
      * taken. If a non null subscription is returned, then this is the subscription that will be
