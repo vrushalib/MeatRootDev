@@ -111,15 +111,15 @@
 		</div>
 		<div id="search">
 			<%if (useSolr) { %>						
-				<input type="text" id="search-input" class="rounded-corners-left" name="searchText" onkeydown="javascript:kkKeydown();">
+				<input type="text" id="search-input" name="searchText" onkeydown="javascript:kkKeydown();">
 				<input id="kk_key" type="hidden"/>
-				<a id="search-button" class="rounded-corners-right"><kk:msg  key="suggested.search.search"/></a>
+				<a id="search-button" ><kk:msg  key="suggested.search.search"/></a>
 			<% } else { %>	
 				<form action="QuickSearch.action" id="quickSearchForm" method="post">
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 					<input type="hidden" value="true" name="searchInDesc"/>
-					<input type="text" id="search-input" class="rounded-corners-left" name="searchText">
-					<a id="search-button" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchForm').submit();"><kk:msg  key="suggested.search.search"/></a>
+					<input type="text" id="search-input"  name="searchText">
+					<a id="search-button" onclick="javascript:document.getElementById('quickSearchForm').submit();"><span class="searchicon icon-search"></span><kk:msg  key="suggested.search.search"/></a>
 				</form>	
             <% } %>
 		</div>

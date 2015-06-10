@@ -28,6 +28,8 @@
 <% com.konakart.al.ProductMgr prodMgr = kkEng.getProductMgr();%>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <% com.konakart.al.RewardPointMgr rewardPointMgr = kkEng.getRewardPointMgr();%>
+<% Boolean flag = false; // To check if cart contains only addon products %>
+<% final String addon = "addon"; %>
 
 <script type="text/javascript">
 
@@ -47,6 +49,12 @@ $(function() {
 		    $("#form1 input[name='prodQty']").each(function() {
 		        $(this).rules("add", { required: true, digits: true, maxlength: 7 });
 		     }); 
+		}
+ 	    
+ 	   if ($("#continue-button").length ){
+			$("#addon-message").hide();
+		}else {
+			$("#addon-message").show();
 		}
 	
 		var qtyMap = {};
@@ -154,8 +162,10 @@ $(function() {
 				  redirect(getURL("EditCartSubmit.action", new Array("action","q","id",basketId,"qty",qty)));
 			  }
 		});
+		
 	});
 </script>
+
    		<h1 id="page-title"><kk:msg  key="edit.cart.body.editcart"/></h1>
  	    		<div id="checkout-area" class="content-area rounded-corners">
 	    		<%if (currentCustomer.getBasketItems() == null || currentCustomer.getBasketItems().length == 0){ %>
@@ -168,7 +178,7 @@ $(function() {
 					        </s:iterator>  
 		    			</div>  
 					</s:if>		    		    		
-							    		
+					<div id="addon-message" style="display: none;"><kk:msg key="edit.cart.body.addon"/></div><br>
 		    		<form action="EditCartSubmit.action" id="form1" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 						<input type="hidden" name="goToCheckout" id="goToCheckout" value="" />
@@ -178,7 +188,6 @@ $(function() {
 	    						<tr>
 	    							<td class="narrow-col"><kk:msg  key="edit.cart.body.item"/></td>
 	    							<td class="wide-col"></td>
-	    							
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.price"/></td>
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.total"/></td>
 	    							<td class="narrow-col center"></td>
@@ -187,6 +196,10 @@ $(function() {
 	    					<tbody>
 								<% for (int k = 0; k < currentCustomer.getBasketItems().length; k++){ %>
 									<% BasketIf item = currentCustomer.getBasketItems()[k];%>
+									<%-- Check if cart contains only 'addon products'.If yes, user should not be able to checkout --%>
+									<% if(item.getProduct().getCustom1() == null || !item.getProduct().getCustom1().equalsIgnoreCase(addon)){
+										flag = true;
+									}%>
 		    						<tr>
 		    							<td>
 		    								<%if ((item.getQuantity() > item.getQuantityInStock()) && prodMgr.isStockCheck()) { %>
@@ -302,7 +315,11 @@ $(function() {
 	    					</tbody>	    				
 	    				</table>
 						<div >
-							<a onmouseover="setGoToCheckout()" onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.checkout"/></span></a>						
+						<%if(flag == true){ %>
+							<a onmouseover="setGoToCheckout()" onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.checkout"/></span></a>
+						<%}else{ %>
+							<a href="welcome.action" id="back-button" class="button small-rounded-corners"><span><kk:msg  key="common.back"/></span></a>
+						<%}%>						
 						</div>
 					</form>		
 				<% } %>	    	
