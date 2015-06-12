@@ -86,28 +86,28 @@
 	    <% } %>
 	    <%if(cat.getName().contains("Fresh")) {%>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-one">
-								<div
+								<div onclick="location.href='SelectCat.action?catId=<%=cat.getId()%>'"
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/fresh.jpg') center left no-repeat; background-size: 100% 100%;">
-								<div class="button2"><span>Tender, healthier and tastier<br/> meat straight from the farms!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/homepage_fresh.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
 								</div></li>
 		<%}else if(cat.getName().contains("Frozen")){ %>						
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-two"><div
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-two">
+					            <div onclick="location.href='SelectCat.action?catId=<%=cat.getId()%>'"
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/frozen.jpg') center left no-repeat; background-size: 100% 100%;">
-								<div class="button2"><span>Why wait for a season<br/>frozen gives the  same freshness <br/> throughout the year!!</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div></div></li>
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/homepage_frozen.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
+								</div></li>
 			    <%}else if(cat.getName().contains("Processed")){ %>				
-					<li style="width: 940px; height: 255px;" id="uiv2-slide-three"><div
+					<li style="width: 940px; height: 255px;" id="uiv2-slide-three">
+								<div onclick="location.href='SelectCat.action?catId=<%=cat.getId()%>'"
 								class="uiv2-slider-block-one"
-								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/processed.jpg') center left no-repeat; background-size: 100% 100%;">
-								<div class="button2"><span>From starters to mains,<br/> prepare anything within no time.</span><a href='<%="SelectCat.action?catId="+cat.getId()%>'><input type="button" class="button3" value="Explore" /></a> </div>
+								style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/homepage_processed.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
 								</div></li>
 		<% } %>
 	<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four">
 					
 					<div onclick="location.href='SelectCat.action?catId=46'" class="uiv2-slider-block-one"
-                                                                style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/Zorabian3.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
+                    style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/Zorabian3.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
 								 </div></li>
 								
 				</ul>
@@ -163,13 +163,13 @@
 		<a href="ShowSpecials.action"><img id="banner-1" class="banner-small rounded-corners" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner1.png"/></a>
 			
-			<a href="SelectCat.action?catId=24"><img id="banner-2" class="banner-small rounded-corners" 
+			<a href="SelectProd.action?prodId=153"><img id="banner-2" class="banner-small rounded-corners" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner2.png"/></a>
 			
-			<a href="ShowSpecials.action"><img id="banner-3" class="banner-small rounded-corners" 
+			<a href="SelectCat.action?catId=39"><img id="banner-3" class="banner-small rounded-corners" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner3.png"/></a>
 			
-			<a href="SelectProd.action?prodId=35"><img id="banner-4" class="banner-small rounded-corners last-child" 
+			<a href="SelectCat.action?catId=36"><img id="banner-4" class="banner-small rounded-corners last-child" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner4.png"/></a>
 	
 
