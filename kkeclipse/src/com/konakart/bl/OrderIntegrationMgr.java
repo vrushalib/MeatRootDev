@@ -20,6 +20,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,6 +30,11 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import com.konakart.app.Booking;
 import com.konakart.app.Coupon;
@@ -202,7 +209,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             if (newStatus == OrderMgr.PAYMENT_RECEIVED_STATUS)
             {
             	//Code to send SMS on Successful order
-            	sendSMS(order);
+            	//sendSMS(order);
             	
                 manageDigitalDownloads(order);
                 manageGiftCertificates(order);
@@ -229,33 +236,58 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
     }
 
-    private void sendSMS(OrderIf order) {
-    	String mobileNumber = order.getCustomerTelephone().replaceAll("+", "").replaceAll(" ", "").replaceAll("-", "");
-    	if (mobileNumber.length() == 10 ) {
-    		mobileNumber = "91" + mobileNumber;
-    	}
-    	
-    	if (mobileNumber.length() != 12 || mobileNumber.matches("[a-zA-Z]")) {
-    		log.warn("Invalid Customer Mobile Number Provided : " + order.getCustomerTelephone() + "Processed : " + mobileNumber);
-    		return;
-    	}
-    	
-    	//Sending SMS using Http Client
-    	String message  = "This is a test message";
-    	//String message = "Your order is placed successfully";
-    	CloseableHttpClient httpclient = HttpClients.createDefault();
-    	String URL = "http://enterprise.smsgupshup.com/GatewayAPI/rest?method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000122945&auth_scheme=plain&password=ol5IyP9oI&v=1.1&format=text";
-    	URL = String.format(URL, mobileNumber, message);
-    	HttpGet httpGet = new HttpGet(URL);
-    	try {
-			CloseableHttpResponse response1 = httpclient.execute(httpGet);
-			log.info("SMS Sending Response :  " + response1.getStatusLine());
-		} catch (ClientProtocolException e) {
-			log.error("Exception Occured while Sending SMS : " + e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			log.error("Exception Occured while Sending SMS : " + e.getMessage());
-			e.printStackTrace();
+	private void sendSMS(OrderIf order) {
+		String nonEmptyMobile = order.getCustomerTelephone();
+		if (null == nonEmptyMobile || nonEmptyMobile.isEmpty()) {
+			nonEmptyMobile = order.getCustomerTelephone1();
+		}
+
+		if (null != nonEmptyMobile && !nonEmptyMobile.isEmpty()) {
+			String mobileNumber = order.getCustomerTelephone()
+					.replaceAll("\\+", "").replaceAll(" ", "")
+					.replaceAll("\\-", "");
+			if (mobileNumber.length() == 10) {
+				mobileNumber = "91" + mobileNumber;
+			}
+
+			if (mobileNumber.length() != 12 || mobileNumber.matches("[a-zA-Z]")) {
+				log.warn("Invalid Customer Mobile Number Provided : "
+						+ order.getCustomerTelephone() + "Processed : "
+						+ mobileNumber);
+				return;
+			}
+
+			// Sending SMS using Http Client
+			String message = "This is a test message";
+			// String message = "Your order is placed successfully";
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			
+			URI uri = null;
+			try {
+				uri = new URI(
+				        "http", 
+				        "enterprise.smsgupshup.com", 
+				        "/GatewayAPI/rest",
+				        String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000122945&auth_scheme=plain&password=ol5IyP9oI&v=1.1&format=text", mobileNumber, message),
+				        null);
+			} catch (URISyntaxException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			HttpGet httpGet = new HttpGet(uri.toASCIIString());
+			try {
+				CloseableHttpResponse response1 = httpclient.execute(httpGet);
+				log.info("SMS Sending Response :  " + response1.getStatusLine());
+			} catch (ClientProtocolException e) {
+				log.error("Exception Occured while Sending SMS : "
+						+ e.getMessage());
+				e.printStackTrace();
+			} catch (IOException e) {
+				log.error("Exception Occured while Sending SMS : "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 

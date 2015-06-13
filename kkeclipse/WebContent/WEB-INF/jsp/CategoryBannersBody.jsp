@@ -30,97 +30,15 @@
 <% String contentDir = kkEng.getContentImagesDir();%>
 <% boolean contentEnabled = kkEng.getContentMgr().isEnabled();%>
 
-<%--<% if (!hideRow1) { 
-	<%if (contentEnabled) { %>
-		<% catBanners = kkEng.getContentMgr().getContentForTypeAndKey(2, 3, kkEng.getCategoryMgr().getCurrentCat().getSearchKey());%>
-	<% } else { %>
-		<% catBanners = new Content[1];%>
-		<% ContentIf banner = new Content();%>
-		<% catBanners[0] = banner;%>
-	<% } %>
-	
-	<% if (catBanners.length > 0) { %>
-		<% if (catBanners[0].getClickUrl() != null && catBanners[0].getClickUrl().length() > 0) { %>
-			<a href="<%=catBanners[0].getClickUrl()%>">
-				<picture class="rounded-corners">
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName1()%>" media="(min-width: 750px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName2()%>" media="(min-width: 440px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName3()%>" >
-					<!--[if IE 9]></video><![endif]-->
-					<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName1()%>">
-				</picture>
-			</a> 	
-		<% } else { %>
-			<picture class="rounded-corners">
-				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName1()%>" media="(min-width: 750px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName2()%>" media="(min-width: 440px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName3()%>" >
-				<!--[if IE 9]></video><![endif]-->
-				<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catBanners[0].getDescription().getName1()%>">
-			</picture>
-		<% } %>
-	<% } %>
+<% String custom1 = kkEng.getCategoryMgr().getCurrentCat().getCustom2(); %>
+<% String custom2 = kkEng.getCategoryMgr().getCurrentCat().getCustom3(); %>
+
+<% if ( null != custom1 && !custom1.isEmpty() && null != custom2 && !custom2.isEmpty()) { %>
+<% String productId1 = custom1.split(":")[0]; %>
+<% String productURL1 = custom1.split(":")[1]; %>
+<% String productId2 = custom2.split(":")[0]; %>
+<% String productURL2 = custom2.split(":")[1]; %>
+<a href="SelectProd.action?prodId=<%=productId1%>"><div class="leftImg" style="width:49%; height: 200px; background-image: url(<%=productURL1 %>); display:inline-table;"></div></a>
+<a href="SelectProd.action?prodId=<%=productId2%>"><div class="rightImg" style="width:49%; height: 200px; background-image: url(<%=productURL2 %>); display:inline-table;"></div></a>
 <% } %>
-
-<% if (!hideRow2) { %>
-	<%if (contentEnabled) { %>
-		<% catSubBanners = kkEng.getContentMgr().getContentForTypeAndKey(2, 4, kkEng.getCategoryMgr().getCurrentCat().getSearchKey());%>
-	<% } else { %>
-		<% catSubBanners = new Content[2];%>
-		<% ContentIf banner1 = new Content();%>
-		<% ContentIf banner2 = new Content();%>
-		<% catSubBanners[0] = banner1;%>
-		<% catSubBanners[1] = banner2;%>
-	<% } %>
-
-	<% if (catSubBanners.length > 1 && catSubBanners[0] != null  && catSubBanners[1] != null) { %>
-		<div id="banners">
-		<% if (catSubBanners[0].getClickUrl() != null && catSubBanners[0].getClickUrl().length() > 0) { %>
-			<a href="<%=catSubBanners[0].getClickUrl()%>">
-				<picture class="banner-double rounded-corners">
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName1()%>" media="(min-width: 750px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName2()%>" media="(min-width: 440px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName3()%>" >
-					<!--[if IE 9]></video><![endif]-->
-					<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName1()%>">
-				</picture>
-			</a> 	
-		<% } else { %>
-			<picture class="banner-double rounded-corners">
-				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName1()%>" media="(min-width: 750px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName2()%>" media="(min-width: 440px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName3()%>" >
-				<!--[if IE 9]></video><![endif]-->
-				<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[0].getDescription().getName1()%>">
-			</picture>
-		<% } %>	
-
-		<%if (catSubBanners[1].getClickUrl() != null && catSubBanners[1].getClickUrl().length() > 0) { %>
-			<a href="<%=catSubBanners[1].getClickUrl()%>">
-				<picture class="banner-double rounded-corners last-child">
-					<!--[if IE 9]><video style="display: none;"><![endif]-->
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName1()%>" media="(min-width: 750px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName2()%>" media="(min-width: 440px)">
-					<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName3()%>" >
-					<!--[if IE 9]></video><![endif]-->
-					<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName1()%>">
-				</picture>
-			</a> 	
-		<% } else { %>
-			<picture class="banner-double rounded-corners last-child">
-				<!--[if IE 9]><video style="display: none;"><![endif]-->
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName1()%>" media="(min-width: 750px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName2()%>" media="(min-width: 440px)">
-				<source srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName3()%>" >
-				<!--[if IE 9]></video><![endif]-->
-				<img srcset="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=catSubBanners[1].getDescription().getName1()%>">
-			</picture>
-		<% } %>	
-	<% } %>	
-	</div>
-<% } %>  --%>
 

@@ -89,7 +89,8 @@
 	<definition name="catalog.showprods.page" extends="main.layout">
 		<put-attribute name="defName" value="catalog.showprods.page"/>
 		<put-attribute name="contentClass" value="narrow"/>
-		<put-attribute name="body1" value="/WEB-INF/jsp/ProductsBody.jsp"/>
+		<put-attribute name="body1" value="/WEB-INF/jsp/CategoryBannersBody.jsp"/>
+		<put-attribute name="body2" value="/WEB-INF/jsp/ProductsBody.jsp"/>
 		<put-attribute name="left1" value="/WEB-INF/jsp/Facets.jsp"/>
 	</definition>
 	<!-- Page shown for a list of all orders for a customer -->
