@@ -153,6 +153,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
          */
         if (order.getStatus() == com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS)
         {
+			sendSMS(order);
             manageDigitalDownloads(order);
             manageGiftCertificates(order);
             manageGiftRegistries(order);
@@ -175,7 +176,9 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             // Uncomment if using Bookable Products
             // manageBookings(order);
-        }
+        } else if (order.getStatus() == OrderMgr.PENDING_STATUS) {
+			sendSMS(order);
+		}
 
         // By default we don't create any invoices.
         // createInvoice(order);
@@ -211,7 +214,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             if (newStatus == OrderMgr.PAYMENT_RECEIVED_STATUS)
             {
             	//Code to send SMS on Successful order
-            	//sendSMS(order);
+            	sendSMS(order);
             	
                 manageDigitalDownloads(order);
                 manageGiftCertificates(order);
@@ -226,7 +229,10 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 // Uncomment if using Bookable Products
                 // manageBookings(order);
             }
-
+			
+			else if (newStatus == OrderMgr.PENDING_STATUS) {
+				sendSMS(order);
+			}
             /*
              * Uncomment the call to createInvoice() if you want your invoice to be created when the
              * order reaches a particular state and not when it is first saved.
@@ -264,10 +270,14 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			if (order.getCustom1().equalsIgnoreCase("m")) {
 				slot = "7am - 10:30am";
 			}
+			
+			String amount = order.getOrderTotals()[0].getText();			
 			// Sending SMS using Http Client
-			String message = String.format("Dear %s, Your order %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s.", order.getCustomerName(),order.getOrderNumber(), today, order.getCustom2(), slot);
+			String message = String.format("Dear %s, Your order %s of amount %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s. Order details and e-receipt has been sent to the registered email. Happy Meating!", order.getCustomerName(),order.getId(),amount, today, order.getCustom2(), slot);
 			// String message = "Your order is placed successfully";
 			CloseableHttpClient httpclient = HttpClients.createDefault();
+			
+			String URLParams = String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message);
 			
 			URI uri = null;
 			try {
@@ -275,7 +285,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 				        "http", 
 				        "enterprise.smsgupshup.com", 
 				        "/GatewayAPI/rest",
-				        String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message),
+				        URLParams,
 				        null);
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
