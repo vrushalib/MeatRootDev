@@ -22,6 +22,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -256,9 +258,14 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 						+ mobileNumber);
 				return;
 			}
-
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+			String today = dateFormat.format(new Date());
+			String slot = "1pm - 4pm";
+			if (order.getCustom1().equalsIgnoreCase("m")) {
+				slot = "7am - 10:30am";
+			}
 			// Sending SMS using Http Client
-			String message = "This is a test message";
+			String message = String.format("Dear %s, Your order %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s.", order.getCustomerName(),order.getOrderNumber(), today, order.getCustom2(), slot);
 			// String message = "Your order is placed successfully";
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			
@@ -268,7 +275,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 				        "http", 
 				        "enterprise.smsgupshup.com", 
 				        "/GatewayAPI/rest",
-				        String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000122945&auth_scheme=plain&password=ol5IyP9oI&v=1.1&format=text", mobileNumber, message),
+				        String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message),
 				        null);
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
