@@ -266,7 +266,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 			String today = dateFormat.format(new Date());
-			String slot = "1pm - 4pm";
+			String slot = "4pm - 7pm";
 			if (order.getCustom1().equalsIgnoreCase("m")) {
 				slot = "7am - 10:30am";
 			}
