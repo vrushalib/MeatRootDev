@@ -266,8 +266,8 @@ public class CheckoutConfirmationSubmitAction extends BaseAction
 	}
 
 	public void addDeliverySlotAndDeliveryDate(HttpServletRequest request, OrderIf checkoutOrder) {
-		checkoutOrder.setCustom1(request.getParameter("udf2"));
-		checkoutOrder.setCustom2(request.getParameter("udf3"));
+		checkoutOrder.setCustom1(request.getParameter("delivery_slot"));
+		checkoutOrder.setCustom2(request.getParameter("delivery_date"));
 	}
 
 	private String getTxnId(){
