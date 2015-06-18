@@ -30,7 +30,7 @@
 							<div class="form-section">
 								<div class="notification-header">
 								    Order Number is <%=order.getId() %>.<br>
-									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else %> 1pm - 4pm. Thank you for shopping with us.
+									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else %> 4pm - 7pm. Thank you for shopping with us.
 								</div>
 							</div>
 							<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
@@ -54,6 +54,7 @@
 							<% } %>
 							<div class="form-buttons-wide">
 								<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.continue"/></span></a>
+							</div>
 							</div>
 						</form>
 			    	</div>

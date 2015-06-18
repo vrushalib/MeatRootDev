@@ -49,7 +49,7 @@ var _sokParams = {
 	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
 	    "sale_coupon" : null,
 	    "event" : "checkout" 
-}
+};
 
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
@@ -220,7 +220,7 @@ function getOrderProductRow(result, op) {
 		row += '</td>';
 	}
 	row += '</tr>';		
-	return row
+	return row;
 }
 
 function shippingRefresh(storeId) {
@@ -300,6 +300,36 @@ $(function() {
     if ($("#form1").length) {
 		$("#form1").validate(validationRules);
 	}
+    $.datepicker.setDefaults($.datepicker.regional['<%=kkEng.getLocale().substring(0,2)%>']);
+	$('#datepicker').datepicker(
+	{ 
+		dateFormat: '<%=kkEng.getMsg("datepicker.date.format")%>', 
+		minDate: '<s:property value="deliveryDate"/>',
+		maxDate: '+7d'  
+	}).on("change", function(){
+		if ($('#datepicker').val() == $('#datepicker').datepicker("option", "minDate")){
+			if ('<s:property value="morningSlot"/>' == 'true' && '<%=kkEng.getConfigAsBoolean("ENABLE_MORNING_SLOT", false)%>' == 'true') {
+				$("#morningSlot").attr("disabled", false);
+				$("#morningSlot").attr('checked', 'checked');
+			}
+			else{
+				$("#morningSlot").attr("disabled", true);
+				$("#eveningSlot").attr('checked', 'checked');
+			}
+			if ('<%=kkEng.getConfigAsBoolean("ENABLE_EVENING_SLOT", true)%>' == 'true') {
+				$("#eveningSlot").attr("disabled", false);
+			}
+			else{
+				$("#eveningSlot").attr("disabled", true);
+			}
+		}
+		else{
+			$("#morningSlot").attr("disabled", false);
+			$("#morningSlot").attr('checked', 'checked');
+			$("#eveningSlot").attr("disabled", false);
+		}
+	});
+
 	
 	$("#addr-dialog").dialog({
 		autoOpen: false,
@@ -383,135 +413,25 @@ public boolean empty(String s)
 			return true;
 		return false;
 	}
-%>
-
-<%!
-public void addDeliverySlotAndDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
-	String MORNING = "m";
-	String AFTERNOON = "a";
-	String deliverySlot = null;
-	String deliveryDay = null;
-	Date today = new Date();
-	Time now = new Time(today.getTime());
-
-	Calendar cal = Calendar.getInstance();
-	cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
-	cal.set(Calendar.MINUTE, 00);
-	cal.set(Calendar.SECOND, 00);
-	Time twelveAm = new Time(cal.getTime().getTime());
-
-	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
-	Time sixAm = new Time(cal.getTime().getTime());
-
-	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
-	cal.set(Calendar.MINUTE, 30);
-	Time eightThirtyPm = new Time(cal.getTime().getTime());
-
-		if (now.after(twelveAm) && now.before(sixAm)) {
-			deliverySlot = AFTERNOON;
-			deliveryDay = getDateToday();
-		} else if (now.before(eightThirtyPm)) {
-			deliverySlot = MORNING;
-			deliveryDay = getDateTomorrow();
-		} else {
-			deliverySlot = AFTERNOON;
-			deliveryDay = getDateTomorrow();
-		}
-	checkoutOrder.setCustom1(deliverySlot);
-	checkoutOrder.setCustom2(deliveryDay);
-	checkoutOrder.setCustom3("false");
-}
-
-public String getOrderMessage(String slot, String day, Boolean zorabianAfterSeven){
-	String message = "";
-	if(zorabianAfterSeven){ 
-		message =  "Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery slot for Zorabian Fresh is <b>"+ 
-		           day +"</b> between <b>7am to 10.30am</b>. For earlier delivery slot please check for alternative options.";
-	}else{
-		if( slot.equalsIgnoreCase("a"))
-			slot = "1pm - 4pm";
-		else
-			slot = "7am - 10:30am";
-		    message =  "Your order will be delivered on <b>"+ day +" </b> between <b>" + slot + "</b>."; 
-	}	
-	System.out.println(message);
-	return message;
-}
-
-public void addDeliverySlotAndDeliveryDateForZorabian(com.konakart.appif.OrderIf checkoutOrder) {
-	System.out.println("Order contains zorabian product(s)");
-	Date today = new Date();
-	Time now = new Time(today.getTime());
-
-	Calendar cal = Calendar.getInstance();
-	cal.set(Calendar.HOUR_OF_DAY, 6); // 6 AM
-	cal.set(Calendar.MINUTE, 00);
-	cal.set(Calendar.SECOND, 00);
-	Time sixAm = new Time(cal.getTime().getTime());
-
-	cal.set(Calendar.HOUR_OF_DAY, 19); // 7 PM
-	Time sevenPm = new Time(cal.getTime().getTime());
-
-	checkoutOrder.setCustom1("m");//morning
-	if (now.after(sevenPm)) {
-		checkoutOrder.setCustom2( getDateAfterTomorrow());
-		checkoutOrder.setCustom3("true");
-	} else{
-		checkoutOrder.setCustom2( getDateTomorrow());
-		checkoutOrder.setCustom3("false");
-	}
-}
-
-public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
-	boolean flag = false;
-	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
-	for (com.konakart.appif.OrderProductIf prod : products) {
-		if (prod.getProduct().getManufacturerName()
-				.toLowerCase().contains("zorabian")) {
-			flag = true;
-		}
-	}
-	return flag;
-}
-
-public String getDateToday() {
-	return new SimpleDateFormat("MMM dd, yyyy").format(new Date());
-}
-
-public String getDateTomorrow() {
-	Calendar c = new GregorianCalendar();
-	c.add(Calendar.DATE, 1);
-	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
-}
-
-public String getDateAfterTomorrow() {
-	Calendar c = new GregorianCalendar();
-	c.add(Calendar.DATE, 2);
-	return (new SimpleDateFormat("MMM dd, yyyy").format(c.getTime()));
-}
 
 %>
 
 			<%  
 						String continueButtonText = ((String)request.getAttribute("payment")).equals("cod") ? "Checkout Order" : "Proceed to Payment";
 						int error=0;
-						if(orderContainsZorabianProduct(order)){
-							addDeliverySlotAndDeliveryDateForZorabian(order);
-						}else {
-							addDeliverySlotAndDeliveryDate(order);
-						}
-						String udf2 = order.getCustom1();
-						String udf3 = order.getCustom2();
-						System.out.println("delivery slot: "+ udf2 + " delivery date : "+ udf3);
-						String deliveryMessage = getOrderMessage(order.getCustom1(), order.getCustom2(), Boolean.valueOf(order.getCustom3()));
-				%>
+			%>
+			
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-	    		    <div id = "deliveryMessage" style="font-size: 13.5px"> <%=deliveryMessage %></div><br>
+	    			<s:if test="zorabianAfterSeven">
+	    				<div id = "deliveryMessage" style="font-size: 13.5px"> Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery day for zorabian fresh is <b><s:property value="deliveryDate"/></b>.
+	    		        For earlier delivery slot, please check for alternative options.
+	    		    </div><br>
+					</s:if>
 		    		<form id="form1" action="CheckoutConfirmationSubmit.action" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
-		    				<div id="delivery-address" class="order-confirmation-area">
+		    				<div id="delivery-address"  >
 			    				<div class="heading-container">
 			    					<h3><kk:msg  key="show.order.details.body.deliveryaddress"/></h3>
 			    					<div class="order-confirmation-options">
@@ -548,24 +468,47 @@ public String getDateAfterTomorrow() {
 									<% } %>
 								</div>		    				
 			    			</div>
+			    			<div id="delivery-date" class="order-confirmation-area">
+			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
+			    				<input id="datepicker" type="text"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    			</div>
+			    			<br>
+			    			<div id="delivery-slot" class="order-confirmation-area">
+			    				<h3><kk:msg  key="show.order.details.body.deliveryslot"/></h3>
+			    				<%if (kkEng.getConfigAsBoolean("ENABLE_MORNING_SLOT",false) ) {%>
+			    					<s:if test="morningSlot">
+			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" checked>Morning (7am - 10:30am)
+			    					</s:if>
+			    					<s:else>
+			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
+			    					</s:else>
+			    				<%} else { %>
+			    					<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
+			    				<%} if (kkEng.getConfigAsBoolean("ENABLE_EVENING_SLOT",true)) {%>
+									<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (4pm - 7pm)
+								<%} else { %>
+									<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (4pm - 7pm)
+								<%} %>
+			    			</div>
+			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">
-			    				<div class="heading-container">
-			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3>
-			    					<div class="order-confirmation-options">
-			    					<a href="NewAddr.action?opcbilling=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.new"/></a>
-			    					<span class="separator-small"></span>
-			    					<a id="editBilling" href='<%="EditAddr.action?addrId="+order.getBillingAddrId()+"&opcbilling=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.edit"/></a>
-									<%if (cust != null && cust.getType() != 2) { %>
-				    					<span class="separator-small"></span>
-				    					<a id="abshipping" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="checkout.confirmation.addr.book"/></a>
-									<% } %>
-			    				</div>
-			    				</div>
+<!-- 			    				<div class="heading-container"> -->
+<%-- 			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3> --%>
+<!-- 			    					<div class="order-confirmation-options"> -->
+<%-- 			    					<a href="NewAddr.action?opcbilling=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.new"/></a> --%>
+<!-- 			    					<span class="separator-small"></span> -->
+<%-- 			    					<a id="editBilling" href='<%="EditAddr.action?addrId="+order.getBillingAddrId()+"&opcbilling=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.edit"/></a> --%>
+<%-- 									<%if (cust != null && cust.getType() != 2) { %> --%>
+<!-- 				    					<span class="separator-small"></span> -->
+<%-- 				    					<a id="abshipping" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="checkout.confirmation.addr.book"/></a> --%>
+<%-- 									<% } %> --%>
+<!-- 			    				</div> -->
+<!-- 			    				</div> -->
 			    				<div class="order-confirmation-area-content">
-			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
+<%-- 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span> --%>
 								     <div id="payment-method" class="order-confirmation-area-content-select">
 										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
-										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
+										<select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
 										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
 												<% String payment = ((String)request.getAttribute("payment"));%> 
@@ -782,9 +725,6 @@ public String getDateAfterTomorrow() {
 	    						<% } %>
 							</div>
 						</div>			
-						
-						<input type="hidden" value="<%=udf2%>" name="udf2"/>
-						<input type="hidden" value="<%=udf3%>" name="udf3"/>
 						
 						<div id="confirm-order-button-container">	
 						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >

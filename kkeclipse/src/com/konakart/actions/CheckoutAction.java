@@ -18,6 +18,11 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,6 +68,13 @@ public class CheckoutAction extends BaseAction
     private boolean otValid = true;
 
     private int deliveryId = -1;
+    
+    /*Flag to check if the order contains zorabian products and order placement time is after seven*/
+    private boolean zorabianAfterSeven = false;
+    
+    private String deliveryDate;
+    
+    private boolean morningSlot = true;
 
     /**
      * Called when we don't want to reset the checkout order but just change the delivery address
@@ -354,6 +366,9 @@ public class CheckoutAction extends BaseAction
 
             // Ensure that the current customer has his addresses populated
             kkAppEng.getCustomerMgr().populateCurrentCustomerAddresses(/* force */false);
+            
+            //Get the earliest delivery date
+            setDeliveryDate(getEarliestDeliveryDate(order));
 
             kkAppEng.getNav().set(kkAppEng.getMsg("header.checkout"));
             kkAppEng.getNav().add(kkAppEng.getMsg("header.order.confirmation"));
@@ -364,6 +379,72 @@ public class CheckoutAction extends BaseAction
             return super.handleException(request, e);
         }
 
+    }
+    
+    public String getEarliestDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
+    	String deliveryDay = null;
+    	Date today = new Date();
+    	Time now = new Time(today.getTime());
+
+    	Calendar cal = Calendar.getInstance();
+    	cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
+    	cal.set(Calendar.MINUTE, 00);
+    	cal.set(Calendar.SECOND, 00);
+    	Time twelveAm = new Time(cal.getTime().getTime());
+
+    	cal.set(Calendar.HOUR_OF_DAY, 13); // 1 PM
+    	Time onePm = new Time(cal.getTime().getTime());
+    	
+    	cal.set(Calendar.HOUR_OF_DAY, 19); //7 PM
+    	Time sevenPm = new Time(cal.getTime().getTime());
+    	
+
+    	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
+    	cal.set(Calendar.MINUTE, 30);
+    	Time eightThirtyPm = new Time(cal.getTime().getTime());
+
+    	if (now.after(twelveAm) && now.before(onePm)) {
+    		setMorningSlot(false);
+    		deliveryDay = getDate(new Date());
+    	} else if (now.after(sevenPm) && containsZorabianProduct(checkoutOrder)) {
+    		setZorabianAfterSeven(true);
+    		deliveryDay = getDateAfterTomorrow();
+    	} else { 
+	    	deliveryDay = getDateTomorrow();
+	    	if(now.after(eightThirtyPm)){
+	    		setMorningSlot(false);
+	    	} 
+    	}
+    	return deliveryDay;
+    }
+    
+    
+    public String getDate(Date date) {
+    	return new SimpleDateFormat("dd/MM/yyyy").format(date);
+    }
+
+    public String getDateTomorrow() {
+    	Calendar c = new GregorianCalendar();
+    	c.add(Calendar.DATE, 1);
+    	return getDate(c.getTime());
+    }
+
+    public String getDateAfterTomorrow() {
+    	Calendar c = new GregorianCalendar();
+    	c.add(Calendar.DATE, 2);
+    	return getDate(c.getTime());
+    }
+    
+    public boolean containsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
+    	boolean flag = false;
+    	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
+    	for (com.konakart.appif.OrderProductIf prod : products) {
+    		if (prod.getProduct().getManufacturerName()
+    				.toLowerCase().contains("zorabian")) {
+    			flag = true;
+    		}
+    	}
+    	return flag;
     }
 
     /**
@@ -539,5 +620,47 @@ public class CheckoutAction extends BaseAction
     {
         this.deliveryId = deliveryId;
     }
+
+	/**
+	 * @return the zorabianAfterSeven
+	 */
+	public boolean getZorabianAfterSeven() {
+		return zorabianAfterSeven;
+	}
+
+	/**
+	 * @param zorabianAfterSeven the zorabianAfterSeven to set
+	 */
+	public void setZorabianAfterSeven(boolean zorabianAfterSeven) {
+		this.zorabianAfterSeven = zorabianAfterSeven;
+	}
+
+	/**
+	 * @return the deliveryDate
+	 */
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	/**
+	 * @param deliveryDate the deliveryDate to set
+	 */
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
+
+	/**
+	 * @return the morningSlot
+	 */
+	public boolean getMorningSlot() {
+		return morningSlot;
+	}
+
+	/**
+	 * @param morningSlot the morningSlot to set
+	 */
+	public void setMorningSlot(boolean morningSlot) {
+		this.morningSlot = morningSlot;
+	}
 
 }
