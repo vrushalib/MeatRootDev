@@ -21,6 +21,9 @@
 <%@page import="com.konakart.app.Content"%>
 <%@page import="com.konakart.app.ContentDescription"%>
 <%@page import="com.konakart.appif.ContentIf"%>
+<%@page import="com.konakart.app.CategoryImageProps"%>
+<%@page import="flexjson.JSONDeserializer"%>
+
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% ContentIf[] catBanners = null;%>
@@ -30,15 +33,12 @@
 <% String contentDir = kkEng.getContentImagesDir();%>
 <% boolean contentEnabled = kkEng.getContentMgr().isEnabled();%>
 
-<% String custom1 = kkEng.getCategoryMgr().getCurrentCat().getCustom2(); %>
-<% String custom2 = kkEng.getCategoryMgr().getCurrentCat().getCustom3(); %>
+<% String custom2 = kkEng.getCategoryMgr().getCurrentCat().getCustom2(); %>
 
-<% if ( null != custom1 && !custom1.isEmpty() && null != custom2 && !custom2.isEmpty()) { %>
-<% String productId1 = custom1.split(":")[0]; %>
-<% String productURL1 = custom1.split(":")[1]; %>
-<% String productId2 = custom2.split(":")[0]; %>
-<% String productURL2 = custom2.split(":")[1]; %>
-<a href="SelectProd.action?prodId=<%=productId1%>"><div class="leftImg" style="width:49%; height: 200px; background-image: url(<%=productURL1 %>); display:inline-table;"></div></a>
-<a href="SelectProd.action?prodId=<%=productId2%>"><div class="rightImg" style="width:49%; height: 200px; background-image: url(<%=productURL2 %>); display:inline-table;"></div></a>
+<% if ( null != custom2 && !custom2.isEmpty() ) { %>
+<% CategoryImageProps categoryImageProps = new JSONDeserializer<CategoryImageProps>().deserialize(custom2, CategoryImageProps.class);  %>
+<div class="leftImg" style="width:100%; height: 250px; background-size:100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getcU() %>); display:inline-table;"></div>
+<a href="SelectProd.action?prodId=<%=categoryImageProps.getbLL()%>"><div class="leftImg" style="width:49.5%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbLU() %>); display:inline-table;"></div></a>
+<a href="SelectProd.action?prodId=<%=categoryImageProps.getbRL()%>"><div class="rightImg" style="width:50%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbRU() %>); display:inline-table;"></div></a>
 <% } %>
 
