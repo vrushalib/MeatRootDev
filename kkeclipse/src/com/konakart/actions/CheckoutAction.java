@@ -75,6 +75,8 @@ public class CheckoutAction extends BaseAction
     private String deliveryDate;
     
     private boolean morningSlot = true;
+    
+    private boolean eveningSlot = true;
 
     /**
      * Called when we don't want to reset the checkout order but just change the delivery address
@@ -368,7 +370,7 @@ public class CheckoutAction extends BaseAction
             kkAppEng.getCustomerMgr().populateCurrentCustomerAddresses(/* force */false);
             
             //Get the earliest delivery date
-            setDeliveryDate(getEarliestDeliveryDate(order));
+            setDeliveryDate(getEarliestDeliveryDate( kkAppEng, order));
 
             kkAppEng.getNav().set(kkAppEng.getMsg("header.checkout"));
             kkAppEng.getNav().add(kkAppEng.getMsg("header.order.confirmation"));
@@ -381,7 +383,7 @@ public class CheckoutAction extends BaseAction
 
     }
     
-    public String getEarliestDeliveryDate(com.konakart.appif.OrderIf checkoutOrder) {
+    public String getEarliestDeliveryDate(KKAppEng eng, com.konakart.appif.OrderIf checkoutOrder) {
     	String deliveryDay = null;
     	Date today = new Date();
     	Time now = new Time(today.getTime());
@@ -402,22 +404,57 @@ public class CheckoutAction extends BaseAction
     	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
     	cal.set(Calendar.MINUTE, 30);
     	Time eightThirtyPm = new Time(cal.getTime().getTime());
-
-    	if (now.after(twelveAm) && now.before(onePm)) {
-    		setMorningSlot(false);
-    		deliveryDay = getDate(new Date());
-    	} else if (now.after(sevenPm) && containsZorabianProduct(checkoutOrder)) {
-    		setZorabianAfterSeven(true);
-    		deliveryDay = getDateAfterTomorrow();
-    	} else { 
-	    	deliveryDay = getDateTomorrow();
-	    	if(now.after(eightThirtyPm)){
-	    		setMorningSlot(false);
-	    	} 
+    	
+    	if(orderContainsZorabianProduct(checkoutOrder)){
+    		if(now.before(sevenPm))
+    			deliveryDay = getDateTomorrow();
+    		else{
+    			setZorabianAfterSeven(true);
+        		deliveryDay = getDateAfterTomorrow();
+    		}
+    	}else{
+	    	if (now.after(twelveAm) && now.before(onePm)) {
+	    		if(isEveningSlotEnabled(eng)){
+	    			setMorningSlot(false);
+		    		deliveryDay = getDate(new Date());
+	    		}else{
+	    			deliveryDay = getDateTomorrow();
+	    		}
+	    	} else { 
+	    		if(now.after(eightThirtyPm)){
+		    		if(isEveningSlotEnabled(eng)){
+		    			setMorningSlot(false);
+		    			deliveryDay = getDateTomorrow();
+		    		}else{
+		    			deliveryDay = getDateAfterTomorrow();
+		    		} 
+		    	} else{
+		    		deliveryDay = getDateTomorrow();
+		    		if(!isMorningSlotEnabled(eng)){
+		    			setMorningSlot(false);
+		    		}
+		    		if(!isMorningSlotEnabled(eng) && !isEveningSlotEnabled(eng)){
+		    			deliveryDay = getDateAfterTomorrow();
+		    		}
+		    	}
+	    	}
     	}
     	return deliveryDay;
     }
     
+    public boolean isEveningSlotEnabled(KKAppEng eng){
+    	if(eng.getConfigAsBoolean("ENABLE_EVENING_SLOT", true)){
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public boolean isMorningSlotEnabled(KKAppEng eng){
+    	if(eng.getConfigAsBoolean("ENABLE_MORNING_SLOT", false)){
+    		return true;
+    	}
+    	return false;
+    }
     
     public String getDate(Date date) {
     	return new SimpleDateFormat("dd/MM/yyyy").format(date);
@@ -435,7 +472,7 @@ public class CheckoutAction extends BaseAction
     	return getDate(c.getTime());
     }
     
-    public boolean containsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
+    public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
     	boolean flag = false;
     	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
     	for (com.konakart.appif.OrderProductIf prod : products) {
@@ -661,6 +698,20 @@ public class CheckoutAction extends BaseAction
 	 */
 	public void setMorningSlot(boolean morningSlot) {
 		this.morningSlot = morningSlot;
+	}
+
+	/**
+	 * @return the eveningSlot
+	 */
+	public boolean getEveningSlot() {
+		return eveningSlot;
+	}
+
+	/**
+	 * @param eveningSlot the eveningSlot to set
+	 */
+	public void setEveningSlot(boolean eveningSlot) {
+		this.eveningSlot = eveningSlot;
 	}
 
 }

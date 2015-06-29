@@ -308,7 +308,7 @@ $(function() {
 		maxDate: '+7d'  
 	}).on("change", function(){
 		if ($('#datepicker').val() == $('#datepicker').datepicker("option", "minDate")){
-			if ('<s:property value="morningSlot"/>' == 'true' && '<%=kkEng.getConfigAsBoolean("ENABLE_MORNING_SLOT", false)%>' == 'true') {
+			if ('<s:property value="morningSlot"/>' == 'true' ) {
 				$("#morningSlot").attr("disabled", false);
 				$("#morningSlot").attr('checked', 'checked');
 			}
@@ -316,7 +316,7 @@ $(function() {
 				$("#morningSlot").attr("disabled", true);
 				$("#eveningSlot").attr('checked', 'checked');
 			}
-			if ('<%=kkEng.getConfigAsBoolean("ENABLE_EVENING_SLOT", true)%>' == 'true') {
+			if ('<s:property value="eveningSlot"/>' == 'true') {
 				$("#eveningSlot").attr("disabled", false);
 			}
 			else{
@@ -468,27 +468,28 @@ public boolean empty(String s)
 									<% } %>
 								</div>		    				
 			    			</div>
+			    			<br>
 			    			<div id="delivery-date" class="order-confirmation-area">
 			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
 			    				<input id="datepicker" type="text"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    				<span class="validation-msg"></span>
 			    			</div>
-			    			<br>
+			    			<br><br>
 			    			<div id="delivery-slot" class="order-confirmation-area">
 			    				<h3><kk:msg  key="show.order.details.body.deliveryslot"/></h3>
-			    				<%if (kkEng.getConfigAsBoolean("ENABLE_MORNING_SLOT",false) ) {%>
 			    					<s:if test="morningSlot">
 			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" checked>Morning (7am - 10:30am)
 			    					</s:if>
 			    					<s:else>
 			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
 			    					</s:else>
-			    				<%} else { %>
-			    					<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
-			    				<%} if (kkEng.getConfigAsBoolean("ENABLE_EVENING_SLOT",true)) {%>
-									<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (4pm - 7pm)
-								<%} else { %>
-									<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (4pm - 7pm)
-								<%} %>
+			    				    <s:if test="eveningSlot">
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (4pm - 7pm)
+									</s:if>
+									<s:else>
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (4pm - 7pm)
+									</s:else>
+									<span class="validation-msg"></span>
 			    			</div>
 			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">

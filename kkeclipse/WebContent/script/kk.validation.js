@@ -164,6 +164,12 @@ var validationRules = {
 		rewardPoints : {
 			maxlength : 40,
 			digits : true
+		},
+		delivery_date : {
+			required : true
+		},
+		delivery_slot : {
+			required : true
 		}
 	},
 	highlight : function(element, errorClass, validClass) {
