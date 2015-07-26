@@ -38,7 +38,9 @@
 <% if ( null != custom2 && !custom2.isEmpty() ) { %>
 <% CategoryImageProps categoryImageProps = new JSONDeserializer<CategoryImageProps>().deserialize(custom2, CategoryImageProps.class);  %>
 <div class="leftImg" style="width:100%; height: 250px; background-size:100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getcU() %>); display:inline-table;"></div>
-<a href="SelectProd.action?prodId=<%=categoryImageProps.getbLL()%>"><div class="leftImg" style="width:49.5%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbLU() %>); display:inline-table;"></div></a>
-<a href="SelectProd.action?prodId=<%=categoryImageProps.getbRL()%>"><div class="rightImg" style="width:50%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbRU() %>); display:inline-table;"></div></a>
+<div style="width:100%; height: 10px;" ></div>
+<a href="SelectProd.action?prodId=<%=categoryImageProps.getbLL()%>"><div class="leftImg" style="width:48.5%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbLU() %>); display:inline-table;"></div></a>
+<div style="width:2%;  display:inline-table;" ></div>
+<a href="SelectProd.action?prodId=<%=categoryImageProps.getbRL()%>"><div class="rightImg" style="width:48.5%; height: 140px; background-size: 100%; background-image: url(images/banners/categoryBanner/<%=categoryImageProps.getbRU() %>); display:inline-table;"></div></a>
 <% } %>
 
