@@ -246,10 +246,13 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
 	private void sendSMS(OrderIf order) {
 		String nonEmptyMobile = order.getCustomerTelephone();
+		System.out.println("SendSMS - Mobile Number: " + nonEmptyMobile);
 		if (null == nonEmptyMobile || nonEmptyMobile.isEmpty()) {
 			nonEmptyMobile = order.getCustomerTelephone1();
 		}
-
+		
+		System.out.println("SendSMS - Mobile Number1: " + nonEmptyMobile);
+		
 		if (null != nonEmptyMobile && !nonEmptyMobile.isEmpty()) {
 			String mobileNumber = order.getCustomerTelephone()
 					.replaceAll("\\+", "").replaceAll(" ", "")
@@ -278,7 +281,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			
 			String URLParams = String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message);
-			
+			System.out.println("URL Params: " + URLParams);
 			URI uri = null;
 			try {
 				uri = new URI(
@@ -295,6 +298,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			HttpGet httpGet = new HttpGet(uri.toASCIIString());
 			try {
 				CloseableHttpResponse response1 = httpclient.execute(httpGet);
+				System.out.println("SMS Sending Response :  " + response1.getStatusLine());
 				log.info("SMS Sending Response :  " + response1.getStatusLine());
 			} catch (ClientProtocolException e) {
 				log.error("Exception Occured while Sending SMS : "
