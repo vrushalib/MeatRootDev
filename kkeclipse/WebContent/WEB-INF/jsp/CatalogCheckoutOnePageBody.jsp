@@ -471,7 +471,7 @@ public boolean empty(String s)
 			    			<br>
 			    			<div id="delivery-date" class="order-confirmation-area">
 			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
-			    				<input id="datepicker" type="text"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    				<input id="datepicker" type="text" readonly="readonly"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
 			    				<span class="validation-msg"></span>
 			    			</div>
 			    			<br><br>
