@@ -69,7 +69,7 @@ No. MeatRoot provides free home delivery.<br/><br/>
 <b>11: When do you deliver?</b><br/><br/>
 We deliver on all days. Order today and get it tomorrow.<br/><br/>
 <b>12: Where do you deliver?</b><br/><br/>
-We currently deliver only in Aundh, Baner, Hinjewadi and Wakad area.<br/><br/>
+We deliver all across Pune.<br/><br/>
 <b>13: Are the prices inclusive of tax?</b><br/><br/>
 Yes, the stated prices are inclusive of tax.<br/><br/>
 <b>14: Can I pay by cash?</b><br/><br/>
