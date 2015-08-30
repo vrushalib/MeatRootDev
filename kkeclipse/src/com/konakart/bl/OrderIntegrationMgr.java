@@ -269,14 +269,16 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 			String today = dateFormat.format(new Date());
-			String slot = "4pm - 7pm";
+			String slot = "6pm - 8pm";
 			if (order.getCustom1().equalsIgnoreCase("m")) {
 				slot = "7am - 10:30am";
+			} else if (order.getCustom1().equalsIgnoreCase("a")) {
+				slot = "11am - 1pm";
 			}
 			
 			String amount = order.getOrderTotals()[0].getText();			
 			// Sending SMS using Http Client
-			String message = String.format("Dear %s, Your order %s of amount %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s. Order details and e-receipt has been sent to the registered email. Happy Meating!", order.getCustomerName(),order.getId(),amount, today, order.getCustom2(), slot);
+			String message = String.format("Dear %s, Your order #%s of amount %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s. Order details and e-receipt has been sent to the registered email. Happy Meating!", order.getCustomerName(),order.getId(),amount, today, order.getCustom2(), slot);
 			// String message = "Your order is placed successfully";
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			
