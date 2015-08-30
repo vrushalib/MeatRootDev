@@ -314,18 +314,30 @@ $(function() {
 			}
 			else{
 				$("#morningSlot").attr("disabled", true);
-				$("#eveningSlot").attr('checked', 'checked');
+				if ('<s:property value="afternoonSlot"/>' == 'true') {
+					$("#afternoonSlot").attr('checked', 'checked');
+				} else {
+					$("#eveningSlot").attr('checked', 'checked');
+				}
+			}
+			if ('<s:property value="afternoonSlot"/>' == 'true') {
+				$("#afternoonSlot").attr("disabled", false);
+			}
+			else{
+				$("#afternoonSlot").attr("disabled", true);
 			}
 			if ('<s:property value="eveningSlot"/>' == 'true') {
 				$("#eveningSlot").attr("disabled", false);
 			}
 			else{
 				$("#eveningSlot").attr("disabled", true);
-			}
+			}			
+
 		}
 		else{
 			$("#morningSlot").attr("disabled", false);
 			$("#morningSlot").attr('checked', 'checked');
+			$("#afternoonSlot").attr("disabled", false);
 			$("#eveningSlot").attr("disabled", false);
 		}
 	});
@@ -423,8 +435,8 @@ public boolean empty(String s)
 			
     		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-	    			<s:if test="zorabianAfterSeven">
-	    				<div id = "deliveryMessage" style="font-size: 13.5px"> Please note that cut off time for Zorabian Fresh is 7pm. So next available delivery day for zorabian fresh is <b><s:property value="deliveryDate"/></b>.
+	    			<s:if test="zorabianAfterEight">
+	    				<div id = "deliveryMessage" style="font-size: 13.5px"> Please note that cut off time for Zorabian Fresh is 8pm. So next available delivery day for zorabian fresh is <b><s:property value="deliveryDate"/></b>.
 	    		        For earlier delivery slot, please check for alternative options.
 	    		    </div><br>
 					</s:if>
@@ -483,11 +495,23 @@ public boolean empty(String s)
 			    					<s:else>
 			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
 			    					</s:else>
-			    				    <s:if test="eveningSlot">
-										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (4pm - 7pm)
+			    					<s:if test="afternoonSlot and !morningSlot">
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" checked>Afternoon (11am - 1pm)
 									</s:if>
+									<s:elseif test="afternoonSlot and morningSlot">
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" >Afternoon (11am - 1pm)
+									</s:elseif>
 									<s:else>
-										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (4pm - 7pm)
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" disabled>Afternoon (11am - 1pm)
+									</s:else>
+			    				    <s:if test="eveningSlot and !morningSlot and !afternoonSlot">
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (6pm - 8pm)
+									</s:if>
+									<s:elseif test="eveningSlot and (morningSlot or afternoonSlot)">
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e">Evening (6pm - 8pm)
+									</s:elseif>
+									<s:else>
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (6pm - 8pm)
 									</s:else>
 									<span class="validation-msg"></span>
 			    			</div>

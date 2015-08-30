@@ -18,11 +18,8 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +36,9 @@ import com.konakart.appif.OrderIf;
 import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.appif.ShippingQuoteIf;
 import com.konakart.bl.ConfigConstants;
+import com.konakart.util.Constants;
+import com.konakart.util.DeliveryDateServiceFactory;
+import com.konakart.util.DeliveryDateServiceIf;
 
 /**
  * Gets called before viewing the checkout delivery page.
@@ -77,6 +77,8 @@ public class CheckoutAction extends BaseAction
     private boolean morningSlot = true;
     
     private boolean eveningSlot = true;
+    
+    private boolean afternoonSlot = true;
 
     /**
      * Called when we don't want to reset the checkout order but just change the delivery address
@@ -384,62 +386,28 @@ public class CheckoutAction extends BaseAction
     }
     
     public String getEarliestDeliveryDate(KKAppEng eng, com.konakart.appif.OrderIf checkoutOrder) {
-    	String deliveryDay = null;
-    	Date today = new Date();
-    	Time now = new Time(today.getTime());
-
-    	Calendar cal = Calendar.getInstance();
-    	cal.set(Calendar.HOUR_OF_DAY, 00); // 12 AM
-    	cal.set(Calendar.MINUTE, 00);
-    	cal.set(Calendar.SECOND, 00);
-    	Time twelveAm = new Time(cal.getTime().getTime());
-
-    	cal.set(Calendar.HOUR_OF_DAY, 13); // 1 PM
-    	Time onePm = new Time(cal.getTime().getTime());
+    	// set default values for slots
+    	setMorningSlot(isMorningSlotEnabled(eng));
+    	setEveningSlot(isEveningSlotEnabled(eng));
+    	setAfternoonSlot(isAfternoonSlotEnabled(eng));
     	
-    	cal.set(Calendar.HOUR_OF_DAY, 19); //7 PM
-    	Time sevenPm = new Time(cal.getTime().getTime());
+    	Map<String, Boolean> slotsMap = new HashMap<String, Boolean>(); 
+    	DeliveryDateServiceIf deliveryDateService = DeliveryDateServiceFactory.getDeliveryDateService(checkoutOrder);
+    	String fetchedDeliveryDay = deliveryDateService.getDeliveryDate(eng, checkoutOrder, slotsMap);
     	
-
-    	cal.set(Calendar.HOUR_OF_DAY, 20); // 8:30 PM
-    	cal.set(Calendar.MINUTE, 30);
-    	Time eightThirtyPm = new Time(cal.getTime().getTime());
-    	
-    	if(orderContainsZorabianProduct(checkoutOrder)){
-    		if(now.before(sevenPm))
-    			deliveryDay = getDateTomorrow();
-    		else{
-    			setZorabianAfterSeven(true);
-        		deliveryDay = getDateAfterTomorrow();
+    	if(slotsMap != null && !slotsMap.isEmpty()) {
+    		if(slotsMap.containsKey(Constants.ZORABIAN_AFTER_EIGHT) && slotsMap.get(Constants.ZORABIAN_AFTER_EIGHT) != null) {
+    			setZorabianAfterSeven(slotsMap.get(Constants.ZORABIAN_AFTER_EIGHT));
     		}
-    	}else{
-	    	if (now.after(twelveAm) && now.before(onePm)) {
-	    		if(isEveningSlotEnabled(eng)){
-	    			setMorningSlot(false);
-		    		deliveryDay = getDate(new Date());
-	    		}else{
-	    			deliveryDay = getDateTomorrow();
-	    		}
-	    	} else { 
-	    		if(now.after(eightThirtyPm)){
-		    		if(isEveningSlotEnabled(eng)){
-		    			setMorningSlot(false);
-		    			deliveryDay = getDateTomorrow();
-		    		}else{
-		    			deliveryDay = getDateAfterTomorrow();
-		    		} 
-		    	} else{
-		    		deliveryDay = getDateTomorrow();
-		    		if(!isMorningSlotEnabled(eng)){
-		    			setMorningSlot(false);
-		    		}
-		    		if(!isMorningSlotEnabled(eng) && !isEveningSlotEnabled(eng)){
-		    			deliveryDay = getDateAfterTomorrow();
-		    		}
-		    	}
-	    	}
+    		if(slotsMap.containsKey(Constants.MORNING_SLOT) && slotsMap.get(Constants.MORNING_SLOT) != null) {
+    			setMorningSlot(slotsMap.get(Constants.MORNING_SLOT));
+    		}
+    		if(slotsMap.containsKey(Constants.AFTERNOON_SLOT) && slotsMap.get(Constants.AFTERNOON_SLOT) != null) {
+    			setAfternoonSlot(slotsMap.get(Constants.AFTERNOON_SLOT));
+    		}
     	}
-    	return deliveryDay;
+
+    	return fetchedDeliveryDay;
     }
     
     public boolean isEveningSlotEnabled(KKAppEng eng){
@@ -456,32 +424,11 @@ public class CheckoutAction extends BaseAction
     	return false;
     }
     
-    public String getDate(Date date) {
-    	return new SimpleDateFormat("dd/MM/yyyy").format(date);
-    }
-
-    public String getDateTomorrow() {
-    	Calendar c = new GregorianCalendar();
-    	c.add(Calendar.DATE, 1);
-    	return getDate(c.getTime());
-    }
-
-    public String getDateAfterTomorrow() {
-    	Calendar c = new GregorianCalendar();
-    	c.add(Calendar.DATE, 2);
-    	return getDate(c.getTime());
-    }
-    
-    public boolean orderContainsZorabianProduct(com.konakart.appif.OrderIf checkoutOrder) {
-    	boolean flag = false;
-    	com.konakart.appif.OrderProductIf[] products = checkoutOrder.getOrderProducts();
-    	for (com.konakart.appif.OrderProductIf prod : products) {
-    		if (prod.getProduct().getManufacturerName()
-    				.toLowerCase().contains("zorabian")) {
-    			flag = true;
-    		}
+    public boolean isAfternoonSlotEnabled(KKAppEng eng){
+    	if(eng.getConfigAsBoolean("ENABLE_AFTERNOON_SLOT", false)){
+    		return true;
     	}
-    	return flag;
+    	return false;
     }
 
     /**
@@ -714,4 +661,12 @@ public class CheckoutAction extends BaseAction
 		this.eveningSlot = eveningSlot;
 	}
 
+	public boolean getAfternoonSlot() {
+		return afternoonSlot;
+	}
+
+	public void setAfternoonSlot(boolean afternoonSlot) {
+		this.afternoonSlot = afternoonSlot;
+	}
+	
 }
