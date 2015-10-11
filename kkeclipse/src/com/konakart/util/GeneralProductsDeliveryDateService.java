@@ -21,9 +21,9 @@ public class GeneralProductsDeliveryDateService extends AbstractDeliveryDateServ
     	cal.set(Calendar.MINUTE, 00);
     	cal.set(Calendar.SECOND, 00);
    	
-    	cal.set(Calendar.HOUR_OF_DAY, 8); //8.30 AM
+    	cal.set(Calendar.HOUR_OF_DAY, 6); //6.30 AM
     	cal.set(Calendar.MINUTE, 30);
-    	Time eightThirtyAm = new Time(cal.getTime().getTime());
+    	Time sixThirtyAm = new Time(cal.getTime().getTime());
     	
     	cal.set(Calendar.HOUR_OF_DAY, 15); //3 PM
     	cal.set(Calendar.MINUTE, 00);
@@ -33,14 +33,14 @@ public class GeneralProductsDeliveryDateService extends AbstractDeliveryDateServ
     	cal.set(Calendar.MINUTE, 30);
     	Time eightThirtyPm = new Time(cal.getTime().getTime());
     	
-    	if(now.before(eightThirtyAm)) {
+    	if(now.before(sixThirtyAm)) {
     		if(isAfternoonSlotEnabled(eng) || isEveningSlotEnabled(eng)) {
     			deliveryDay = getDate(new Date());
         		slotsMap.put(Constants.MORNING_SLOT, false);	
     		} else {
     			deliveryDay = getDateTomorrow();
     		}    		
-    	} else if (now.after(eightThirtyAm) && now.before(threePm)) {
+    	} else if (now.after(sixThirtyAm) && now.before(threePm)) {
     		if(isEveningSlotEnabled(eng)) {
     			slotsMap.put(Constants.MORNING_SLOT, false);
         		slotsMap.put(Constants.AFTERNOON_SLOT, false);
