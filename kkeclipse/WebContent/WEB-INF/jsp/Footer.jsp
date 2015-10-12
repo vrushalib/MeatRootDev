@@ -97,6 +97,7 @@ $(function() {
    	</div>
    	<div id="links-2" class="footer-area narrow">
    		<a href ="AboutUs.action"><kk:msg  key="footer.about.us"/></a><br />
+   		<a href ="http://www.meatroot.com/blog"><kk:msg  key="footer.blog"/></a><br />
    		<a href ="PlacingOrder.action"><kk:msg  key="footer.placing.order"/></a><br />
 		<a href ="Payment.action"><kk:msg  key="footer.payment"/></a><br />
 		<a href ="OrderTracking.action"><kk:msg  key="footer.order.tracking"/></a><br />
