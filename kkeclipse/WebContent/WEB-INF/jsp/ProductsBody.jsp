@@ -72,6 +72,8 @@ function layoutItems() {
 <% com.konakart.appif.CategoryIf currentCat = prodMgr.getSelectedCategory();%>
 <% com.konakart.appif.ManufacturerIf currentManu = prodMgr.getSelectedManufacturer();%>
 <% String sortBy = prodMgr.getDataDesc().getOrderBy();%>
+<% com.konakart.app.EngineConfig engineConfig = new com.konakart.app.EngineConfig(); %>
+<% com.konakart.appif.KKEngIf engine = new com.konakart.app.KKEng(engineConfig); %>
 
 
  <%if (prodArray == null || prodArray.length == 0){ %>
@@ -171,6 +173,7 @@ function layoutItems() {
 	 					<% for (int i = 0; i < numProds; i++){ %>
 							<% com.konakart.appif.ProductIf prod = prodArray[i];%>
 							<li>
+							<%prod = engine.getProduct(null, prod.getId(), -1); %>
 							<kk:prodTile prod="<%=prod%>"/>
 							</li>
 						<%}%>

@@ -1,3 +1,5 @@
+<%@page import="com.konakart.app.DataDescriptor"%>
+<%@page import="com.konakart.appif.DataDescriptorIf"%>
 <%@include file="Taglibs.jsp" %>
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
@@ -10,10 +12,12 @@
  for (int i = 0; i < noOfCategories; i++) {
     com.konakart.appif.CategoryIf cat = categories[i]; 
     if(cat.getCustom1() == null ){ //category is not invisible. custom1 value for invisible categories is "i".
+    	DataDescriptorIf optionsDescriptor = new DataDescriptor();
+     	optionsDescriptor.setFillProductOptions(true);
    		 if(cat.getChildren() != null && cat.getChildren().length > 0){ //If a category has a subcategory
    			for(int j = 0; j < cat.getChildren().length ; j++){
-   			 	com.konakart.appif.CategoryIf subCat = cat.getChildren()[j]; 
-		        com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, null, subCat.getId(), true, -1); 
+   			 	com.konakart.appif.CategoryIf subCat = cat.getChildren()[j];   			 	
+		        com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, optionsDescriptor, subCat.getId(), true, -1); 
 		        com.konakart.appif.ProductIf[] prods = products.getProductArray(); 
 		        if(prods != null && prods.length > 0 ){ 
 		               prods[0].setCategoryId(subCat.getId()); %>
@@ -22,7 +26,7 @@
        		 } 
        	 } 
         else { 
-    	    com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, null, cat.getId(), true, -1); 
+    	    com.konakart.appif.ProductsIf products = engine.getProductsPerCategory(null, optionsDescriptor, cat.getId(), true, -1); 
 	        com.konakart.appif.ProductIf[] prods = products.getProductArray(); 
 	        if(prods != null && prods.length > 0 ){ 
 	               prods[0].setCategoryId(cat.getId()); %>
