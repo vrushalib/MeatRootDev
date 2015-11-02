@@ -1130,10 +1130,13 @@ display: table;
 	z-index: 103;
 }
 
-.item-buttons-container{
+/*.item-buttons-container{
+	margin-top: 60px;
+}*/
+
+.item-buttons.centered{
 	margin-top: 60px;
 }
-
 .add-to-wishlist-container{	
 	margin-top: 5px;
 }
