@@ -17,6 +17,9 @@
 
 package com.konakart.actions;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +28,8 @@ import org.apache.struts2.ServletActionContext;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.json.BasketJson;
 import com.konakart.al.json.WishListJson;
+import com.konakart.app.Option;
+import com.konakart.appif.OptionIf;
 import com.konakart.appif.ProductIf;
 
 /**
@@ -37,7 +42,21 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
     private String xsrf_token;
     
     protected int qty = 1;
+    
+    private int numOptions = 0;
+    
+    private int[] optionId = new int[20];
+    
+    private int[] valueId = new int[20];
 
+    private int[] type = new int[20];
+    
+    private String[] quantity = new String[20];
+
+    private String[] custText = new String[20];
+
+    private String[] custPrice = new String[20];
+    
 	public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
@@ -63,25 +82,94 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
                 log.debug("Product Id of selected product from application = " + getProdId());
             }
 
+            /*
+             * If the product has options then we can't add it to the cart directly. We must first
+             * go to the product details page so that the options can be selected.
+             */
+            /*if (selectedProd.getOpts() != null && selectedProd.getOpts().length > 0)
+            {
+                
+                 * Set just the product id. In the Javascript we work out the redirect URL so that
+                 * it works also when we are running as a portlet
+                 
+                setRedirectURL(Integer.toString(getProdId()));
+                return SUCCESS;
+            }*/
+            
+            /*
+             * Get the selected options from the form and place them in an array of option objects
+             */
+            OptionIf[] opts = null;
+            if (getNumOptions() > 0)
+            {
+                ArrayList<OptionIf> optsList = new ArrayList<OptionIf>();
+                for (int i = 0; i < getNumOptions(); i++)
+                {
+                    OptionIf o = new Option();
+                    o.setId(getOptionId()[i]);
+                    o.setValueId(getValueId()[i]);
+                    o.setType(getType()[i]);
+                    o.setCustomerText(getCustText()[i]);
+                    try
+                    {
+                        o.setQuantity(Integer.parseInt(getQuantity()[i]));
+                    } catch (Exception e)
+                    {
+                        o.setQuantity(0);
+                    }
+                    try
+                    {
+                        if (getCustPrice()[i] != null && getCustPrice()[i].length() > 0)
+                        {
+                            o.setCustomerPrice(new BigDecimal(getCustPrice()[i]));
+                        }
+                    } catch (Exception e)
+                    {
+                    }
+                    if (o.getType() == Option.TYPE_CUSTOMER_TEXT)
+                    {
+                        if (o.getCustomerText() != null && o.getCustomerText().length() > 0
+                               /* && !addToWishListB*/)
+                        {
+                            /*
+                             * Only add the option if there is some text since the option could
+                             * increase the cost of the product. Doesn't get added to the wishlist.
+                             */
+                            optsList.add(o);
+                        }
+                    } else if (o.getType() == Option.TYPE_VARIABLE_QUANTITY)
+                    {
+                        if (o.getQuantity() > 0 /*&& !addToWishListB*/)
+                        {
+                            /*
+                             * Only add the option if quantity > 0 since the option could increase
+                             * the cost of the product. Doesn't get added to the wishlist.
+                             */
+                            optsList.add(o);
+                        }
+                    } else if (o.getType() == Option.TYPE_CUSTOMER_PRICE)
+                    {
+                        if (o.getCustomerPrice() != null /*&& !addToWishListB*/)
+                        {
+                            /*
+                             * Only add the option if price has been populated since the option
+                             * increases the cost of the product. Doesn't get added to the wishlist.
+                             */
+                            optsList.add(o);
+                        }
+                    } else
+                    {
+                        optsList.add(o);
+                    }
+                }
+                opts = optsList.toArray(new OptionIf[0]);
+            }
+            
             // Get the product from its Id
             kkAppEng.getProductMgr().fetchSelectedProduct(getProdId());
             ProductIf selectedProd = kkAppEng.getProductMgr().getSelectedProduct();
             if (selectedProd == null)
             {
-                return SUCCESS;
-            }
-
-            /*
-             * If the product has options then we can't add it to the cart directly. We must first
-             * go to the product details page so that the options can be selected.
-             */
-            if (selectedProd.getOpts() != null && selectedProd.getOpts().length > 0)
-            {
-                /*
-                 * Set just the product id. In the Javascript we work out the redirect URL so that
-                 * it works also when we are running as a portlet
-                 */
-                setRedirectURL(Integer.toString(getProdId()));
                 return SUCCESS;
             }
             
@@ -90,7 +178,7 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
             }
 
             // Common code for adding to cart
-            this.addToCart(kkAppEng, selectedProd, null, qty);
+            this.addToCart(kkAppEng, selectedProd, opts, qty);
 
             // Common code for setting messages
             this.setMsgs(kkAppEng);
@@ -313,5 +401,61 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
 
 	public void setQty(int qty) {
 		this.qty = qty;
+	}
+
+	public int getNumOptions() {
+		return numOptions;
+	}
+
+	public void setNumOptions(int numOptions) {
+		this.numOptions = numOptions;
+	}
+
+	public int[] getOptionId() {
+		return optionId;
+	}
+
+	public void setOptionId(int[] optionId) {
+		this.optionId = optionId;
+	}
+
+	public int[] getValueId() {
+		return valueId;
+	}
+
+	public void setValueId(int[] valueId) {
+		this.valueId = valueId;
+	}
+
+	public int[] getType() {
+		return type;
+	}
+
+	public void setType(int[] type) {
+		this.type = type;
+	}
+
+	public String[] getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(String[] quantity) {
+		this.quantity = quantity;
+	}
+
+	public String[] getCustText() {
+		return custText;
+	}
+
+	public void setCustText(String[] custText) {
+		this.custText = custText;
+	}
+
+	public String[] getCustPrice() {
+		return custPrice;
+	}
+
+	public void setCustPrice(String[] custPrice) {
+		this.custPrice = custPrice;
 	}
 }
