@@ -366,9 +366,9 @@ public class ProdTileTag extends BaseTag
                         for (Iterator<ProdOption> iterator1 =  optContainer.getOptValues().iterator(); iterator1.hasNext();) {
                             ProdOption option =  iterator1.next();
                             if (eng.displayPriceWithTax()){
-                                sb.append("<option value=" + option.getId()+"\">" + option.getFormattedValueIncTax() +"</option>");
+                                sb.append("<option value=" + option.getId()+">" + option.getFormattedValueIncTax() +"</option>");
                             } else {
-                                sb.append("<option value=" + option.getId()+"\">" + option.getFormattedValueExTax() +"</option>");
+                                sb.append("<option value=" + option.getId()+">" + option.getFormattedValueExTax() +"</option>");
                             }
                         }
                         sb.append("</select>");

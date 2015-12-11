@@ -57,7 +57,20 @@ function callAction(parmArray, callback, url) {
 			}
 			parms = parms + ',"xsrf_token":"'+ document.getElementById('kk_xsrf_token').value + '"';
 	        parms = parms + '}';
+	        
+	        //Simrendrasingh
+	        //overriding existing method of constructing JSON object
+	        parms = {};
+	        for (var i =0; i < parmArray.length; i++ ) {
+	        	if(i % 2 === 0) {
+	        		parms[parmArray[i]] = parmArray[i+1];
+	        	}
+	        }
+	        parms["xsrf_token"] = document.getElementById('kk_xsrf_token').value;
+	        parms = JSON.stringify(parms);
+	        
 		}
+        
 		$.ajax({
 			type : 'POST',
 			timeout : '20000',
@@ -316,7 +329,21 @@ $(function() {
 				
 				var prodId = (this.id).split('-')[1];			
 				var qty = $("#prodQuantityId_"+prodId).val();			
-				callAction(new Array("prodId",prodId,"qty",qty), 
+				var numOptions = document.getElementsByName('numOptions')[0].value;
+				var optionId = document.getElementsByName("optionId[" + (numOptions-1).toString() +"]")[0].value;
+				var valueId = document.getElementsByName("valueId[" + (numOptions-1).toString() +"]")[0].value;
+				var type = document.getElementsByName("type[" + (numOptions-1).toString() +"]")[0].value;
+				callAction(new Array("prodId",prodId,
+						"qty",qty,
+						"numOptions",numOptions,
+						"optionId",[optionId],
+						"valueId", [valueId], 
+						"type", [type]
+						
+						//"optionId[" + (numOptions-1).toString() +"]", optionId, 
+						//"valueId[" + (numOptions-1).toString() +"]", valueId, 
+						//"type[" + (numOptions-1).toString() +"]", type
+						), 
 						addToCartCallback,
 						"AddToCartFromProdId.action");
 				return false;
