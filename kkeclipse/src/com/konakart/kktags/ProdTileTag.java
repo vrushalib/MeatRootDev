@@ -354,15 +354,15 @@ public class ProdTileTag extends BaseTag
                 prodMgr.fetchSelectedProduct(prod.getId());
                 for(Iterator<ProdOptionContainer> iterator = prodMgr.getSelectedProductOptions().iterator();iterator.hasNext();) {
                     ProdOptionContainer optContainer =  iterator.next();
-                    sb.append("<input type=\"hidden\" name=\"optionId[" + i+"]\" value=\"" + optContainer.getId() + "\"/>");
-                    sb.append("<input type=\"hidden\" name=\"type[" + i+"]\" value=\"" + optContainer.getType() + "\"/>");
+                    sb.append("<input type=\"hidden\" id=\"option_"+ prod.getId() +"\" name=\"optionId[" + i+"]\" value=\"" + optContainer.getId() + "\"/>");
+                    sb.append("<input type=\"hidden\" id=\"type_"+ prod.getId() +"\" name=\"type[" + i+"]\" value=\"" + optContainer.getType() + "\"/>");
                     
                     if (Integer.parseInt(optContainer.getType()) == Option.TYPE_SIMPLE){
                         sb.append(getStartDiv("product-option"));
                         sb.append(getStartSpan(optContainer.getName()));
                         sb.append(":"+END_SPAN);
                         
-                        sb.append("<select name=\"valueId[" + i +"]\">");
+                        sb.append("<select id=\"value_"+ prod.getId() +"\" name=\"valueId[" + i +"]\">");
                         for (Iterator<ProdOption> iterator1 =  optContainer.getOptValues().iterator(); iterator1.hasNext();) {
                             ProdOption option =  iterator1.next();
                             if (eng.displayPriceWithTax()){
@@ -376,7 +376,7 @@ public class ProdTileTag extends BaseTag
                     }
                     i++;
                 }
-                sb.append("<input type=\"hidden\" name=\"numOptions\" value=\""+new Integer(i).toString()+"\"/>");
+                sb.append("<input type=\"hidden\" id=\"numOptions_"+ prod.getId() +"\" name=\"numOptions\" value=\""+new Integer(i).toString()+"\"/>");
             } catch (NumberFormatException e) {
                 // TODO Log error
                 e.printStackTrace();

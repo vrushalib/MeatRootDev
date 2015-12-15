@@ -329,21 +329,19 @@ $(function() {
 				
 				var prodId = (this.id).split('-')[1];			
 				var qty = $("#prodQuantityId_"+prodId).val();			
-				var numOptions = document.getElementsByName('numOptions')[0].value;
-				var optionId = document.getElementsByName("optionId[" + (numOptions-1).toString() +"]")[0].value;
-				var valueId = document.getElementsByName("valueId[" + (numOptions-1).toString() +"]")[0].value;
-				var type = document.getElementsByName("type[" + (numOptions-1).toString() +"]")[0].value;
-				callAction(new Array("prodId",prodId,
-						"qty",qty,
-						"numOptions",numOptions,
-						"optionId",[optionId],
-						"valueId", [valueId], 
-						"type", [type]
-						
-						//"optionId[" + (numOptions-1).toString() +"]", optionId, 
-						//"valueId[" + (numOptions-1).toString() +"]", valueId, 
-						//"type[" + (numOptions-1).toString() +"]", type
-						), 
+				var numOptions = $('#numOptions_' + prodId).val(); //document.getElementsByName('numOptions')[0].value;
+				var optionId = $('#option_' + prodId).val();
+				var valueId = $('#value_' + prodId).val();
+				var type = $('#type_' + prodId).val();// document.getElementsByName("type[" + (numOptions-1).toString() +"]")[0].value;
+				var arrParam = ["prodId",prodId,"qty",qty];
+				
+				numOptions ? arrParam.push("numOptions", numOptions) : 'nothing';
+				optionId ? arrParam.push("optionId", [optionId]) : 'nothing';
+				valueId ? arrParam.push("valueId", [valueId]) : 'nothing';
+				type ? arrParam.push("type", [type]) : 'nothing';
+				
+				
+				callAction(arrParam, 
 						addToCartCallback,
 						"AddToCartFromProdId.action");
 				return false;
