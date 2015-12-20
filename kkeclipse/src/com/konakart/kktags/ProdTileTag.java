@@ -175,6 +175,7 @@ public class ProdTileTag extends BaseTag
             sb.append(getStartDiv("item-buttons-container"));
             sb.append(getStartDiv("item-buttons centered"));
             sb.append(getStartDiv("product-buttons"));
+            getProductOptions(sb);
             
             sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"add-to-cart-qty select-qty","prodQuantity"));
             
@@ -201,7 +202,7 @@ public class ProdTileTag extends BaseTag
                 sb.append(END_SPAN);
                 sb.append(END_DIV); // add-to-wishlist-container centered
             }
-            getProductOptions(sb);
+           
             sb.append(END_DIV);	//product-button
             sb.append(END_DIV); // item-buttons centered
             sb.append(END_DIV); // item-buttons-container

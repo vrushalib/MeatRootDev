@@ -1820,6 +1820,8 @@ display: table;
 	margin:	0 1em 0.5em 0;
 	padding: 8px 10px;
 	width: auto !important;
+	-webkit-border-radius: 3px;
+	margin-left: 5px;
 }
 
 .add-to-cart-qty1{
@@ -4106,6 +4108,16 @@ td.center {
 
 .validation-msg  label{
 	color: #A00000 !important;
+}
+
+/*Simrendrasingh CSS Styles*/
+
+ .prodOptions {
+	height: 25px;
+    -webkit-border-radius: 3px;
+    margin: 0 0 10px 0;
+    width: 140px;
+    padding: 0 3px;
 }
 
 
