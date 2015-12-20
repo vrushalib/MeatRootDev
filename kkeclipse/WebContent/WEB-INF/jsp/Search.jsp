@@ -19,7 +19,8 @@
 <%@include file="Taglibs.jsp" %>
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% boolean useSolr = kkEng.isUseSolr();%>
-<% boolean showCookieWarning = !kkEng.isAgreedCookies();%>
+<% boolean showCookieWarning = !kkEng.isAgreedCookies() ? false : false;%> 
+//assigned 'false' to  hide cookies warning. TODO: Should change configuration in kkENg to hide cookies.
 
 <%if (useSolr) { %>						
 	<script type="text/javascript">	

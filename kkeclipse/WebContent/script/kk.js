@@ -257,6 +257,10 @@ $(function() {
 
 	   
 	});
+	$('.prodOptions').click(function (evt) {
+		evt.stopPropagation();
+		
+	});
 	
 	/*
 	 * Hover effects for Sliding Cart 

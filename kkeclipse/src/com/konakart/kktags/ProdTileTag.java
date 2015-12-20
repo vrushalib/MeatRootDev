@@ -177,6 +177,7 @@ public class ProdTileTag extends BaseTag
             sb.append(getStartDiv("product-buttons"));
             
             sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"add-to-cart-qty select-qty","prodQuantity"));
+            
           
             if (eng.getQuotaMgr().canAddToBasket(prod, null) > 0)
             {            	
@@ -200,6 +201,7 @@ public class ProdTileTag extends BaseTag
                 sb.append(END_SPAN);
                 sb.append(END_DIV); // add-to-wishlist-container centered
             }
+            getProductOptions(sb);
             sb.append(END_DIV);	//product-button
             sb.append(END_DIV); // item-buttons centered
             sb.append(END_DIV); // item-buttons-container
@@ -216,7 +218,7 @@ public class ProdTileTag extends BaseTag
             getTitleLink(sb);
 
             // Product Options
-            getProductOptions(sb);
+            //getProductOptions(sb); //commented because moved to hover Moving on hover
             
             // Reviews
             getReviews(sb);
@@ -347,7 +349,7 @@ public class ProdTileTag extends BaseTag
     private void getProductOptions(StringBuffer sb)
     {
         ProductMgr prodMgr = eng.getProductMgr();
-        sb.append(getStartDiv("product-options"));
+        //sb.append(getStartDiv("product-options"));
         if (prod.getOpts() != null && prod.getOpts().length > 0){
             try {
                 int i=0;
@@ -358,11 +360,11 @@ public class ProdTileTag extends BaseTag
                     sb.append("<input type=\"hidden\" id=\"type_"+ prod.getId() +"\" name=\"type[" + i+"]\" value=\"" + optContainer.getType() + "\"/>");
                     
                     if (Integer.parseInt(optContainer.getType()) == Option.TYPE_SIMPLE){
-                        sb.append(getStartDiv("product-option"));
-                        sb.append(getStartSpan(optContainer.getName()));
-                        sb.append(":"+END_SPAN);
+                        //sb.append(getStartDiv("product-option"));
+                        //sb.append(getStartSpan(optContainer.getName()));
+                        //sb.append(":"+END_SPAN);
                         
-                        sb.append("<select id=\"value_"+ prod.getId() +"\" name=\"valueId[" + i +"]\">");
+                        sb.append("<select class=\"prodOptions\" id=\"value_"+ prod.getId() +"\" name=\"valueId[" + i +"]\">");
                         for (Iterator<ProdOption> iterator1 =  optContainer.getOptValues().iterator(); iterator1.hasNext();) {
                             ProdOption option =  iterator1.next();
                             if (eng.displayPriceWithTax()){
@@ -371,7 +373,7 @@ public class ProdTileTag extends BaseTag
                                 sb.append("<option value=" + option.getId()+">" + option.getFormattedValueExTax() +"</option>");
                             }
                         }
-                        sb.append("</select>");
+                        //sb.append("</select>");
                         sb.append(END_DIV);
                     }
                     i++;
@@ -389,7 +391,7 @@ public class ProdTileTag extends BaseTag
             }
             
         }
-        sb.append(END_DIV);
+        //sb.append(END_DIV);
     }
 
     /**
