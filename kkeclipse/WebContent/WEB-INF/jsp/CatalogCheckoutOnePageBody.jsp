@@ -496,13 +496,13 @@ public boolean empty(String s)
 			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
 			    					</s:else>
 			    					<s:if test="afternoonSlot and !morningSlot">
-										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" checked>Afternoon (11am - 1pm)
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" checked>Afternoon (1pm - 3pm)
 									</s:if>
 									<s:elseif test="afternoonSlot and morningSlot">
-										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" >Afternoon (11am - 1pm)
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" >Afternoon (1pm - 3pm)
 									</s:elseif>
 									<s:else>
-										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" disabled>Afternoon (11am - 1pm)
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" disabled>Afternoon (1pm - 3pm)
 									</s:else>
 			    				    <s:if test="eveningSlot and !morningSlot and !afternoonSlot">
 										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (6pm - 8pm)
