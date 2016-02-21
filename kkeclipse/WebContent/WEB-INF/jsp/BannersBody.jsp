@@ -106,8 +106,8 @@
 	<% } %>
 					<li style="width: 940px; height: 255px;" id="uiv2-slide-four">
 					
-					<div onclick="location.href='SelectCat.action?catId=46'" class="uiv2-slider-block-one"
-                    style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/Zorabian3.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
+					<div onclick="location.href='ShowProductsForManufacturer.action?manuId=40'" class="uiv2-slider-block-one"
+                    style="background: url('<%=kkEng.getImageBase()%>/banners/home-page/specials.png'); cursor:pointer; center left no-repeat; background-size: 100% 100%;">
 								 </div></li>
 								
 				</ul>
@@ -125,7 +125,7 @@
 				href="#uiv2-slide-three"></a><span>Processed</span></li>
 
 			<li class=""><span class="arrow  caption-four"></span><a
-					href="#uiv2-slide-four"></a><span>Special Offers</span></li>
+					href="#uiv2-slide-four"></a><span>Real Good Yummiez!</span></li>
 			</ul> 
 		</div>
 	</div> 
@@ -160,9 +160,12 @@
 <%if (true) { %>
 	<div id="banners">
 	
-		<a href="ShowSpecials.action"><img id="banner-1" class="banner-small rounded-corners" 
+<!--		<a href="ShowSpecials.action"><img id="banner-1" class="banner-small rounded-corners" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner1.png"/></a>
-			
+			-->
+		<a href="SelectProd.action?prodId=165"><img id="banner-1" class="banner-small rounded-corners" 
+			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner1.png"/></a>
+
 			<a href="SelectProd.action?prodId=153"><img id="banner-2" class="banner-small rounded-corners" 
 			src="<%=kkEng.getImageBase()%>/banners/home-page/Banner2.png"/></a>
 			

@@ -49,7 +49,8 @@
     <% } else { %>
 		<html>
 			<head>
-			    <meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
+				<meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
 				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
 				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
@@ -113,12 +114,13 @@
 
 					  ga('create', 'UA-55023986-1', 'auto');
 					  ga('send', 'pageview');
-					  
+					 /* 
 					  (function() {
 					      var a = document.createElement('script');a.type = 'text/javascript'; a.async = true;
 					      a.src=('https:'==document.location.protocol?'https://':'http://cdn.')+'chuknu.sokrati.com/15047/tracker.js';
 					      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
 					           })();
+					*/
 
 				</script>
 			</head>
@@ -186,8 +188,98 @@
                 })();
         </script>
         <!--End of Tawk.to Script-->
-		</body>
-		</html>
+
+	<!-- Start of Agnie Script, Google Tag Manager -->
+
+		<noscript>
+			<iframe src="//www.googletagmanager.com/ns.html?id=GTM-NV3N9M"
+				height="0" width="0" style="display:none;visibility:hidden">
+			</iframe>
+		</noscript>
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+			'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+			})(window,document,'script','dataLayer','GTM-NV3N9M');
+		</script>
+		
+
+	<!-- End of Agnie Script, Google Tag Manager -->
+
+	<!-- ViralMint JS -->
+		
+	<script type="text/javascript">
+    			window.vrlmnt = (function(d, s, id) {
+    			var js, vjs = d.getElementsByTagName(s)[0];
+    			if (d.getElementById(id)) return; js = d.createElement(s);
+    			js.src = "//cdn.viralmint.com/js/viralmint-min.js";
+    			js.id = id; js.acc_id = "1444756064";
+    			vjs.parentNode.insertBefore(js, vjs);
+    			return window.vrlmnt || (v = { _e: [], ready: function(f){v._e.push(f)}});
+    		}(document, "script", "viralmint-js"));
+	</script>
+	
+	<!-- ViralMint JS -->
+
+	<!-- ViralMint Custom Variable -->
+<!--		<script type="text/javascript">
+			vrlmnt.ready(function () {
+    			vrlmnt.setCustomData({
+        		login_status: "TRUE_OR_FALSE",
+        		total_cart_value: TOTAL_CART_AMOUNT,
+        		total_purchases: NUMBER_OF_ITEM_IN_CART,
+        		purchases: [{
+         			id: "1ST_PRODUCT_ID",
+            			title: "1ST_PRODUCT_TITLE_HERE",
+            			category: "1ST_PRODUCTS_CATEGORY",
+            			link: "1ST_PRODUCT_ABSOLUTE_LINK",
+            			image: "1ST_PRODUCT_ABSOLUTE_IMAGE_URL",
+            			price: 1ST_PRODUCT_PRICE,
+            			quantity: 1ST_PRODUCT_QUANTITY
+        		}, {
+         			id: "2ND_PRODUCT_ID",
+            			title: "2ND_PRODUCT_TITLE_HERE",
+            			category: "1ST_PRODUCTS_CATEGORY",
+            			link: "2ND_PRODUCT_ABSOLUTE_LINK",
+            			image: "2ND_PRODUCT_ABSOLUTE_IMAGE_URL",
+            			price: 2ND_PRODUCT_PRICE,
+            			quantity: 2ND_PRODUCT_QUANTITY
+        			}]
+     			});
+		});
+		</script>
+	-->
+		<!-- ViralMint Custom Variable -->
+	
+	<!-- KudoBuzz Script -->
+<!--	<script>
+		!function(){ 
+			var e=document.createElement("script");
+			e.type="text/javascript",
+			e.async=!0;
+			var t=location.protocol+"//widgets.kudobuzz.com/js/widgetLoader.js";
+			e.src=t;document.getElementsByTagName("head")[0].appendChild(e);
+			window.Kudos={Widget:function(e){this.uid=e.uid}},
+			Kudos.Widget({uid:"44a4y2t24323p274r2b4s2330314y2z274v2y2a4y2r2q2w2t2c4w2"})
+		}()
+	</script>
+-->
+	<!-- End of KudoBuzz -->
+
+
+	<!-- YotPo Script -->
+<!--
+		<script type="text/javascript">
+			(function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/qf0SjfLBl29nxy9XVWNdNalL52dsXzscAhknL8Ce/widget.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+		</script>
+                        
+-->
+	<!-- End of YotPo -->
+
+
+
+	</body>
+	</html>
 	<%} else {%>
 		</div>
 	<%}%>

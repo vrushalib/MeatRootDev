@@ -30,7 +30,7 @@
 							<div class="form-section">
 								<div class="notification-header">
 								    Order Number is <%=order.getId() %>.<br>
-									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else if(order.getCustom1().equalsIgnoreCase("a")) %> 11am - 1pm <%else %> 6pm - 8pm. Thank you for shopping with us.
+									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else if(order.getCustom1().equalsIgnoreCase("a")) %> 1pm - 3pm <%else %> 6pm - 8pm. Thank you for shopping with us.
 								</div>
 							</div>
 							<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>

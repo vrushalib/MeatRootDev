@@ -43,7 +43,7 @@
 
 
 
-<div id="main-menu" >
+<%--<div id="main-menu" >
 	<% 	for (int i = 0; i < catMgr.getCats().length; i++) {%>
 	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
     <% if(cat.getCustom1() == null || cat.getCustom1().isEmpty()){ //category is not invisible. custom1 value for invisible categories is "i".%>
@@ -59,5 +59,28 @@
 			<%=cat.getName()%></a>
 		<% } %>
 	<% } %>
+</div> --%>
+
+<div id="main-menu" >
+	<% 	for (int i = 0; i < catMgr.getCats().length; i++) {%>
+	<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i];	%>  
+    <% if(cat.getCustom1() == null || cat.getCustom1().isEmpty()){ //category is not invisible. custom1 value for invisible categories is "i".%>
+		<%String menuClass = "menu-item rounded-corners"; %>
+		<%-- <%if (i == catMgr.getCats().length-1){ %>
+			<% menuClass = "menu-item rounded-corners last-child"; %>
+		<% } 
+		else { %>
+			<% menuClass = "menu-item rounded-corners"; %>
+		<% } %> --%>
+		<a href='<%="SelectCat.action?catId="+cat.getId()%>'
+			class="<%=menuClass%>">
+			<%=cat.getName()%></a>
+		<% } %>
+	<% } %>
+	
+	<% String lastItemMenuClass = "menu-item rounded-corners last-child";%>
+	<a href='<%="http://www.meatroot.com/blog"%>'
+			class="<%=lastItemMenuClass%>">
+			<%="Recipes"%></a>
 </div>
 
