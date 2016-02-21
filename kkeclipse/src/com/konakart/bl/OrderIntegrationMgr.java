@@ -273,7 +273,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 			if (order.getCustom1().equalsIgnoreCase("m")) {
 				slot = "7am - 10:30am";
 			} else if (order.getCustom1().equalsIgnoreCase("a")) {
-				slot = "11am - 1pm";
+				slot = "1pm - 3pm";
 			}
 			
 			String amount = order.getOrderTotals()[0].getText();			

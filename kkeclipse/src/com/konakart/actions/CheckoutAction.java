@@ -29,6 +29,7 @@ import org.apache.struts2.ServletActionContext;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppEngCallouts;
 import com.konakart.al.KKAppException;
+import com.konakart.app.KKException;
 import com.konakart.app.ShippingQuote;
 import com.konakart.appif.BasketIf;
 import com.konakart.appif.CustomerIf;
@@ -385,14 +386,14 @@ public class CheckoutAction extends BaseAction
 
     }
     
-    public String getEarliestDeliveryDate(KKAppEng eng, com.konakart.appif.OrderIf checkoutOrder) {
+    public String getEarliestDeliveryDate(KKAppEng eng, com.konakart.appif.OrderIf checkoutOrder) throws KKException {
     	// set default values for slots
     	setMorningSlot(isMorningSlotEnabled(eng));
     	setEveningSlot(isEveningSlotEnabled(eng));
     	setAfternoonSlot(isAfternoonSlotEnabled(eng));
     	
     	Map<String, Boolean> slotsMap = new HashMap<String, Boolean>(); 
-    	DeliveryDateServiceIf deliveryDateService = DeliveryDateServiceFactory.getDeliveryDateService(checkoutOrder);
+    	DeliveryDateServiceIf deliveryDateService = DeliveryDateServiceFactory.getDeliveryDateService(eng, checkoutOrder);
     	String fetchedDeliveryDay = deliveryDateService.getDeliveryDate(eng, checkoutOrder, slotsMap);
     	
     	if(slotsMap != null && !slotsMap.isEmpty()) {
