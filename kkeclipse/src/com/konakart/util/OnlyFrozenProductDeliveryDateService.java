@@ -24,22 +24,23 @@ public class OnlyFrozenProductDeliveryDateService extends AbstractDeliveryDateSe
     	cal.set(Calendar.HOUR_OF_DAY, 7); //7 AM
     	Time sevenAm = new Time(cal.getTime().getTime());
     	
-    	cal.set(Calendar.HOUR_OF_DAY, 10); //10 AM
-    	Time tenAm = new Time(cal.getTime().getTime());
-    	
-    	cal.set(Calendar.HOUR_OF_DAY, 17); //5 PM
+     	cal.set(Calendar.HOUR_OF_DAY, 17); //5 PM
     	Time fivePm = new Time(cal.getTime().getTime());
+    	
+    	cal.set(Calendar.HOUR_OF_DAY, 12); //12.05 PM
+    	cal.set(Calendar.MINUTE, 5);
+    	Time fivePastTwelvePm = new Time(cal.getTime().getTime());
     	
     	if(now.before(sevenAm)) {
     		deliveryDay = getDate(new Date());
-    	} else if (now.after(sevenAm) && now.before(tenAm)) {
+    	} else if (now.after(sevenAm) && now.before(fivePastTwelvePm)) {
     		if(isAfternoonSlotEnabled(eng) || isEveningSlotEnabled(eng)) {
     			slotsMap.put(Constants.MORNING_SLOT, false);
         		deliveryDay = getDate(new Date());	
     		} else {
     			deliveryDay = getDateTomorrow();	
     		}    		
-    	} else if (now.after(tenAm) && now.before(fivePm)) {
+    	} else if (now.after(fivePastTwelvePm) && now.before(fivePm)) {
     		if(isEveningSlotEnabled(eng)) {
     			slotsMap.put(Constants.MORNING_SLOT, false);
         		slotsMap.put(Constants.AFTERNOON_SLOT, false);
