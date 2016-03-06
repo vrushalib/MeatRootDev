@@ -237,14 +237,17 @@ function shippingRefresh(storeId) {
 	}
 }
 
-function paymentRefresh() {	
-	var paymentDetails = document.getElementById("paymentDetails");
-	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+function paymentRefresh(e) {
+	
+	//var paymentDetails = document.getElementById("paymentDetails");
+	//var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+	var selectedPayment = e.value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
 	setLoading();
 
-		var selectedPaymentMode = $("#paymentDetails").val();
-		if(selectedPaymentMode == 'cod'){//cod
+		//var selectedPaymentMode = $("#paymentDetails").val();
+		
+		if(selectedPayment == 'cod'){//cod
 		    $('#continue-button').text("Confirm Order");
 		}else{
 			$('#continue-button').text("Proceed to Payment");
@@ -532,8 +535,29 @@ public boolean empty(String s)
 			    				<div class="order-confirmation-area-content">
 <%-- 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span> --%>
 								     <div id="payment-method" class="order-confirmation-area-content-select">
-										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
-										<select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
+										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3><br/>
+										<div class="payment-radio-buttons">
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+												<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
+												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
+													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
+													<%if (payment.equals(pd.getCode())){ %>														
+														<p>
+														<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" checked="checked"/>
+														<%=pd.getDescription()%>
+														</p>													
+													<% } else { %>														
+														<p>														
+															<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method"/>
+															<%=pd.getDescription()%>
+														</p>			
+													<% } %>
+												<% } %>										
+											<%} %>
+										
+										</div>
+										<%-- <select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
 										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
 												<% String payment = ((String)request.getAttribute("payment"));%> 
@@ -548,7 +572,7 @@ public boolean empty(String s)
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
-										</select>
+										</select> --%>
 									</div>
 								 	<%-- <div id="promotion-codes">
 										<div id="promotion-codes-container">
