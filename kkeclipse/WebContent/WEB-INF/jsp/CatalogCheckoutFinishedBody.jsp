@@ -59,3 +59,55 @@
 						</form>
 			    	</div>
 	    		</div>
+	    		
+	    		<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
+	    		<div>
+	    		<% out.println(kkEng.getCustomerMgr().getCurrentCustomer());%>
+	    		<% out.println(order);%>
+	    		</div>
+	    		 <div
+
+  id="refcandy-mint"
+
+  data-app-id="ijdpgu342un7laa7kzhijptcs"
+
+  data-fname="<%= kkEng.getCustomerMgr().getCurrentCustomer().firstName %>"
+
+  data-lname="<%= kkEng.getCustomerMgr().getCurrentCustomer().lastName%>"
+
+  data-email="<%= kkEng.getCustomerMgr().getCurrentCustomer().emailAddr%>"
+
+  data-amount="00.00"
+
+  data-currency="INR"
+
+  data-timestamp="1456731616"
+
+  data-external-reference-id="93211001"
+
+  data-signature="c97ca2e54f5e61eec1a8a73940e811c1"
+
+></div>
+	    		
+	    		<%} %>
+	    		
+	  <script>
+
+
+$('#refcandy-mint').attr({
+	"data-fname": "",
+	"data-lname": "",
+	"data-email": "",
+	"data-amount": "",
+	"data-currency": "",
+	"data-timestamp": "1456731616",
+	"data-external-reference-id": "93211001",
+	"data-signature": "c97ca2e54f5e61eec1a8a73940e811c1"
+	
+});
+
+</script>
+
+<script>(function(e){var t,n,r,i,s,o,u,a,f,l,c,h,p,d,v;z="script";l="refcandy-purchase-js";c="refcandy-mint";p="go.referralcandy.com/purchase/";t="data-app-id";r={email:"a",fname:"b",lname:"c",amount:"d",currency:"e","accepts-marketing":"f",timestamp:"g","referral-code":"h",locale:"i","external-reference-id":"k",signature:"ab"};i=e.getElementsByTagName(z)[0];s=function(e,t){if(t){return""+e+"="+encodeURIComponent(t)}else{return""}};d=function(e){return""+p+h.getAttribute(t)+".js?aa=75&"};if(!e.getElementById(l)){h=e.getElementById(c);if(h){o=e.createElement(z);o.id=l;a=function(){var e;e=[];for(n in r){u=r[n];v=h.getAttribute("data-"+n);e.push(s(u,v))}return e}();o.src=""+e.location.protocol+"//"+d(h.getAttribute(t))+a.join("&");return i.parentNode.insertBefore(o,i)}}})(document);</script>
+
+	   

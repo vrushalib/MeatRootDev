@@ -325,6 +325,7 @@ $(function() {
 		maxDate: '+7d'  
 	}).on("change", function(){
 		if ($('#datepicker').val() == $('#datepicker').datepicker("option", "minDate")){
+			//$('#deliveryDay').text("Today");
 			if ('<s:property value="morningSlot"/>' == 'true' ) {
 				$("#morningSlot").attr("disabled", false);
 				$("#morningSlot").attr('checked', 'checked');
@@ -352,6 +353,11 @@ $(function() {
 
 		}
 		else{
+			//console.log(($('#datepicker').val().split('/')[0]) + 1);
+			//console.log($('#datepicker').datepicker("option", "minDate").split('/')[0]);
+			
+			//$('#deliveryDay').text( parseInt($('#datepicker').val().split()[0]) + 1 == $('#datepicker').datepicker("option", "minDate").split()[0]);
+			
 			$("#morningSlot").attr("disabled", false);
 			$("#morningSlot").attr('checked', 'checked');
 			$("#afternoonSlot").attr("disabled", false);
@@ -501,6 +507,7 @@ public boolean empty(String s)
 			    			<div id="delivery-date" class="order-confirmation-area">
 			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
 			    				<input id="datepicker" type="text" readonly="readonly"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    				<span id="deliveryDay"></span>
 			    				<span class="validation-msg"></span>
 			    			</div>
 			    			<br><br>
@@ -836,28 +843,4 @@ public boolean empty(String s)
 		    </div>
 
 
-	<div
-
-  id="refcandy-mint"
-
-  data-app-id="ijdpgu342un7laa7kzhijptcs"
-
-  data-fname="John"
-
-  data-lname="Smith"
-
-  data-email="vrushali@meatroot.com"
-
-  data-amount="10.99"
-
-  data-currency="USD"
-
-  data-timestamp="1456731616"
-
-  data-external-reference-id="93211001"
-
-  data-signature="c97ca2e54f5e61eec1a8a73940e811c1"
-
-></div>
-
-
+	
