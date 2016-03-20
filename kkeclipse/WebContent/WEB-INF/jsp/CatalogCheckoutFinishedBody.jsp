@@ -61,10 +61,7 @@
 	    		</div>
 	    		
 	    		<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
-	    		<div>
-	    		<% out.println(kkEng.getCustomerMgr().getCurrentCustomer());%>
-	    		<% out.println(order);%>
-	    		</div>
+	    		
 	    		 <div
 
   id="refcandy-mint"
