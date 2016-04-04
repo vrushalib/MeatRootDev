@@ -556,7 +556,7 @@ public boolean empty(String s)
 			    				<div class="order-confirmation-area-content">
 <%-- 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span> --%>
 								     <div id="payment-method" class="order-confirmation-area-content-select">
-										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3><br/>
+										<h3><kk:msg  key="show.order.details.body.paymentmethod"/></h3>
 										<div class="payment-radio-buttons">
 										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
@@ -564,15 +564,11 @@ public boolean empty(String s)
 												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
 													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
 													<%if (payment.equals(pd.getCode())){ %>														
-														<p>
-														<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" checked="checked"/>
-														<%=pd.getDescription()%>
-														</p>													
-													<% } else { %>														
-														<p>														
-															<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method"/>
-															<%=pd.getDescription()%>
-														</p>			
+														<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" checked="checked">
+														<span style="width:180px;"><%=pd.getDescription()%></span>																											
+													<% } else { %>								
+															<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" style="margin-left:-10px;">
+															<span style="width:100px;"><%=pd.getDescription()%></span>
 													<% } %>
 												<% } %>										
 											<%} %>
