@@ -51,20 +51,6 @@ var _sokParams = {
 	    "event" : "checkout" 
 };
 
-//Variable used for Referral Candy
-var _referralCandyParams = {
-	   	"id": "refcandy-mint",
-	   	"data-app-id":"ijdpgu342un7laa7kzhijptcs",
-	   	"data-fname" :"<%=order.getCustomerName()%>",
-	   	"data-lname":"<%=order.getCustomerName()%>",
-	   	"data-email":"<%=order.getCustomerEmail()%>",
-	   	"data-amount":"10.99",
-	   	"data-currency":"USD",
-	   	"data-timestamp":"1456731616",
-	   	"data-external-reference-id":"93211001",
-	   	"data-signature":"c97ca2e54f5e61eec1a8a73940e811c1"
-};
-
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
 		alert('<%=kkEng.getMsg("common.session.timeout")%>');
