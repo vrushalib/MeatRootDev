@@ -95,7 +95,7 @@
 	</form>
 <% } %>	
 
-<%if (showCookieWarning) { %>	
+<%if (showCookieWarning && false) { %>	 //added false to hide cookied permanently 
 	<div id="cookie-container">
 		<div id="cookie-warning">
 				<span style="display:table-cell; vertical-align:top;"><kk:msg  key="cookie.warning"/></span>

@@ -23,8 +23,8 @@ public class FreshGoatDeliveryDateService extends AbstractDeliveryDateService
     	cal.set(Calendar.MINUTE, 00);
     	cal.set(Calendar.SECOND, 00);    	
     	
-    	cal.set(Calendar.HOUR_OF_DAY, 22); //10 PM
-    	Time tenPm = new Time(cal.getTime().getTime());
+    	cal.set(Calendar.HOUR_OF_DAY, 21); //9 PM
+    	Time ninePm = new Time(cal.getTime().getTime());
     	
     	cal.set(Calendar.HOUR_OF_DAY, 15); //3 PM
     	Time threePm = new Time(cal.getTime().getTime());
@@ -43,9 +43,9 @@ public class FreshGoatDeliveryDateService extends AbstractDeliveryDateService
    /* 	cal.set(Calendar.HOUR_OF_DAY, 15); //3 PM 
     	Time threePmNextDay = new Time(cal.getTime().getTime());*/
     	
-    	if(now.after(threePm) && now.before(tenPm)) {
+    	if(now.after(threePm) && now.before(ninePm)) {
     		deliveryDay = getDateTomorrow();
-    	} else if (now.after(tenPm) && now.before(midnight)) {
+    	} else if (now.after(ninePm) && now.before(midnight)) {
     		if(isAfternoonSlotEnabled(eng) || isEveningSlotEnabled(eng)) {
     			slotsMap.put(Constants.MORNING_SLOT, false);
         		deliveryDay = getDateTomorrow();	

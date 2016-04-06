@@ -237,14 +237,17 @@ function shippingRefresh(storeId) {
 	}
 }
 
-function paymentRefresh() {	
-	var paymentDetails = document.getElementById("paymentDetails");
-	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+function paymentRefresh(e) {
+	
+	//var paymentDetails = document.getElementById("paymentDetails");
+	//var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+	var selectedPayment = e.value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
 	setLoading();
 
-		var selectedPaymentMode = $("#paymentDetails").val();
-		if(selectedPaymentMode == 'cod'){//cod
+		//var selectedPaymentMode = $("#paymentDetails").val();
+		
+		if(selectedPayment == 'cod'){//cod
 		    $('#continue-button').text("Confirm Order");
 		}else{
 			$('#continue-button').text("Proceed to Payment");
@@ -308,6 +311,7 @@ $(function() {
 		maxDate: '+7d'  
 	}).on("change", function(){
 		if ($('#datepicker').val() == $('#datepicker').datepicker("option", "minDate")){
+			//$('#deliveryDay').text("Today");
 			if ('<s:property value="morningSlot"/>' == 'true' ) {
 				$("#morningSlot").attr("disabled", false);
 				$("#morningSlot").attr('checked', 'checked');
@@ -335,6 +339,11 @@ $(function() {
 
 		}
 		else{
+			//console.log(($('#datepicker').val().split('/')[0]) + 1);
+			//console.log($('#datepicker').datepicker("option", "minDate").split('/')[0]);
+			
+			//$('#deliveryDay').text( parseInt($('#datepicker').val().split()[0]) + 1 == $('#datepicker').datepicker("option", "minDate").split()[0]);
+			
 			$("#morningSlot").attr("disabled", false);
 			$("#morningSlot").attr('checked', 'checked');
 			$("#afternoonSlot").attr("disabled", false);
@@ -484,6 +493,7 @@ public boolean empty(String s)
 			    			<div id="delivery-date" class="order-confirmation-area">
 			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
 			    				<input id="datepicker" type="text" readonly="readonly"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    				<span id="deliveryDay"></span>
 			    				<span class="validation-msg"></span>
 			    			</div>
 			    			<br><br>
@@ -532,8 +542,25 @@ public boolean empty(String s)
 			    				<div class="order-confirmation-area-content">
 <%-- 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span> --%>
 								     <div id="payment-method" class="order-confirmation-area-content-select">
-										<h3><label><kk:msg  key="show.order.details.body.paymentmethod"/></label></h3>
-										<select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
+										<h3><kk:msg  key="show.order.details.body.paymentmethod"/></h3>
+										<div class="payment-radio-buttons">
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+												<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
+												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
+													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
+													<%if (payment.equals(pd.getCode())){ %>														
+														<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" checked="checked">
+														<span style="width:180px;"><%=pd.getDescription()%></span>																											
+													<% } else { %>								
+															<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" style="margin-left:-10px;">
+															<span style="width:100px;"><%=pd.getDescription()%></span>
+													<% } %>
+												<% } %>										
+											<%} %>
+										
+										</div>
+										<%-- <select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
 										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
 												<% String payment = ((String)request.getAttribute("payment"));%> 
@@ -548,7 +575,7 @@ public boolean empty(String s)
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
-										</select>
+										</select> --%>
 									</div>
 								 	<%-- <div id="promotion-codes">
 										<div id="promotion-codes-container">
@@ -798,6 +825,4 @@ public boolean empty(String s)
 		    </div>
 
 
-
-
-
+	

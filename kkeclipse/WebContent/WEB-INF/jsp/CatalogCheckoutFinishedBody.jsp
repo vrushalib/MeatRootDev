@@ -17,7 +17,7 @@
 //
 --%>
 <%@include file="Taglibs.jsp" %>
-
+<%@page import="java.util.Calendar"%>
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <% com.konakart.appif.OrderIf order = (com.konakart.appif.OrderIf)request.getAttribute("order");%>
@@ -59,3 +59,37 @@
 						</form>
 			    	</div>
 	    		</div>
+	    		
+	    		<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
+	    		<%-- <%out.println(order.getTotalIncTax()); %>  --%>
+	    		
+	    		 <div
+
+  id="refcandy-popsicle"
+
+  data-app-id="ijdpgu342un7laa7kzhijptcs"
+
+  data-fname=<%=kkEng.getCustomerMgr().getCurrentCustomer().getFirstName()%>
+
+  data-lname="<%=kkEng.getCustomerMgr().getCurrentCustomer().getLastName()%>"
+
+  data-email="<%=kkEng.getCustomerMgr().getCurrentCustomer().getEmailAddr()%>"
+
+  data-amount="<%=order.getTotalIncTax()%>"
+
+  data-currency="INR"
+
+  data-timestamp="<%=Calendar.getInstance().getTimeInMillis() / 1000%>"
+
+  data-external-reference-id="<%=order.getOrderNumber()%>"
+
+  data-signature="123"
+
+></div>
+	    		
+<%} %>
+	    		
+
+<script>(function(e){var t,n,r,i,s,o,u,a,f,l,c,h,p,d,v;z="script";l="refcandy-purchase-js";c="refcandy-popsicle";p="go.referralcandy.com/purchase/";t="data-app-id";r={email:"a",fname:"b",lname:"c",amount:"d",currency:"e","accepts-marketing":"f",timestamp:"g","referral-code":"h",locale:"i","external-reference-id":"k",signature:"ab"};i=e.getElementsByTagName(z)[0];s=function(e,t){if(t){return""+e+"="+encodeURIComponent(t)}else{return""}};d=function(e){return""+p+h.getAttribute(t)+".js?aa=75&"};if(!e.getElementById(l)){h=e.getElementById(c);if(h){o=e.createElement(z);o.id=l;a=function(){var e;e=[];for(n in r){u=r[n];v=h.getAttribute("data-"+n);e.push(s(u,v))}return e}();o.src=""+e.location.protocol+"//"+d(h.getAttribute(t))+a.join("&");return i.parentNode.insertBefore(o,i)}}})(document);</script>
+
+	   

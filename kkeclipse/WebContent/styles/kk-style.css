@@ -4105,4 +4105,19 @@ td.center {
 	color: #A00000 !important;
 }
 
+/*custom css*/
+.order-confirmation-area-content-select .payment-radio-buttons {
+	height: 30px;
+    margin: 14px 0 0 0;
+    display: inline-flex;
+    font-size: 13px;
+    
+		
+}
+
+.order-confirmation-area-content-select .payment-radio-buttons p {
+	width: 200px;
+}
+
+
 
