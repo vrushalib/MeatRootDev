@@ -34,7 +34,6 @@ import com.konakart.app.KKException;
 import com.konakart.appif.IpnHistoryIf;
 import com.konakart.appif.SSOTokenIf;
 import com.konakart.bl.modules.payment.barclaycardsmartpayapi.BarclaycardSmartPayApi;
-import com.konakart.bl.modules.payment.barclaycardsmartpayhosted.BarclaycardSmartPayHosted;
 
 /**
  * This class is an Action class for what to do when a payment notification callback is received
@@ -256,7 +255,7 @@ public class BarclaycardSmartPayApiNotificationAction extends BaseGatewayAction
             if (countryCode == null)
             {
                 log.warn("CountryCode not returned in the "
-                        + BarclaycardSmartPayHosted.BC_SPAY_HOSTED_GATEWAY_CODE + " response");
+                        + BarclaycardSmartPayApi.BC_SPAY_API_GATEWAY_CODE + " response");
             }
 
             ipnHistory.setOrderId(orderId);

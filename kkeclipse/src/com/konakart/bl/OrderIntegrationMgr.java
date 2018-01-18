@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2016 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -20,10 +20,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,19 +29,17 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import com.konakart.app.Booking;
 import com.konakart.app.Coupon;
 import com.konakart.app.CreditCard;
+import com.konakart.app.CustomerTag;
 import com.konakart.app.ExportOrderOptions;
 import com.konakart.app.KKConfiguration;
 import com.konakart.app.KKEng;
 import com.konakart.app.MqOptions;
+import com.konakart.app.OrderProduct;
+import com.konakart.app.OrderTotal;
 import com.konakart.app.OrderUpdate;
 import com.konakart.app.PaymentOptions;
 import com.konakart.app.PdfOptions;
@@ -53,6 +48,7 @@ import com.konakart.app.Subscription;
 import com.konakart.appif.BookingIf;
 import com.konakart.appif.CouponIf;
 import com.konakart.appif.CustomerIf;
+import com.konakart.appif.CustomerTagIf;
 import com.konakart.appif.EngineConfigIf;
 import com.konakart.appif.ExportOrderOptionsIf;
 import com.konakart.appif.ExportOrderResponseIf;
@@ -68,8 +64,12 @@ import com.konakart.appif.PaymentScheduleIf;
 import com.konakart.appif.ProductIf;
 import com.konakart.appif.SubscriptionIf;
 import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
+import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
 import com.konakart.blif.AdminEngineMgrIf;
 import com.konakart.blif.BillingMgrIf;
+import com.konakart.blif.ConfigurationMgrIf;
+import com.konakart.blif.CustomerTagMgrIf;
+import com.konakart.blif.ExportMgrIf;
 import com.konakart.blif.OrderMgrIf;
 import com.konakart.blif.OrderTotalMgrIf;
 import com.konakart.blif.ProductMgrIf;
@@ -118,6 +118,21 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
     }
 
     /**
+     * Called just before returning the order from the CreateOrder method. This method gives the
+     * opportunity to modify any detail of the order before it is returned. If null is returned,
+     * then no action is taken. If a non null Order is returned, then this is the order that will be
+     * saved.
+     * 
+     * @param order
+     * @return Returns an order object
+     */
+    public OrderIf afterCreateOrder(OrderIf order)
+    {
+        manageReturnValues(order);
+        return order;
+    }
+
+    /**
      * Called just before an order is saved. This method gives the opportunity to modify any detail
      * of the order before it is saved. If null is returned, then no action is taken. If a non null
      * Order is returned, then this is the order that will be saved.
@@ -127,7 +142,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
      */
     public OrderIf beforeSaveOrder(OrderIf order)
     {
-        return null;
+        manageFilters(order);
+        return order;
     }
 
     /**
@@ -153,10 +169,24 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
          */
         if (order.getStatus() == com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS)
         {
-			sendSMS(order);
             manageDigitalDownloads(order);
             manageGiftCertificates(order);
             manageGiftRegistries(order);
+            exportOrder(order);
+            removeStockReservations(order);
+
+            // Updates the B2B_AGGREGATE_ORDER_TOTAL tag to keep track of the total
+            // order value created by this customer
+            // updateCustomerTags(order);
+
+            // Reduces the inventory of a product in a free product promotion
+            // manageFreeProductInventory(order);
+
+            // Uncomment if using a Tax Module (such as TaxCloud, Avalara etc)
+            // manageTax(order);
+
+            // Uncomment if using Bookable Products
+            // manageBookings(order);
 
             // Post the order to the order message queue for processing by some other system
             // postOrderToQueue(order);
@@ -170,15 +200,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             // Uncomment to export the order for shipping
             // createOrderExportForShipping(order);
-
-            // Uncomment if using a Tax Module (such as TaxCloud, Avalara etc)
-            // manageTax(order);
-
-            // Uncomment if using Bookable Products
-            // manageBookings(order);
-        } else if (order.getStatus() == OrderMgr.PENDING_STATUS) {
-			sendSMS(order);
-		}
+        }
 
         // By default we don't create any invoices.
         // createInvoice(order);
@@ -213,12 +235,18 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             if (newStatus == OrderMgr.PAYMENT_RECEIVED_STATUS)
             {
-            	//Code to send SMS on Successful order
-            	sendSMS(order);
-            	
                 manageDigitalDownloads(order);
                 manageGiftCertificates(order);
                 manageGiftRegistries(order);
+                exportOrder(order);
+                removeStockReservations(order);
+
+                // Updates the B2B_AGGREGATE_ORDER_TOTAL tag to keep track of the total
+                // order value created by this customer
+                // updateCustomerTags(order);
+
+                // Reduces the inventory of a product in a free product promotion
+                // manageFreeProductInventory(order);
 
                 // Post the order to the order message queue for processing by some other system
                 // postOrderToQueue(order);
@@ -229,10 +257,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 // Uncomment if using Bookable Products
                 // manageBookings(order);
             }
-			
-			else if (newStatus == OrderMgr.PENDING_STATUS) {
-				sendSMS(order);
-			}
+
             /*
              * Uncomment the call to createInvoice() if you want your invoice to be created when the
              * order reaches a particular state and not when it is first saved.
@@ -244,77 +269,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
     }
 
-	private void sendSMS(OrderIf order) {
-		String nonEmptyMobile = order.getCustomerTelephone();
-		System.out.println("SendSMS - Mobile Number: " + nonEmptyMobile);
-		if (null == nonEmptyMobile || nonEmptyMobile.isEmpty()) {
-			nonEmptyMobile = order.getCustomerTelephone1();
-		}
-		
-		System.out.println("SendSMS - Mobile Number1: " + nonEmptyMobile);
-		
-		if (null != nonEmptyMobile && !nonEmptyMobile.isEmpty()) {
-			String mobileNumber = order.getCustomerTelephone()
-					.replaceAll("\\+", "").replaceAll(" ", "")
-					.replaceAll("\\-", "");
-			if (mobileNumber.length() == 10) {
-				mobileNumber = "91" + mobileNumber;
-			}
-
-			if (mobileNumber.length() != 12 || mobileNumber.matches("[a-zA-Z]")) {
-				log.warn("Invalid Customer Mobile Number Provided : "
-						+ order.getCustomerTelephone() + "Processed : "
-						+ mobileNumber);
-				return;
-			}
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-			String today = dateFormat.format(new Date());
-			String slot = "6pm - 8pm";
-			if (order.getCustom1().equalsIgnoreCase("m")) {
-				slot = "7am - 10:30am";
-			} else if (order.getCustom1().equalsIgnoreCase("a")) {
-				slot = "1pm - 3pm";
-			}
-			
-			String amount = order.getOrderTotals()[0].getText();			
-			// Sending SMS using Http Client
-			String message = String.format("Dear %s, Your order #%s of amount %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s. Order details and e-receipt has been sent to the registered email. Happy Meating!", order.getCustomerName(),order.getId(),amount, today, order.getCustom2(), slot);
-			// String message = "Your order is placed successfully";
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			
-			String URLParams = String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message);
-			System.out.println("URL Params: " + URLParams);
-			URI uri = null;
-			try {
-				uri = new URI(
-				        "http", 
-				        "enterprise.smsgupshup.com", 
-				        "/GatewayAPI/rest",
-				        URLParams,
-				        null);
-			} catch (URISyntaxException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			HttpGet httpGet = new HttpGet(uri.toASCIIString());
-			try {
-				CloseableHttpResponse response1 = httpclient.execute(httpGet);
-				System.out.println("SMS Sending Response :  " + response1.getStatusLine());
-				log.info("SMS Sending Response :  " + response1.getStatusLine());
-			} catch (ClientProtocolException e) {
-				log.error("Exception Occured while Sending SMS : "
-						+ e.getMessage());
-				e.printStackTrace();
-			} catch (IOException e) {
-				log.error("Exception Occured while Sending SMS : "
-						+ e.getMessage());
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
+    /**
      * Called just before a subscription is inserted. This method gives the opportunity to modify
      * any detail of the subscription before it is inserted. If null is returned, then no action is
      * taken. If a non null subscription is returned, then this is the subscription that will be
@@ -375,7 +330,6 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             adEngineMgr.callPaymentModule(getEng().getEngConf(),
                     "com.konakartadmin.modules.payment.authorizenet.AdminPayment", options);
         }
-
     }
 
     /**
@@ -629,11 +583,13 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
                 if (numDownloadsCreated == order.getOrderProducts().length)
                 {
-                    orderMgr.updateOrder(order.getId(), OrderMgr.DELIVERED_STATUS, /* customerNotified */
+                    orderMgr.updateOrder(order.getId(),
+                            OrderMgr.DELIVERED_STATUS, /* customerNotified */
                             false, "Download Link Available", updateOrder);
                 } else if (numDownloadsCreated > 0)
                 {
-                    orderMgr.updateOrder(order.getId(), OrderMgr.PARTIALLY_DELIVERED_STATUS, /* customerNotified */
+                    orderMgr.updateOrder(order.getId(),
+                            OrderMgr.PARTIALLY_DELIVERED_STATUS, /* customerNotified */
                             false, "Download Link Available", updateOrder);
                 }
             }
@@ -679,6 +635,106 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
     public String createTrackingNumber(OrderIf order) throws Exception
     {
         return null;
+    }
+
+    /**
+     * Exports the order for ERP XML Integration.
+     * 
+     * @param order
+     */
+    private void exportOrder(OrderIf order)
+    {
+        try
+        {
+            ConfigurationMgrIf configMgr = getConfigMgr();
+            boolean erpEnabled = configMgr.getConfigurationValueAsBool(
+                    KKConstants.CONF_KEY_ERP_INT_INTEGRATION_ENABLED, false);
+            boolean exportOrder = configMgr
+                    .getConfigurationValueAsBool(KKConstants.CONF_KEY_ERP_EXPORT_ORDER, false);
+            if (erpEnabled && exportOrder)
+            {
+                ExportMgrIf mgr = getExportMgr();
+                mgr.exportOrder(getStoreId(), order);
+            }
+        } catch (Exception e)
+        {
+            log.error("Problem exporting order to queue", e);
+        }
+    }
+
+    /**
+     * Move data about the order into the filter fields
+     * 
+     * @param order
+     */
+    private void manageFilters(OrderIf order)
+    {
+        // Get the scale for the currency
+        int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+
+        // Find the total of the order
+        BigDecimal total = null;
+        if (order.getOrderTotals() == null)
+        {
+            if (log.isWarnEnabled())
+            {
+                log.warn("Order (LifecycleId: " + order.getLifecycleId() + " OrderNumber:"
+                        + order.getOrderNumber() + " has no OrderTotals attached");
+            }
+        } else
+        {
+            for (int i = 0; i < order.getOrderTotals().length; i++)
+            {
+                OrderTotal ot = (OrderTotal) order.getOrderTotals()[i];
+                if (ot.getClassName().equals(OrderTotalMgr.ot_total))
+                {
+                    total = ot.getValue().setScale(scale, BigDecimal.ROUND_HALF_UP);
+                }
+            }
+        }
+
+        // In this example we set the filterDecimal1 attribute to the order total so that we can
+        // filter orders based on order size
+        order.setFilterDecimal1(total);
+    }
+
+    /**
+     * Create return value amounts for a single product. Note that if promotion modules are active
+     * they will have to modify these amounts if the products are discounted.
+     * 
+     * @param order
+     */
+    private void manageReturnValues(OrderIf order)
+    {
+        // Get the scale for the currency
+        int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+
+        if (order.getOrderProducts() == null || order.getOrderProducts().length == 0)
+        {
+            if (log.isWarnEnabled())
+            {
+                log.warn("Order (LifecycleId: " + order.getLifecycleId() + " OrderNumber:"
+                        + order.getOrderNumber() + " has no OrderProducts attached");
+            }
+        } else
+        {
+            for (int i = 0; i < order.getOrderProducts().length; i++)
+            {
+                OrderProduct op = (OrderProduct) order.getOrderProducts()[i];
+                if (op.getFinalPriceIncTax() != null)
+                {
+
+                    BigDecimal singleProductPriceWithOptions = op.getFinalPriceIncTax();
+                    if (op.getQuantity() > 1)
+                    {
+                        singleProductPriceWithOptions = op.getFinalPriceIncTax().divide(
+                                new BigDecimal(op.getQuantity()), scale, BigDecimal.ROUND_HALF_UP);
+                    }
+                    op.setRefundValue(singleProductPriceWithOptions);
+                }
+
+            }
+        }
     }
 
     /**
@@ -773,8 +829,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                                 coupon.setCouponCode(couponCode);
                                 coupon.setMaxUse(1);
                                 coupon.setTimesUsed(0);
-                                coupon.setName(order.getId() + " - " + order.getCustomerId()
-                                        + " - " + order.getCustomerName()); // Set this to whatever
+                                coupon.setName(order.getId() + " - " + order.getCustomerId() + " - "
+                                        + order.getCustomerName()); // Set this to whatever
                                 // you like
 
                                 // Insert the coupon and Associate it with the promotion
@@ -793,10 +849,11 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
                             } else
                             {
-                                log.warn("A promotion was not found for Gift Certificate product id = "
-                                        + op.getProductId()
-                                        + " so it was not processed for order id = "
-                                        + op.getOrderId());
+                                log.warn(
+                                        "A promotion was not found for Gift Certificate product id = "
+                                                + op.getProductId()
+                                                + " so it was not processed for order id = "
+                                                + op.getOrderId());
                             }
                         }
                     } else if (op.getType() == ProductMgr.DIGITAL_DOWNLOAD)
@@ -822,11 +879,13 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 if (numCertificates + numDownloads == order.getOrderProducts().length
                         && numCertificates > 0)
                 {
-                    orderMgr.updateOrder(order.getId(), OrderMgr.DELIVERED_STATUS, /* customerNotified */
+                    orderMgr.updateOrder(order.getId(),
+                            OrderMgr.DELIVERED_STATUS, /* customerNotified */
                             false, "Download Link Available", updateOrder);
                 } else if (numCertificates > 0)
                 {
-                    orderMgr.updateOrder(order.getId(), OrderMgr.PARTIALLY_DELIVERED_STATUS, /* customerNotified */
+                    orderMgr.updateOrder(order.getId(),
+                            OrderMgr.PARTIALLY_DELIVERED_STATUS, /* customerNotified */
                             false, "Download Link Available", updateOrder);
                 }
             }
@@ -905,8 +964,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                      */
                     if (order.getPointsRedeemed() > 0 && order.getPointsReservationId() <= 0)
                     {
-                        int reservationId = getRewardPointMgr().reservePoints(
-                                order.getCustomerId(), order.getPointsRedeemed());
+                        int reservationId = getRewardPointMgr().reservePoints(order.getCustomerId(),
+                                order.getPointsRedeemed());
                         // Save the reservation id
                         orderMgr.setRewardPointReservationId(order.getCustomerId(), order.getId(),
                                 reservationId);
@@ -1063,8 +1122,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             options.setOrderId(order.getId());
             options.setCode(KKConstants.EXP_ORDER_BY_SHIPPING_MODULE);
 
-            ExportOrderResponseIf response = adEngineMgr
-                    .exportOrder(getEng().getEngConf(), options);
+            ExportOrderResponseIf response = adEngineMgr.exportOrder(getEng().getEngConf(),
+                    options);
 
             if (response != null)
             {
@@ -1117,8 +1176,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
             options.setOrderId(order.getId());
             options.setCode(KKConstants.EXP_ORDER_FULL_ORDER_TO_XML);
 
-            ExportOrderResponseIf response = adEngineMgr
-                    .exportOrder(getEng().getEngConf(), options);
+            ExportOrderResponseIf response = adEngineMgr.exportOrder(getEng().getEngConf(),
+                    options);
 
             if (response != null)
             {
@@ -1217,7 +1276,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
     private void manageTaxCloud(OrderIf order)
     {
         // Use manageTax instead.
-        
+
         if (log.isDebugEnabled())
         {
             log.debug("Entered manageTaxCloud()");
@@ -1277,12 +1336,14 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                         module.commitOrder(order);
                         if (log.isDebugEnabled())
                         {
-                            log.debug("Committed order (id " + order.getId() + ") to " + moduleName);
+                            log.debug(
+                                    "Committed order (id " + order.getId() + ") to " + moduleName);
                         }
                     }
                 } catch (Exception e)
                 {
-                    log.warn("Problem committing order (id " + order.getId() + ") to " + moduleName);
+                    log.warn(
+                            "Problem committing order (id " + order.getId() + ") to " + moduleName);
                     e.printStackTrace();
                 }
             }
@@ -1347,6 +1408,44 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
     }
 
     /**
+     * If product stock was reserved we remove the reservation records from the stock reservation
+     * table
+     * 
+     * @param order
+     */
+    private void removeStockReservations(OrderIf order)
+    {
+        if (log.isDebugEnabled())
+        {
+            log.debug("Entered removeStockReservations()");
+        }
+        try
+        {
+            Boolean enableStockReservation = getConfigMgr().getConfigurationValueAsBool(false,
+                    ConfigConstants.STOCK_RESERVATION_ENABLE, false);
+
+            if (enableStockReservation)
+            {
+                // Check the order products to see whether any of them are gift registry items
+                if (order != null && order.getOrderProducts() != null
+                        && order.getOrderProducts().length > 0)
+                {
+                    int numRemoved = getProdMgr().removeStockReservationsForOrderProducts(
+                            order.getCustomerId(), order.getOrderProducts(), null);
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("Removed " + numRemoved
+                                + " stock reservation records for order id = " + order.getId());
+                    }
+                }
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Utility method that gets the vendor orders for the parent order and adds the latest state
      * change of the parent order to the vendor orders.
      * 
@@ -1359,13 +1458,13 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         {
             log.debug("Entered manageChildren()");
         }
-        
+
         EngineConfigIf conf = getEng().getEngConf();
         if (conf == null)
         {
             return;
         }
-        
+
         String mainStoreId = conf.getStoreId();
 
         // Get latest status history object from the parent order
@@ -1387,7 +1486,8 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 return;
             }
 
-            OrderStatusHistoryIf latestStatus = order.getStatusTrail()[order.getStatusTrail().length - 1];
+            OrderStatusHistoryIf latestStatus = order.getStatusTrail()[order.getStatusTrail().length
+                    - 1];
 
             // Change the state for each child
             for (Iterator<Record> iterator = rows.iterator(); iterator.hasNext();)
@@ -1400,11 +1500,9 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 OrderUpdateIf orderUpdate = new OrderUpdate();
                 orderUpdate.setUpdatedById(latestStatus.getUpdatedById());
 
-                eng.getMgrFactory()
-                        .getOrderMgr(/* createNew */true)
-                        .updateOrder(childId, latestStatus.getOrderStatusId(),
-                                latestStatus.isCustomerNotified(), latestStatus.getComments(),
-                                orderUpdate);
+                eng.getMgrFactory().getOrderMgr(/* createNew */true).updateOrder(childId,
+                        latestStatus.getOrderStatusId(), latestStatus.isCustomerNotified(),
+                        latestStatus.getComments(), orderUpdate);
             }
 
         } catch (Exception e)
@@ -1493,6 +1591,118 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         public void setCommitConfigKey(String commitConfigKey)
         {
             this.commitConfigKey = commitConfigKey;
+        }
+    }
+
+    /**
+     * The stock level of products added to a Free Product Promotion module is not managed by
+     * default. If you wish to manage the stock, this method may be called once the order has been
+     * paid for.
+     * 
+     * @param order
+     */
+    @SuppressWarnings("unused")
+    private void manageFreeProductInventory(OrderIf order)
+    {
+        if (log.isDebugEnabled())
+        {
+            log.debug("Entered manageFreeProductInventory()");
+        }
+        try
+        {
+            // Check the order totals to see whether any are free product promotions
+            if (order != null && order.getOrderTotals() != null)
+            {
+                for (int i = 0; i < order.getOrderTotals().length; i++)
+                {
+                    OrderTotalIf ot = order.getOrderTotals()[i];
+                    if (ot.getClassName().equals("ot_free_product"))
+                    {
+                        int prodId = -1;
+                        try
+                        {
+                            prodId = Integer.parseInt(ot.getCustom2());
+                        } catch (Exception e)
+                        {
+                            log.warn(
+                                    "Free Product promotion doesn't contain a product id in the custom2 attribute. The value found was "
+                                            + ot.getCustom2()
+                                            + ". Inventory will not be deducted.");
+                        }
+                        if (prodId > 0)
+                        {
+                            getProdMgr().updateProductQuantityWithOptions(prodId,
+                                    /* opts */null, /* encodedOptions */
+                                    null, /* quantitySold */1, /* setStatus */false,
+                                    /* FetchProductOptions */null);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Updates the B2B_AGGREGATE_ORDER_TOTAL tag to keep track of the total order value created by
+     * this customer
+     * 
+     * @param order
+     * @throws Exception
+     */
+    @SuppressWarnings("unused")
+    private void updateCustomerTags(OrderIf order)
+    {
+        // Get the scale for the currency
+        int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+
+        // Find the total of the order
+        BigDecimal total = null;
+        if (order.getOrderTotals() != null)
+        {
+            for (int i = 0; i < order.getOrderTotals().length; i++)
+            {
+                OrderTotal ot = (OrderTotal) order.getOrderTotals()[i];
+                if (ot.getClassName().equals(OrderTotalMgr.ot_total))
+                {
+                    total = ot.getValue().setScale(scale, BigDecimal.ROUND_HALF_UP);
+                }
+            }
+        }
+        if (total == null)
+        {
+            return;
+        }
+        try
+        {
+            CustomerTagMgrIf ctMgr = getCustomerTagMgr();
+            if (ctMgr == null)
+            {
+                log.warn("Customer Tag Mgr not installed");
+                return;
+            }
+
+            String totalStr = ctMgr.getCustomerTagValue(order.getCustomerId(),
+                    KKConstants.B2B_AGGREGATE_ORDER_TOTAL);
+            BigDecimal aggregateTotal = null;
+            try
+            {
+                aggregateTotal = new BigDecimal(totalStr);
+            } catch (Exception e)
+            {
+                aggregateTotal = new BigDecimal(0);
+            }
+            aggregateTotal = aggregateTotal.add(total);
+
+            CustomerTagIf tag = new CustomerTag();
+            tag.setName(KKConstants.B2B_AGGREGATE_ORDER_TOTAL);
+            tag.setValue(aggregateTotal.toString());
+            ctMgr.insertCustomerTag(order.getCustomerId(), tag, /* ignoreSetByAPI */true);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

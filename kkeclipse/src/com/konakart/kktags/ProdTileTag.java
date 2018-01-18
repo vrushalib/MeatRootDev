@@ -71,7 +71,7 @@ public class ProdTileTag extends BaseTag
      * @param _eng
      * @param _prod
      * @param context
-     * @param _style 
+     * @param _style
      */
     public void init(KKAppEng _eng, ProductIf _prod, PageContext context, String _style)
     {
@@ -83,6 +83,7 @@ public class ProdTileTag extends BaseTag
             this.pageContext = context;
         }
     }
+
     public int doStartTag() throws JspException
     {
         try
@@ -119,7 +120,7 @@ public class ProdTileTag extends BaseTag
             // Outer div for product tile
             sb.append(getStartDiv("item style-small"));
             // Image
-            getImageLink(sb, KKAppEng.IMAGE_SMALL, /*addLink*/true);
+            getImageLink(sb, KKAppEng.IMAGE_SMALL, /* addLink */true);
             // Title
             getTitleLink(sb);
             // Reviews
@@ -136,43 +137,31 @@ public class ProdTileTag extends BaseTag
 
             // Float over
             sb.append(getStartDiv("item-over", rand + "ov-" + Integer.toString(prod.getId())));
-           
-            String value = rand + "atc-" + Integer.toString(prod.getId());
-            
-            //sb.append(getTick("tick-button","tickId"));
 
-            
-            if (prod.getQuantity() > qtyWarn)
+            if (eng.getProductMgr().isStockCheck())
             {
-            	 
-            	/*sb.append(getStartDiv("tick-button"));
-            	sb.append(getTick("tick-button",value));            	
-            	
-            	   sb.append(END_DIV); //tick-button*/ 
-            	   
-               sb.append(getStartDiv("items-left green"));
-                sb.append(getMsg("product.tile.in.stock"));
-                sb.append(END_DIV);
-            } else if (prod.getQuantity() <= qtyWarn && prod.getQuantity() > 0)
-            {
-                sb.append(getStartDiv("items-left amber"));
-                sb.append(getMsg("product.tile.limited.stock", Integer.toString(prod.getQuantity())));
-                sb.append(END_DIV);
-            } else
-            {
-                sb.append(getStartDiv("items-left red"));
-                sb.append(getMsg("product.tile.out.of.stock"));
-                sb.append(END_DIV);
+                if (prod.getQuantity() > qtyWarn)
+                {
+                    sb.append(getStartDiv("items-left green"));
+                    sb.append(getMsg("product.tile.in.stock"));
+                    sb.append(END_DIV);
+                } else if (prod.getQuantity() <= qtyWarn && prod.getQuantity() > 0)
+                {
+                    sb.append(getStartDiv("items-left amber"));
+                    sb.append(getMsg("product.tile.limited.stock",
+                            Integer.toString(prod.getQuantity())));
+                    sb.append(END_DIV);
+                } else
+                {
+                    sb.append(getStartDiv("items-left red"));
+                    sb.append(getMsg("product.tile.out.of.stock"));
+                    sb.append(END_DIV);
+                }
             }
             sb.append(getStartDiv("item-buttons-container"));
             sb.append(getStartDiv("item-buttons centered"));
-            sb.append(getStartDiv("product-buttons"));
-            
-            sb.append(getStartSelect("product-buttons","prodQuantityId_"+Integer.toString(prod.getId()),"add-to-cart-qty select-qty","prodQuantity"));
-          
             if (eng.getQuotaMgr().canAddToBasket(prod, null) > 0)
-            {            	
-            	
+            {
                 sb.append(getStartA("add-to-cart-button button small-rounded-corners", "#", rand
                         + "atc-" + Integer.toString(prod.getId())));
                 sb.append(getMsg("common.add.to.cart"));
@@ -192,17 +181,14 @@ public class ProdTileTag extends BaseTag
                 sb.append(END_SPAN);
                 sb.append(END_DIV); // add-to-wishlist-container centered
             }
-            sb.append(END_DIV);	//product-button
             sb.append(END_DIV); // item-buttons centered
             sb.append(END_DIV); // item-buttons-container
-            
             sb.append(getStartDiv("item-overlay"));
             sb.append(END_DIV); // item-overlay
-         
             sb.append(END_DIV); // item-over
 
             // Image
-            getImageLink(sb, KKAppEng.IMAGE_MEDIUM, /*addLink*/false);
+            getImageLink(sb, KKAppEng.IMAGE_MEDIUM, /* addLink */false);
 
             // Title
             getTitleLink(sb);
@@ -257,7 +243,6 @@ public class ProdTileTag extends BaseTag
         }
     }
 
-   
     private void getImageLink(StringBuffer sb, int size, boolean addLink)
     {
         String url;
@@ -271,13 +256,13 @@ public class ProdTileTag extends BaseTag
         }
         if (addLink)
         {
-        sb.append(getStartA(null, url));
+            sb.append(getStartA(null, url));
         }
         sb.append(getImg("item-img", eng.getProdImage(prod, size), prod.getName(), /* addBase */
                 false));
         if (addLink)
         {
-        sb.append(END_A);
+            sb.append(END_A);
         }
     }
 

@@ -27,7 +27,16 @@
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<div class="notification-header">
-									<kk:msg  key="logout.body.message"/>.
+									<kk:msg  key="logout.body.message"/>
+									<%if (kkEng.getLoginType() != null && kkEng.getLoginType().equalsIgnoreCase(com.konakart.al.CustomerMgr.FACEBOOK)) {%> 
+										<kk:msg  key="logout.body.message.fb"/>
+									<%}%>
+									<%if (kkEng.getLoginType() != null && kkEng.getLoginType().equalsIgnoreCase(com.konakart.al.CustomerMgr.PAYPAL)) {%> 
+										<kk:msg  key="logout.body.message.pp"/>
+									<%}%>
+									<%if (kkEng.getLoginType() != null && kkEng.getLoginType().equalsIgnoreCase(com.konakart.al.CustomerMgr.GOOGLEPLUS)) {%> 
+										<kk:msg  key="logout.body.message.gp"/>
+									<%}%>
 								</div>
 							</div>
 							<div class="form-buttons-wide">

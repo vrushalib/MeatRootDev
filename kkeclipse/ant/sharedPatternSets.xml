@@ -96,6 +96,7 @@
 		<include name="**/al/**/*" />
 		<include name="**/filter/*" />
 		<include name="**/servlet/*" />
+		<include name="**/liferay/*.*" />
 
 		<exclude name="**/*.properties" />
 		<exclude name="**/actions/*.*" />
@@ -117,13 +118,13 @@
 	<patternset id="konakart_custom_jar">
 		<include name="**/al/KKAppEngCallouts.*" />
 		<include name="**/al/SPSManagerIf.*" />
-		<include name="**/bl/OrderIntegrationMgr*.*" />
+		<include name="**/bl/OrderIntegrationMgr$TaxModuleData.*" />
+		<include name="**/bl/OrderIntegrationMgr.*" />
 		<include name="**/bl/LoginIntegrationMgr.*" />
 		<include name="**/bl/ReorderMgr.*" />
 		<include name="**/blif/LDAPMgrIf.*" />
-		<include name="**/com/konakart/actions/Suggested*.*" />
+		<include name="**/com/konakart/actions/SuggestedSearch.*" />
 		<include name="**/com/konakart/actions/*Action.*" />
-		<include name="**/com/konakart/actions/TransactionStatus.*" />
 		<include name="**/com/konakart/actions/gateways/BaseGatewayAction.*" />
 		<include name="**/com/konakart/kktags/*.*" />
 		<include name="**/modules/payment/Base*.*" />

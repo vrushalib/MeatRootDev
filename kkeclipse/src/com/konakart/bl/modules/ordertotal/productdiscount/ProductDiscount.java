@@ -60,8 +60,8 @@ import com.workingdogs.village.DataSetException;
  */
 public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalInterface
 {
-    // Module name must be the same as the class name although it can be all in lowercase
-    private static String code = "ot_product_discount";
+    /** Module name must be the same as the class name although it can be all in lowercase */
+    public static String code = "ot_product_discount";
 
     private static String bundleName = BaseModule.basePackage
             + ".ordertotal.productdiscount.ProductDiscount";
@@ -164,6 +164,13 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
      * for doing this is to get a line item of the order for each discounted product. We still need
      * to populate the order total that we return with the total discount amount because this will
      * be used to compare this promotion with other promotions in order to decide which one to use.
+     * <p>
+     * The returned OrderTotal custom attributes are populated as follows:
+     * <ul>
+     * <li>custom1 = Product Id</li>
+     * <li>custom2 = Product SKU</li>
+     * <li>custom3 = Encoded Product Id containing the product id and ids of the options.</li>
+     * </ul>
      * 
      * @param order
      * @param dispPriceWithTax
@@ -174,6 +181,7 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
     public OrderTotal getOrderTotal(Order order, boolean dispPriceWithTax, Locale locale)
             throws Exception
     {
+        
         OrderTotal ot;
         StaticData sd = staticDataHM.get(getStoreId());
 
@@ -245,10 +253,18 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                 }
 
                 ot = new OrderTotal();
+                ot.setPromotionId(promotion.getId());
                 ot.setSortOrder(sd.getSortOrder());
                 ot.setClassName(code);
                 ot.setPromotions(new Promotion[]
                 { promotion });
+                if (percentageDiscount)
+                {
+                    ot.setDiscountPercent(discountApplied);
+                } else
+                {
+                    ot.setDiscountAmount(discountApplied);
+                }
 
                 // Does promotion only apply to a min order value ?
                 if (minTotalOrderVal != null)
@@ -283,6 +299,9 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                     OrderProductIf op = promotion.getApplicableProducts()[j];
                     if (op != null && op.getQuantity() >= minProdQuantity)
                     {
+                        String encodedProdId = getBasketMgr().createEncodedProduct(
+                                op.getProductId(), op.getOpts());
+
                         // Get the current total price of the product(s)
                         BigDecimal currentPrice = null;
                         if (applyBeforeTax)
@@ -339,6 +358,9 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                                 // Title looks like "-10EUR Philips TV"
                                 ot.setTitle("-" + formattedDiscount + " " + op.getName());
                             }
+                            ot.setCustom1(Integer.toString(op.getProductId()));
+                            ot.setCustom2(op.getSku());
+                            ot.setCustom3(encodedProdId);
                         } else
                         {
                             // Set the order total attributes
@@ -374,6 +396,7 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                          * Create a new Order Total module for each product
                          */
                         OrderTotal singleOt = new OrderTotal();
+                        singleOt.setPromotionId(promotion.getId());
                         singleOt.setSortOrder(sd.getSortOrder());
                         singleOt.setClassName(code);
                         singleOt.setValue(discount);
@@ -381,10 +404,15 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
                         if (percentageDiscount)
                         {
                             singleOt.setTitle("-" + discountApplied + "% " + op.getName() + ":");
+                            singleOt.setDiscountPercent(discountApplied);
                         } else
                         {
                             singleOt.setTitle("-" + formattedDiscount + " " + op.getName() + ":");
+                            singleOt.setDiscountAmount(discountApplied);
                         }
+                        singleOt.setCustom1(Integer.toString(op.getProductId()));
+                        singleOt.setCustom2(op.getSku());
+                        singleOt.setCustom3(encodedProdId);
                         otList.add(singleOt);
                     }
                 }
@@ -424,6 +452,9 @@ public class ProductDiscount extends BaseOrderTotalModule implements OrderTotalI
         // Call a helper method to decide which OrderTotal we should return
         OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
+        // Modify the refund values of each product 
+        setRefundValues(order, retOT, applyBeforeTax);
+        
         return retOT;
 
     }

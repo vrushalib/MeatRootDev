@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -83,7 +83,7 @@ public class Total extends OrderTotalModule
         int i = 0;
         configs[i++] = new KKConfiguration("Display Total", "MODULE_ORDER_TOTAL_TOTAL_STATUS",
                 "true", "Do you want to display the total order value?", 6, 1, "",
-                "tep_cfg_select_option(array('true', 'false'), ", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Sort Order", "MODULE_ORDER_TOTAL_TOTAL_SORT_ORDER",
                 "50", "Sort order of display.", 6, 2, "", "", now);
 

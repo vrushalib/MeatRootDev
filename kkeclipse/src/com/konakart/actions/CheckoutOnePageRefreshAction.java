@@ -40,6 +40,7 @@ import com.konakart.appif.OrderProductIf;
 import com.konakart.appif.OrderTotalIf;
 import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.appif.ShippingQuoteIf;
+import com.konakart.bl.PromotionMgr;
 
 /**
  * Gets called before viewing the checkout delivery page.
@@ -56,9 +57,15 @@ public class CheckoutOnePageRefreshAction extends BaseAction
 
     private String couponCode;
 
+    private String couponCodeWarning;
+
     private String giftCertCode;
 
+    private String giftCertCodeWarning;
+
     private String rewardPoints;
+
+    private String adminDiscount;
 
     private String deliveryAddrId;
 
@@ -76,7 +83,7 @@ public class CheckoutOnePageRefreshAction extends BaseAction
 
     private String qtyMsg;
 
-    private boolean otValid = true;
+    private String checkoutMsg = null;
 
     private String xsrf_token;
 
@@ -122,6 +129,16 @@ public class CheckoutOnePageRefreshAction extends BaseAction
             {
                 checkoutOrder.setCouponCode(couponCode);
                 kkAppEng.getOrderMgr().setCouponCode(couponCode);
+                int codeCheck = kkAppEng.getEng().checkCoupon(couponCode);
+                switch (codeCheck)
+                {
+                case PromotionMgr.COUPON_DOESNT_EXIST:
+                    couponCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.exists");
+                    break;
+                case PromotionMgr.COUPON_EXISTS_INACTIVE:
+                    couponCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.active");
+                    break;
+                }
             }
 
             // Set the gift certificate code
@@ -129,6 +146,35 @@ public class CheckoutOnePageRefreshAction extends BaseAction
             {
                 checkoutOrder.setGiftCertCode(giftCertCode);
                 kkAppEng.getOrderMgr().setGiftCertCode(giftCertCode);
+                int codeCheck = kkAppEng.getEng().checkCoupon(giftCertCode);
+                switch (codeCheck)
+                {
+                case PromotionMgr.COUPON_DOESNT_EXIST:
+                    giftCertCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.exists");
+                    break;
+                case PromotionMgr.COUPON_EXISTS_INACTIVE:
+                    giftCertCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.active");
+                    break;
+                }
+            }
+
+            // Set the admin discount
+            if (adminDiscount != null)
+            {
+                if (adminDiscount.length() == 0)
+                {
+                    checkoutOrder.setAdminDiscount(null);
+                } else
+                {
+                    try
+                    {
+                        BigDecimal adminDiscountBD = new BigDecimal(adminDiscount);
+                        checkoutOrder.setAdminDiscount(adminDiscountBD);
+                    } catch (Exception e)
+                    {
+                        log.warn("Admin discount was not a valid number = " + adminDiscount);
+                    }
+                }
             }
 
             // Set the reward points
@@ -278,7 +324,13 @@ public class CheckoutOnePageRefreshAction extends BaseAction
              * Check to see whether all compulsory order totals are present. The code in the
              * KKAppEngCallouts class may be modified to match your requirements.
              */
-            otValid = new KKAppEngCallouts().validateOrderTotals(kkAppEng, checkoutOrder);
+            KKAppEngCallouts callouts = new KKAppEngCallouts();
+            checkoutMsg = callouts.validateOrderTotals(kkAppEng, checkoutOrder);
+
+            /*
+             * Validate the order for the customer
+             */
+            checkoutMsg = callouts.validateOrderForCustomer(kkAppEng, checkoutOrder);
 
             // Create the main order
             order = new OrderJson();
@@ -390,7 +442,8 @@ public class CheckoutOnePageRefreshAction extends BaseAction
             otClone.setTitle(ot.getTitle());
             otClone.setText(ot.getText());
             if ((ot.getClassName().equals("ot_reward_points"))
-                    || (ot.getClassName().equals("ot_free_product")))
+                    || (ot.getClassName().equals("ot_free_product"))
+                    || (ot.getClassName().equals("ot_product_reward_points")))
             {
                 otClone.setValue(ot.getValue().toPlainString());
             } else
@@ -658,23 +711,6 @@ public class CheckoutOnePageRefreshAction extends BaseAction
     }
 
     /**
-     * @return the otValid
-     */
-    public boolean isOtValid()
-    {
-        return otValid;
-    }
-
-    /**
-     * @param otValid
-     *            the otValid to set
-     */
-    public void setOtValid(boolean otValid)
-    {
-        this.otValid = otValid;
-    }
-
-    /**
      * @return the storeId
      */
     public String getStoreId()
@@ -740,5 +776,73 @@ public class CheckoutOnePageRefreshAction extends BaseAction
     public void setPaymentMethods(NameValue[] paymentMethods)
     {
         this.paymentMethods = paymentMethods;
+    }
+
+    /**
+     * @return the checkoutMsg
+     */
+    public String getCheckoutMsg()
+    {
+        return checkoutMsg;
+    }
+
+    /**
+     * @param checkoutMsg
+     *            the checkoutMsg to set
+     */
+    public void setCheckoutMsg(String checkoutMsg)
+    {
+        this.checkoutMsg = checkoutMsg;
+    }
+
+    /**
+     * @return the adminDiscount
+     */
+    public String getAdminDiscount()
+    {
+        return adminDiscount;
+    }
+
+    /**
+     * @param adminDiscount
+     *            the adminDiscount to set
+     */
+    public void setAdminDiscount(String adminDiscount)
+    {
+        this.adminDiscount = adminDiscount;
+    }
+
+    /**
+     * @return the couponCodeWarning
+     */
+    public String getCouponCodeWarning()
+    {
+        return couponCodeWarning;
+    }
+
+    /**
+     * @param couponCodeWarning
+     *            the couponCodeWarning to set
+     */
+    public void setCouponCodeWarning(String couponCodeWarning)
+    {
+        this.couponCodeWarning = couponCodeWarning;
+    }
+
+    /**
+     * @return the giftCertCodeWarning
+     */
+    public String getGiftCertCodeWarning()
+    {
+        return giftCertCodeWarning;
+    }
+
+    /**
+     * @param giftCertCodeWarning
+     *            the giftCertCodeWarning to set
+     */
+    public void setGiftCertCodeWarning(String giftCertCodeWarning)
+    {
+        this.giftCertCodeWarning = giftCertCodeWarning;
     }
 }

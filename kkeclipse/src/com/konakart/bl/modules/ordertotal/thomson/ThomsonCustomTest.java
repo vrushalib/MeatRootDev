@@ -34,15 +34,15 @@ public class ThomsonCustomTest extends ThomsonCustomBase
     /**
      * Constructor
      * 
-     * @param _eng
+     * @param storefrontEngine
      *            a KKENgIf engine
-     * @param _module
+     * @param thomsonModule
      *            the instance of the module
      */
-    public ThomsonCustomTest(KKEngIf _eng,
-            com.konakart.bl.modules.ordertotal.thomson.Thomson _module)
+    public ThomsonCustomTest(KKEngIf storefrontEngine,
+            com.konakart.bl.modules.ordertotal.thomson.Thomson thomsonModule)
     {
-        super(_eng, _module);
+        super(storefrontEngine, thomsonModule);
     }
 
     /**

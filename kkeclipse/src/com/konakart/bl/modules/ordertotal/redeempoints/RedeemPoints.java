@@ -165,8 +165,7 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
         {
             if (promArray.length > 1)
             {
-                log
-                        .warn("There is more than one active Redeem Points promotion module. Only one of these modules will be used.");
+                log.warn("There is more than one active Redeem Points promotion module. Only one of these modules will be used.");
             }
 
             Promotion promotion = promArray[0];
@@ -214,6 +213,7 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
             }
 
             ot = new OrderTotal();
+            ot.setPromotionId(promotion.getId());
             ot.setSortOrder(sd.getSortOrder());
             ot.setClassName(code);
             ot.setPromotions(new Promotion[]
@@ -284,7 +284,7 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
             if (amount.compareTo(order.getTotalIncTax()) == 1)
             {
                 /*
-                 * If the amount is greater than the order total, we reduce he number of points used
+                 * If the amount is greater than the order total, we reduce the number of points used
                  * to match the order total.
                  */
                 BigDecimal points = order.getTotalIncTax().divide(pointsMultiplier, 0,
@@ -292,10 +292,7 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
                 order.setPointsRedeemed(points.intValue());
                 amount = order.getTotalIncTax();
                 order.setTotalIncTax(new BigDecimal(0));
-            } else
-            {
-                order.setTotalIncTax(order.getTotalIncTax().subtract(amount));
-            }
+            } 
 
             // Set the order total attributes
             ot.setValue(amount);
@@ -303,45 +300,43 @@ public class RedeemPoints extends BaseOrderTotalModule implements OrderTotalInte
             // Title looks like "10 Reward Points Redeemed:"
             ot.setTitle(order.getPointsRedeemed() + " "
                     + rb.getString(MODULE_ORDER_TOTAL_REDEEM_POINTS_TITLE) + ":");
-            
-            
-            /*
-             * We need to reduce the tax amount. This is done differently depending on whether
-             * the discount is applied to the amount before or after tax.
-             */
-            BigDecimal total = null;
-            if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
-                    && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
-            {
-                // Use total including shipping cost
-                total = order.getTotalExTax();
-            } else
-            {
-                // Use subtotal that doesn't include shipping
-                total = order.getSubTotalExTax();
-            }
 
-            if (total != null && total.compareTo(new BigDecimal(0)) != 0
-                    && order.getTax() != null)
+            // Get the tax portion of the discount
+            if (log.isDebugEnabled())
             {
-                BigDecimal averageTaxRate = order.getTax().divide(total, 6,
-                        BigDecimal.ROUND_HALF_UP);
+                log.debug("------START: "+ot.getClassName()+"------");
+                log.debug("order.getTotalExTax()       = " + order.getTotalExTax());
+                log.debug("order.getTax()              = " + order.getTax());
+                log.debug("order.getTotalIncTax()      = " + order.getTotalIncTax());
+                log.debug("localOt.getValue()          = " + ot.getValue());
+                log.debug("localOt.getTax()            = " + ot.getTax());
+            }
+            
+            
+            BigDecimal tax = getTaxForDiscount(order, amount, scale, applyBeforeTax);
+            ot.setTax(tax);
+            order.setTotalIncTax(order.getTotalIncTax().subtract(ot.getValue()));
+            order.setTotalExTax(order.getTotalExTax().subtract(ot.getValue()));
+            if (tax != null)
+            {
+                order.setTax(order.getTax().subtract(tax));
                 if (applyBeforeTax)
                 {
-                    // Calculate the tax discount based on the average tax
-                    BigDecimal taxDiscount = amount.multiply(averageTaxRate);
-                    taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
-                    ot.setTax(taxDiscount);
-                    order.setTax(order.getTax().subtract(taxDiscount));
-                    order.setTotalIncTax(order.getTotalIncTax().subtract(taxDiscount));
+                    order.setTotalIncTax(order.getTotalIncTax().subtract(tax));
                 } else
                 {
-                    BigDecimal taxDiscount = getTaxFromTotal(amount, averageTaxRate, scale);
-                    ot.setTax(taxDiscount);
-                    order.setTax(order.getTax().subtract(taxDiscount));
+                    order.setTotalExTax(order.getTotalExTax().add(tax));
                 }
             }
-            
+
+            if (log.isDebugEnabled())
+            {
+                log.debug("New order.getTotalExTax()   = " + order.getTotalExTax());
+                log.debug("New order.getTax()          = " + order.getTax());
+                log.debug("New order.getTotalIncTax()  = " + order.getTotalIncTax());
+                log.debug("------END  : "+ot.getClassName()+"------");
+            }
+        
             return ot;
         }
 

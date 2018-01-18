@@ -24,6 +24,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.appif.BasketIf;
+import com.konakart.bl.PromotionMgr;
 
 /**
  * Gets called after editing the cart.
@@ -36,9 +37,13 @@ public class EditCartSubmitAction extends BaseAction
     private String goToCheckout = "";
 
     private String couponCode;
+    
+    private String couponCodeWarning = "";
 
     private String giftCertCode;
 
+    private String giftCertCodeWarning = "";
+    
     private String rewardPoints;
 
     public String execute()
@@ -248,6 +253,16 @@ public class EditCartSubmitAction extends BaseAction
                 } else
                 {
                     kkAppEng.getOrderMgr().setCouponCode(getCouponCode());
+                    int codeCheck = kkAppEng.getEng().checkCoupon(getCouponCode());
+                    switch (codeCheck)
+                    {
+                    case PromotionMgr.COUPON_DOESNT_EXIST:
+                        couponCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.exists");
+                        break;
+                    case PromotionMgr.COUPON_EXISTS_INACTIVE:
+                        couponCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.active");
+                        break;
+                    }
                 }
 
                 /*
@@ -259,6 +274,16 @@ public class EditCartSubmitAction extends BaseAction
                 } else
                 {
                     kkAppEng.getOrderMgr().setGiftCertCode(getGiftCertCode());
+                    int codeCheck = kkAppEng.getEng().checkCoupon(giftCertCode);
+                    switch (codeCheck)
+                    {
+                    case PromotionMgr.COUPON_DOESNT_EXIST:
+                        giftCertCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.exists");
+                        break;
+                    case PromotionMgr.COUPON_EXISTS_INACTIVE:
+                        giftCertCodeWarning = kkAppEng.getMsg("one.page.checkout.coupon.not.active");
+                        break;
+                    }
                 }
 
                 /*
@@ -371,6 +396,38 @@ public class EditCartSubmitAction extends BaseAction
     public void setGiftCertCode(String giftCertCode)
     {
         this.giftCertCode = giftCertCode;
+    }
+
+    /**
+     * @return the couponCodeWarning
+     */
+    public String getCouponCodeWarning()
+    {
+        return couponCodeWarning;
+    }
+
+    /**
+     * @param couponCodeWarning the couponCodeWarning to set
+     */
+    public void setCouponCodeWarning(String couponCodeWarning)
+    {
+        this.couponCodeWarning = couponCodeWarning;
+    }
+
+    /**
+     * @return the giftCertCodeWarning
+     */
+    public String getGiftCertCodeWarning()
+    {
+        return giftCertCodeWarning;
+    }
+
+    /**
+     * @param giftCertCodeWarning the giftCertCodeWarning to set
+     */
+    public void setGiftCertCodeWarning(String giftCertCodeWarning)
+    {
+        this.giftCertCodeWarning = giftCertCodeWarning;
     }
 
 }

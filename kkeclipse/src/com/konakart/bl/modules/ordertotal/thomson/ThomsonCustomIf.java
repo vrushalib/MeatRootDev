@@ -104,52 +104,81 @@ public interface ThomsonCustomIf
      * @param sd
      *            the StaticData which caches configuration data for the store
      * @param order
-     *            the order. 
+     *            the order.
      * @param line
      *            the IndataLineType line
      */
     public void addUserElementsShipping(StaticData sd, OrderIf order, IndataLineType line);
-    
+
     /**
      * Get the value to be used for GROSS_AMOUNT for a product
+     * 
      * @param sd
      * @param orderProduct
      * @param order
      * @return a String representing the value to use for the GROSS_AMOUNT for a product
      */
-    public String getGROSS_AMOUNTForProduct(StaticData sd, OrderProductIf orderProduct, OrderIf order);
-    
+    public String getGROSS_AMOUNTForProduct(StaticData sd, OrderProductIf orderProduct,
+            OrderIf order);
+
     /**
      * Get the value to be used for GROSS_AMOUNT for shipping
+     * 
      * @param sd
      * @param shipping
      * @param order
      * @return a String representing the value to use for the GROSS_AMOUNT for shipping
      */
     public String getGROSS_AMOUNTForShipping(StaticData sd, ShippingQuoteIf shipping, OrderIf order);
-    
+
     /**
      * Make any required adjustments to the original order after the call to the tax module.
+     * 
      * @param sd
      * @param response
      * @param order
      */
-    public void adjustOrderAfterTaxCalculation(StaticData sd, TaxCalculationResponse response, OrderIf order);
-    
+    public void adjustOrderAfterTaxCalculation(StaticData sd, TaxCalculationResponse response,
+            OrderIf order);
+
     /**
-     * Return the adjustment for freight inclusive shipping.  This will be deducted from the order's total tax. 
+     * Return the adjustment for freight inclusive shipping. This will be deducted from the order's
+     * total tax.
+     * 
      * @param sd
      * @param response
      * @param order
      * @return the adjustment value for freight inclusive shipping
      */
-    // public BigDecimal adjustmentForInclusiveShipping(StaticData sd, TaxCalculationResponse response,
-    //        OrderIf order);
-    
+    // public BigDecimal adjustmentForInclusiveShipping(StaticData sd, TaxCalculationResponse
+    // response,
+    // OrderIf order);
+
     /**
      * Calculate the totals for the Order after the tax is returned from the External Tax Service
+     * 
      * @param sd
      * @param order
      */
     public void calculateTotals(StaticData sd, OrderIf order);
+
+    /**
+     * Calculate the geocode from the postcode. Typically this is used to extract the geocode part
+     * of US-style addresses. Eg. for postcode 12345-1234 this would return 1234.
+     * 
+     * @param order
+     * @param postcode
+     * @return the geocode extracted from the postcode if present
+     */
+    public String getGeocodeFromPostcode(OrderIf order, String postcode);
+
+    /**
+     * Calculate the postcode from the postcode. Typically this is used to chop off the geocode part
+     * of US-style addresses. Eg. for postcode 12345-1234 this would return 12345.
+     * 
+     * @param order
+     * @param postcode
+     * @return the postcode extracted from the postcode
+     */
+    public String getPostcodeFromPostcode(OrderIf order, String postcode);
 }

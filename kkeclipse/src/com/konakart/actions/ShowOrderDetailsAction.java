@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
+import com.konakart.appif.OrderIf;
+import com.konakart.util.KKConstants;
 
 /**
  * Called to show the details of a order. Retrieves the id from the orderId parameter.
@@ -30,6 +32,10 @@ import com.konakart.al.KKAppEng;
 public class ShowOrderDetailsAction extends BaseAction
 {
     private static final long serialVersionUID = 1L;
+
+    private boolean waitingForApproval = false;
+
+    private boolean canApprove = false;
 
     public String execute()
     {
@@ -68,7 +74,19 @@ public class ShowOrderDetailsAction extends BaseAction
                 log.debug("Order Id from application = " + orderId);
             }
 
-            kkAppEng.getOrderMgr().getOrder(new Integer(orderId).intValue());
+            OrderIf order = kkAppEng.getOrderMgr().getOrder(new Integer(orderId).intValue());
+            if (order == null)
+            {
+                return "InvalidOrderId";
+            }
+
+            if (order.getStatus() == com.konakart.bl.OrderMgr.WAITING_APPROVAL_STATUS)
+            {
+                waitingForApproval = true;
+            }
+
+            canApprove = kkAppEng.getCustomerMgr().getTagValueAsBool(
+                    KKConstants.B2B_CAN_APPROVE_ORDERS, false);
 
             kkAppEng.getNav().add(kkAppEng.getMsg("header.order"), request);
 
@@ -79,6 +97,40 @@ public class ShowOrderDetailsAction extends BaseAction
             return super.handleException(request, e);
         }
 
+    }
+
+    /**
+     * @return the waitingForApproval
+     */
+    public boolean isWaitingForApproval()
+    {
+        return waitingForApproval;
+    }
+
+    /**
+     * @param waitingForApproval
+     *            the waitingForApproval to set
+     */
+    public void setWaitingForApproval(boolean waitingForApproval)
+    {
+        this.waitingForApproval = waitingForApproval;
+    }
+
+    /**
+     * @return the canApprove
+     */
+    public boolean isCanApprove()
+    {
+        return canApprove;
+    }
+
+    /**
+     * @param canApprove
+     *            the canApprove to set
+     */
+    public void setCanApprove(boolean canApprove)
+    {
+        this.canApprove = canApprove;
     }
 
 }

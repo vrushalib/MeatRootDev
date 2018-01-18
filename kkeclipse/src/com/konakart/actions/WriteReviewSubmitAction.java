@@ -37,6 +37,8 @@ public class WriteReviewSubmitAction extends BaseAction
     private int rating;
 
     private String reviewText;
+    
+    private int productId;
 
     public String execute()
     {
@@ -65,7 +67,7 @@ public class WriteReviewSubmitAction extends BaseAction
                 return null;
             }
 
-            kkAppEng.getReviewMgr().writeReview(getReviewText(), getRating(), custId);
+            kkAppEng.getReviewMgr().writeReview(getReviewText(), getRating(), custId, productId);
 
             // Set reward points if applicable
             if (kkAppEng.getRewardPointMgr().isEnabled())
@@ -89,15 +91,16 @@ public class WriteReviewSubmitAction extends BaseAction
 
             // Get the latest reviews
             ProductIf prod = kkAppEng.getProductMgr().getSelectedProduct();
-            if (prod != null)
+            if (prod == null || prod.getId() != productId)
             {
-                ReviewSearch search = new ReviewSearch();
-                search.setProductId(prod.getId());
-                kkAppEng.getReviewMgr().fetchReviews(null, search);
+                kkAppEng.getProductMgr().fetchSelectedProduct(productId);
             }
-
+            
+            ReviewSearch search = new ReviewSearch();
+            search.setProductId(productId);
+            kkAppEng.getReviewMgr().fetchReviews(null, search);
+            kkAppEng.getReviewMgr().setShowTab(true);
             kkAppEng.getNav().set(kkAppEng.getMsg("header.reviews"), request);
-
             return SUCCESS;
 
         } catch (Exception e)
@@ -139,6 +142,22 @@ public class WriteReviewSubmitAction extends BaseAction
     public void setReviewText(String reviewText)
     {
         this.reviewText = reviewText;
+    }
+
+    /**
+     * @return the productId
+     */
+    public int getProductId()
+    {
+        return productId;
+    }
+
+    /**
+     * @param productId the productId to set
+     */
+    public void setProductId(int productId)
+    {
+        this.productId = productId;
     }
 
 }

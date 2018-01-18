@@ -23,6 +23,15 @@
 <%@page import="com.konakart.app.DataDescConstants"%>
 <%@page import="com.konakart.app.Option"%>
 
+<script type="text/javascript">
+$(function() {
+	// Ensure selected option shows correct image
+	$('.simple-option').each(function(i, obj) {
+	    obj.options[0].selected = true;
+	});
+});
+</script>
+
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% com.konakart.al.ProductMgr prodMgr = kkEng.getProductMgr();%>
 <% com.konakart.al.ReviewMgr revMgr = kkEng.getReviewMgr();%>
@@ -45,6 +54,20 @@
 						<input type="hidden" name="addToWishList" id="addToWishList" class="addToWishList" value="" />
 						<input type="hidden" name="prodId" value="<%=prod.getId()%>" />
 						<input type="hidden" name="wishListId" id="wishListId" class="wishListId" value="-1" />
+						<input type="hidden" id="gallery_nav_base" value="<%=kkEng.getImageBase()%>" type="hidden"/>								
+						<input type="hidden" id="gallery_nav_uuid" value="<%=prod.getUuid()%>" type="hidden"/>	
+						<%if (prod.getImages() != null && prod.getImages().getImgNames() != null && prod.getImages().getImgNames().length > 0) {%>	
+							<%StringBuffer names = new StringBuffer();%>						
+						    <%for (int i = 0; i < prod.getImages().getImgNames().length; i++){%>
+								<%String name = prod.getImages().getImgNames()[i]; %>
+							    <%if (i>0){%>
+					                <%names.append(",");%>
+					        	<%}%>
+					        	<%names.append(name); %>
+							<%}%>
+							<input type="hidden" id="gallery_img_names" value="<%=names%>" type="hidden"/>	
+						<%}%>
+													
 						<div id="product-price">
 							<%java.math.BigDecimal saving = null;%>
 							<%if (kkEng.displayPriceWithTax()){%>
@@ -87,12 +110,16 @@
 				            <%}%>
 	   					</div>	
 	   					<%int qtyWarn = kkEng.getStockWarnLevel();%>
-	   					<%if (prod.getQuantity() > qtyWarn){%>
-				            <div id="left-in-stock"><kk:msg  key="product.details.body.in.stock"/></div>  
-				        <%} else if (prod.getQuantity() <= qtyWarn && prod.getQuantity() > 0){%>
-				            <div id="left-in-stock"><kk:msg  key="product.details.body.limited.stock" arg0="<%=Integer.toString(prod.getQuantity())%>"/></div>  
+	   					<%if (prodMgr.isStockCheck()) { %>
+		   					<%if (prod.getQuantity() > qtyWarn){%>
+					            <div id="left-in-stock"><kk:msg  key="product.details.body.in.stock"/></div>  
+					        <%} else if (prod.getQuantity() <= qtyWarn && prod.getQuantity() > 0){%>
+					            <div id="left-in-stock"><kk:msg  key="product.details.body.limited.stock" arg0="<%=Integer.toString(prod.getQuantity())%>"/></div>  
+					        <%} else{%>
+					            <div id="left-in-stock"><kk:msg  key="product.details.body.out.of.stock"/></div>  
+					        <%}%>
 				        <%} else{%>
-				            <div id="left-in-stock"><kk:msg  key="product.details.body.out.of.stock"/></div>  
+				            <div id="left-in-stock"></div>  
 				        <%}%>
 	   					<div class="labels">
 	   					    <%if (prod.getType() == com.konakart.bl.ProductMgr.FREE_SHIPPING || prod.getType() == com.konakart.bl.ProductMgr.FREE_SHIPPING_BUNDLE_PRODUCT_TYPE){%>
@@ -114,13 +141,19 @@
 									<%if (Integer.parseInt(optContainer.getType()) == Option.TYPE_SIMPLE){%>
 										<td class="opt-name"><%=optContainer.getName() %></td>
 										<td class="opt-value">
-											<select name="valueId[<%=i%>]">
+											<select class="simple-option" name="valueId[<%=i%>]" onchange="optionChanged(this)">
 												<%for (Iterator<ProdOption> iterator1 =  optContainer.getOptValues().iterator(); iterator1.hasNext();) {  %>																	
 													<% ProdOption option =  iterator1.next();%>	
+													<% String optCode =  (optContainer.getCode()!=null && optContainer.getCode().length()>0)?optContainer.getCode():null;%>
+													<% String valCode =  (option.getCode()!=null && option.getCode().length()>0)?option.getCode():null;%>
+													<% String combinedCode = "";%>
+													<%if (optCode != null && valCode != null){%>
+														 <%combinedCode = optCode+"_"+valCode+"_";%>
+													<%}%>
 													<%if (kkEng.displayPriceWithTax()){%>
-														 <option value="<%=option.getId()%>"><%=option.getFormattedValueIncTax() %></option>
+														<option id="<%=combinedCode%>" value="<%=option.getId()%>"><%=option.getFormattedValueIncTax() %></option>
 													<%}else{%>
-														<option value="<%=option.getId()%>"><%=option.getFormattedValueExTax() %></option>														
+														<option id="<%=combinedCode%>" value="<%=option.getId()%>"><%=option.getFormattedValueExTax() %></option>														
 													<%}%>
 												<%}%>
 											</select> 

@@ -124,7 +124,15 @@ public class NewAddrSubmitAction extends BaseAction
             addr.setGender(escapeFormInput(getGender()));
             addr.setLastName(escapeFormInput(getLastName()));
             addr.setPostcode(escapeFormInput(getPostcode()));
-            addr.setState(escapeFormInput(getState()));
+            if (kkAppEng.getCustomerMgr().getSelectedZones() == null
+                    || kkAppEng.getCustomerMgr().getSelectedZones().length == 0)
+            {
+                addr.setState(escapeFormInput(getState()));
+            } else
+            {
+                // Don't escape since we try to match the state
+                addr.setState(getState());
+            }
             addr.setStreetAddress(escapeFormInput(getStreetAddress()));
             addr.setStreetAddress1(escapeFormInput(getStreetAddress1()));
             addr.setSuburb(escapeFormInput(getSuburb()));

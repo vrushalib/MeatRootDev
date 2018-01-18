@@ -46,17 +46,20 @@ import com.workingdogs.village.DataSetException;
 /**
  * Module that creates an OrderTotal object for awarding a free product. The product to be awarded
  * can have a status set to false so that it isn't enabled and cannot be searched for and bought
- * normally through the store.<br>
+ * normally through the store.
+ * <p>
  * The SKU of the free product is saved in the Custom1 field of the Order Total. The id of the free
  * product is saved in the Custom2 field of the Order Total.
- * 
+ * <p>
  * The promotion may be activated only if:
  * <ul>
  * <li>The total amount of the order is greater than a minimum amount</li>
  * <li>The total number of products ordered is greater than a minimum amount</li>
  * <li>The total number of a single product ordered is greater than a minimum amount</li>
  * </ul>
- * 
+ * In order to enable inventory management for the free product, the promotion must be configured to
+ * disable the promotion if the product is out of stock and in the OrderIntegrationMgr you must
+ * uncomment the calls to <code>manageFreeProductInventory()</code>.
  */
 public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInterface
 {
@@ -81,6 +84,7 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
     private final static String MODULE_ORDER_TOTAL_FREE_PRODUCT_STATUS = "MODULE_ORDER_TOTAL_FREE_PRODUCT_STATUS";
 
     // Message Catalog Keys
+
     private final static String MODULE_ORDER_TOTAL_FREE_PRODUCT_TITLE = "module.order.total.freeproduct.title";
 
     /**
@@ -91,7 +95,6 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
      * @throws DataSetException
      * @throws KKException
      * @throws TorqueException
-     * 
      */
     public FreeProduct(KKEngIf eng) throws TorqueException, KKException, DataSetException
     {
@@ -116,7 +119,6 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
      * Sets some static variables during setup
      * 
      * @throws KKException
-     * 
      */
     public void setStaticVariables() throws KKException
     {
@@ -198,6 +200,9 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
                 // Free Product Id
                 int prodId = getCustomInt(promotion.getCustom5(), 5);
 
+                // If set to true, the promotion is disabled when product is not in stock
+                boolean disableIfNotInStock = getCustomBoolean(promotion.getCustom6(), 6);
+
                 // Get the order value
                 BigDecimal orderValue = null;
                 if (applyBeforeTax)
@@ -267,6 +272,10 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
                     ProductIf prod = getProdMgr().getProduct(null, prodId, lang.getId());
                     if (prod != null)
                     {
+                        if (disableIfNotInStock && prod.getQuantity() <= 0)
+                        {
+                            continue;
+                        }
                         prodName = prod.getName();
                         prodSku = prod.getSku();
                         prodIdStr = Integer.toString(prod.getId());
@@ -281,6 +290,7 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
                 }
 
                 otArray[i] = new OrderTotal();
+                otArray[i].setPromotionId(promotion.getId());
                 otArray[i].setSortOrder(sd.getSortOrder());
                 otArray[i].setClassName(code);
                 otArray[i].setPromotions(new Promotion[]
@@ -294,6 +304,13 @@ public class FreeProduct extends BaseOrderTotalModule implements OrderTotalInter
                 // shipped
                 otArray[i].setCustom1(prodSku);
                 otArray[i].setCustom2(prodIdStr);
+
+                setPromotionIds(order, Integer.toString(promotion.getId()));
+
+                if (promotion.getCoupon() != null)
+                {
+                    setCouponIds(order, Integer.toString(promotion.getCoupon().getId()));
+                }
             }
 
             ArrayList<OrderTotal> otList = new ArrayList<OrderTotal>();

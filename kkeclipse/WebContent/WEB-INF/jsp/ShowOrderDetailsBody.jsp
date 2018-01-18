@@ -23,6 +23,10 @@
 <% com.konakart.appif.OrderIf order = orderMgr.getSelectedOrder(); %>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
 
+    		<s:set scope="request" var="waitingForApproval" value="waitingForApproval"/> 
+			<%boolean waitingForApproval = (Boolean)(request.getAttribute("waitingForApproval")); %>
+    		<s:set scope="request" var="canApprove" value="canApprove"/> 
+			<%boolean canApprove = (Boolean)(request.getAttribute("canApprove")); %>
    		
     		<h1 id="page-title"><kk:msg  key="show.order.details.body.orderinformation" arg0="<%=String.valueOf(order.getId())%>" arg1="<%=kkEng.getDateAsString(order.getDatePurchased())%>"/></h1>
 	    		<div id="order-details" class="content-area rounded-corners">
@@ -34,27 +38,25 @@
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 									<%if (!isMultivendor){ %>
-									<%-- 	<div id="shipping-info-view" class="order-confirmation-area-content-select">
+										<div id="shipping-info-view" class="order-confirmation-area-content-select">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<p><%=order.getShippingMethod()%></p>
-										</div> --%>
+										</div>
 									<%}%>
 								</div>		    				
 			    			</div>
-			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">
 			    				<div class="heading-container">
 			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3>
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-								<%-- 	<div id="payment-method-view" class="order-confirmation-area-content-select">
+									<div id="payment-method-view" class="order-confirmation-area-content-select">
 										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
 										<p><%=order.getPaymentMethod()%></p>
-									</div>--%>
+									</div>
 								</div>		    				
 			    			</div>
-			    			<br>
 			    			<%if (order.getOrderShipments() != null && order.getOrderShipments().length > 0){ %>
 				    			<div id="shipments" class="order-confirmation-area">
 				    				<div class="heading-container">
@@ -141,6 +143,24 @@
 								<%}%>									
 								</div>		    				
 			    			</div>
+			    			<%if (waitingForApproval && canApprove){%>
+			    				<form action="ApproveOrderSubmit.action" id="approveForm" method="post">
+		    						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
+		    						<input type="hidden" value="<%=order.getId()%>" name="orderId"/>
+		    						<input type="hidden" id="approve" name="approve"/>
+					    			<div  class="order-confirmation-area">
+					    				<div class="order-confirmation-area-content">
+											<label><kk:msg  key="common.comments"/></label> <textarea rows="5" name="comment"></textarea>
+										</div>
+										<a onclick="javascript:reject();" class="button-medium small-rounded-corners">
+												<span><kk:msg  key="common.deny.approval"/></span>
+										</a>									
+										<a onclick="javascript:approve();" class="button-medium small-rounded-corners" style="float:right;">
+												<span><kk:msg  key="common.approve"/></span>
+										</a>									
+					    			</div>
+					    		</form>
+			    			<%}%>
 		    			</div>
 		    			<div id="order-confirmation-column-right">
 			    			<div id="shopping-cart">
@@ -189,7 +209,7 @@
 													<%rowClass = "shopping-cart-total";%>
 												<% } %>										
 												<tr class="<%=rowClass%>">															
-													<%if (ot.getClassName().equals("ot_reward_points")){%>
+													<%if (ot.getClassName().equals("ot_reward_points") || ot.getClassName().equals("ot_product_reward_points")){%>
 													    <td class="cost-overview"><%=ot.getTitle()%></td>	
 														<td class="cost-overview-amounts right"><%=(ot.getValue()!=null)?ot.getValue().intValue():ot.getValue()%></td>
 													<%}else if (ot.getClassName().equals("ot_free_product")) {%>
@@ -242,9 +262,9 @@
 													<%String rowClass = "costs-and-promotions";%>
 													<%if (ot.getClassName().equals("ot_total")){ %>
 														<%rowClass = "shopping-cart-total";%>
-													<% } %>	
+													<% } %>										
 													<tr class="<%=rowClass%>">															
-														<%if (ot.getClassName().equals("ot_reward_points")){%>
+														<%if (ot.getClassName().equals("ot_reward_points") || ot.getClassName().equals("ot_product_reward_points")){%>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	
 															<td class="cost-overview-amounts right"><%=ot.getValue().intValue()%></td>
 														<%}else if (ot.getClassName().equals("ot_free_product")) {%>
@@ -269,12 +289,31 @@
 							</div>
 						</div>			    				
 						<div class="form-buttons-wide">
-							<a href='<%="RepeatOrder.action?orderId="+order.getId()%>' id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.repeat"/></span></a>
+							<%if (!(waitingForApproval && canApprove)){%>
+								<a href='<%="RepeatOrder.action?orderId="+order.getId()%>' id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.repeat"/></span></a>
+							<%}%>
+							<%if (order.getArchivedOrders() != null && order.getArchivedOrders().length > 0){%>
+								<a href='<%="ShowOrderDetails.action?orderId="+order.getArchivedOrders()[0].getId()%>'  class="button small-rounded-corners third-button"><span><kk:msg  key="show.order.details.body.view.archive"/></span></a>
+							<%}%>
 							<a href="MyAccount.action" id="back-button" class="button small-rounded-corners"><span><kk:msg  key="common.back"/></span></a>
 						</div>
 	    		</div>
 
+<script type="text/javascript">	
 
+function approve() {
+	document.getElementById('approve').value = "true";
+	document.getElementById('approveForm').submit();
+}
+
+function reject() {
+	document.getElementById('approve').value = "false";
+	document.getElementById('approveForm').submit();
+}
+
+
+</script>
+			    		
 
 
 

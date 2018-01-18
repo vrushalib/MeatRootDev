@@ -18,8 +18,6 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +27,7 @@ import org.apache.struts2.ServletActionContext;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppEngCallouts;
 import com.konakart.al.KKAppException;
-import com.konakart.app.KKException;
+import com.konakart.app.Basket;
 import com.konakart.app.ShippingQuote;
 import com.konakart.appif.BasketIf;
 import com.konakart.appif.CustomerIf;
@@ -37,9 +35,6 @@ import com.konakart.appif.OrderIf;
 import com.konakart.appif.PaymentDetailsIf;
 import com.konakart.appif.ShippingQuoteIf;
 import com.konakart.bl.ConfigConstants;
-import com.konakart.util.Constants;
-import com.konakart.util.DeliveryDateServiceFactory;
-import com.konakart.util.DeliveryDateServiceIf;
 
 /**
  * Gets called before viewing the checkout delivery page.
@@ -66,20 +61,11 @@ public class CheckoutAction extends BaseAction
 
     private int rewardPointsAvailable;
 
-    private boolean otValid = true;
+    private String checkoutMsg = null;
 
     private int deliveryId = -1;
     
-    /*Flag to check if the order contains zorabian products and order placement time is after seven*/
-    private boolean zorabianAfterSeven = false;
-    
-    private String deliveryDate;
-    
-    private boolean morningSlot = true;
-    
-    private boolean eveningSlot = true;
-    
-    private boolean afternoonSlot = true;
+    private int stockExpirySecs = -1;
 
     /**
      * Called when we don't want to reset the checkout order but just change the delivery address
@@ -138,7 +124,7 @@ public class CheckoutAction extends BaseAction
             // Check to see whether the user is logged in unless it's punchout
             if (!punchout)
             {
-                custId = this.loggedIn(request, response, kkAppEng, "ShowCartItems");
+                custId = this.loggedIn(request, response, kkAppEng, "Checkout");
                 if (custId < 0)
                 {
                     // Uncomment to force checkout without registration
@@ -197,31 +183,79 @@ public class CheckoutAction extends BaseAction
             }
 
             // Check to see whether we are trying to checkout an item that isn't in stock
-            String stockAllowCheckout = kkAppEng.getConfig(ConfigConstants.STOCK_ALLOW_CHECKOUT);
+            String stockAllowCheckout = kkAppEng.getConfig(ConfigConstants.STORE_FRONT_STOCK_ALLOW_CHECKOUT);
+            String reserveStock = kkAppEng.getConfig(ConfigConstants.STOCK_RESERVATION_ENABLE);
             if (stockAllowCheckout != null && stockAllowCheckout.equalsIgnoreCase("false"))
-            {
-                // If required, we check to see whether the products are in stock
-                BasketIf[] items = kkAppEng.getEng().updateBasketWithStockInfoWithOptions(
-                        cust.getBasketItems(), kkAppEng.getBasketMgr().getAddToBasketOptions());
-                for (int i = 0; i < items.length; i++)
+            {             
+                if (reserveStock != null && reserveStock.equalsIgnoreCase("true"))
                 {
-                    BasketIf basket = items[i];
-                    if (basket.getQuantity() > basket.getQuantityInStock())
+                    // If required, we check to see whether the products are in stock
+                    BasketIf[] items = kkAppEng.getBasketMgr().reserveStock(cust.getBasketItems());
+                    for (int i = 0; i < items.length; i++)
                     {
-                        if (basket.getQuantityInStock() > 0)
+                        Basket basket = (Basket) items[i];
+                        if (basket.getReservationId() <= 0)
                         {
-                            addActionError(kkAppEng.getMsg("edit.cart.body.limitedstock.error",
-                                    basket.getProduct().getName(),
-                                    Integer.toString(basket.getQuantityInStock())));
-                        } else
-                        {
-                            addActionError(kkAppEng.getMsg("edit.cart.body.outofstock.error",
-                                    basket.getProduct().getName(),
-                                    Integer.toString(basket.getQuantityInStock())));
+                            if (basket.getQuantityAvailable() > 0)
+                            {
+                                // Inform that some stock is available
+                                addActionError(kkAppEng.getMsg("edit.cart.body.limitedstock.error",
+                                        basket.getProduct().getName(),
+                                        Integer.toString(basket.getQuantityAvailable())));
+                            } else if (basket.getQuantityReserved() > 0)
+                            {
+                                // Inform that some stock is currently reserved and could become available later
+                                addActionError(kkAppEng.getMsg("edit.cart.body.reservedstock.error",
+                                        basket.getProduct().getName(),
+                                        Integer.toString(basket.getQuantityReserved())));
+                            } else
+                            {
+                                addActionError(kkAppEng.getMsg("edit.cart.body.outofstock.error",
+                                        basket.getProduct().getName(),
+                                        Integer.toString(basket.getQuantityInStock())));
+                            }
+                            return "ShowCartItems";
                         }
-                        return "ShowCartItems";
+                        
+                        // Set the number of seconds before the stock reservation expires
+                        if (basket.getReservationStartDate() != null && basket.getReservationExpiryDate() != null)
+                        {
+                            long endMillis = basket.getReservationExpiryDate().getTimeInMillis();
+                            long startMillis = basket.getReservationStartDate().getTimeInMillis();
+                            int secs = (int) ((endMillis-startMillis)/1000);
+                            if (stockExpirySecs == -1)
+                            {
+                                stockExpirySecs =  secs;
+                            } else if (stockExpirySecs >  secs)
+                            {
+                                stockExpirySecs = secs;
+                            }
+                        }
                     }
-                }
+                } else
+                {
+                    // If required, we check to see whether the products are in stock
+                    BasketIf[] items = kkAppEng.getBasketMgr().updateBasketWithStockInfo(cust.getBasketItems());
+                    for (int i = 0; i < items.length; i++)
+                    {
+                        BasketIf basket = items[i];
+                        if (basket.getQuantity() > basket.getQuantityInStock())
+                        {
+                            if (basket.getQuantityInStock() > 0)
+                            {
+                                addActionError(kkAppEng.getMsg("edit.cart.body.limitedstock.error",
+                                        basket.getProduct().getName(),
+                                        Integer.toString(basket.getQuantityInStock())));
+                            } else
+                            {
+                                addActionError(kkAppEng.getMsg("edit.cart.body.outofstock.error",
+                                        basket.getProduct().getName(),
+                                        Integer.toString(basket.getQuantityInStock())));
+                            }
+                            return "ShowCartItems";
+                        }
+                    }
+                }                
             }
 
             // Insert event
@@ -231,6 +265,12 @@ public class CheckoutAction extends BaseAction
             if (punchout)
             {
                 return "PunchoutCheckout";
+            }
+            
+            // Add an address if haven't added one yet
+            if (kkAppEng.getCustomerMgr().isNoAddress())
+            {
+                return "FirstAddress";
             }
 
             /*
@@ -366,14 +406,21 @@ public class CheckoutAction extends BaseAction
              * Check to see whether all compulsory order totals are present. The code in the
              * KKAppEngCallouts class may be modified to match your requirements.
              */
-            otValid = new KKAppEngCallouts().validateOrderTotals(kkAppEng, kkAppEng.getOrderMgr()
+            KKAppEngCallouts callouts = new KKAppEngCallouts();
+            checkoutMsg = callouts.validateOrderTotals(kkAppEng, kkAppEng.getOrderMgr()
                     .getCheckoutOrder());
+            
+            /*
+             * Validate the order for the customer
+             */
+            if (checkoutMsg == null)
+            {
+                checkoutMsg = callouts.validateOrderForCustomer(kkAppEng, kkAppEng.getOrderMgr()
+                        .getCheckoutOrder());
+            }
 
             // Ensure that the current customer has his addresses populated
             kkAppEng.getCustomerMgr().populateCurrentCustomerAddresses(/* force */false);
-            
-            //Get the earliest delivery date
-            setDeliveryDate(getEarliestDeliveryDate( kkAppEng, order));
 
             kkAppEng.getNav().set(kkAppEng.getMsg("header.checkout"));
             kkAppEng.getNav().add(kkAppEng.getMsg("header.order.confirmation"));
@@ -383,53 +430,6 @@ public class CheckoutAction extends BaseAction
         {
             return super.handleException(request, e);
         }
-
-    }
-    
-    public String getEarliestDeliveryDate(KKAppEng eng, com.konakart.appif.OrderIf checkoutOrder) throws KKException {
-    	// set default values for slots
-    	setMorningSlot(isMorningSlotEnabled(eng));
-    	setEveningSlot(isEveningSlotEnabled(eng));
-    	setAfternoonSlot(isAfternoonSlotEnabled(eng));
-    	
-    	Map<String, Boolean> slotsMap = new HashMap<String, Boolean>(); 
-    	DeliveryDateServiceIf deliveryDateService = DeliveryDateServiceFactory.getDeliveryDateService(eng, checkoutOrder);
-    	String fetchedDeliveryDay = deliveryDateService.getDeliveryDate(eng, checkoutOrder, slotsMap);
-    	
-    	if(slotsMap != null && !slotsMap.isEmpty()) {
-    		if(slotsMap.containsKey(Constants.ZORABIAN_AFTER_EIGHT) && slotsMap.get(Constants.ZORABIAN_AFTER_EIGHT) != null) {
-    			setZorabianAfterSeven(slotsMap.get(Constants.ZORABIAN_AFTER_EIGHT));
-    		}
-    		if(slotsMap.containsKey(Constants.MORNING_SLOT) && slotsMap.get(Constants.MORNING_SLOT) != null) {
-    			setMorningSlot(slotsMap.get(Constants.MORNING_SLOT));
-    		}
-    		if(slotsMap.containsKey(Constants.AFTERNOON_SLOT) && slotsMap.get(Constants.AFTERNOON_SLOT) != null) {
-    			setAfternoonSlot(slotsMap.get(Constants.AFTERNOON_SLOT));
-    		}
-    	}
-
-    	return fetchedDeliveryDay;
-    }
-    
-    public boolean isEveningSlotEnabled(KKAppEng eng){
-    	if(eng.getConfigAsBoolean("ENABLE_EVENING_SLOT", true)){
-    		return true;
-    	}
-    	return false;
-    }
-    
-    public boolean isMorningSlotEnabled(KKAppEng eng){
-    	if(eng.getConfigAsBoolean("ENABLE_MORNING_SLOT", false)){
-    		return true;
-    	}
-    	return false;
-    }
-    
-    public boolean isAfternoonSlotEnabled(KKAppEng eng){
-    	if(eng.getConfigAsBoolean("ENABLE_AFTERNOON_SLOT", false)){
-    		return true;
-    	}
-    	return false;
     }
 
     /**
@@ -556,23 +556,6 @@ public class CheckoutAction extends BaseAction
     }
 
     /**
-     * @return the otValid
-     */
-    public boolean isOtValid()
-    {
-        return otValid;
-    }
-
-    /**
-     * @param otValid
-     *            the otValid to set
-     */
-    public void setOtValid(boolean otValid)
-    {
-        this.otValid = otValid;
-    }
-
-    /**
      * @return the vShipping
      */
     public String[] getvShipping()
@@ -606,68 +589,36 @@ public class CheckoutAction extends BaseAction
         this.deliveryId = deliveryId;
     }
 
-	/**
-	 * @return the zorabianAfterSeven
-	 */
-	public boolean getZorabianAfterSeven() {
-		return zorabianAfterSeven;
-	}
+    /**
+     * @return the stockExpirySecs
+     */
+    public int getStockExpirySecs()
+    {
+        return stockExpirySecs;
+    }
 
-	/**
-	 * @param zorabianAfterSeven the zorabianAfterSeven to set
-	 */
-	public void setZorabianAfterSeven(boolean zorabianAfterSeven) {
-		this.zorabianAfterSeven = zorabianAfterSeven;
-	}
+    /**
+     * @param stockExpirySecs the stockExpirySecs to set
+     */
+    public void setStockExpirySecs(int stockExpirySecs)
+    {
+        this.stockExpirySecs = stockExpirySecs;
+    }
 
-	/**
-	 * @return the deliveryDate
-	 */
-	public String getDeliveryDate() {
-		return deliveryDate;
-	}
+    /**
+     * @return the checkoutMsg
+     */
+    public String getCheckoutMsg()
+    {
+        return checkoutMsg;
+    }
 
-	/**
-	 * @param deliveryDate the deliveryDate to set
-	 */
-	public void setDeliveryDate(String deliveryDate) {
-		this.deliveryDate = deliveryDate;
-	}
+    /**
+     * @param checkoutMsg the checkoutMsg to set
+     */
+    public void setCheckoutMsg(String checkoutMsg)
+    {
+        this.checkoutMsg = checkoutMsg;
+    }
 
-	/**
-	 * @return the morningSlot
-	 */
-	public boolean getMorningSlot() {
-		return morningSlot;
-	}
-
-	/**
-	 * @param morningSlot the morningSlot to set
-	 */
-	public void setMorningSlot(boolean morningSlot) {
-		this.morningSlot = morningSlot;
-	}
-
-	/**
-	 * @return the eveningSlot
-	 */
-	public boolean getEveningSlot() {
-		return eveningSlot;
-	}
-
-	/**
-	 * @param eveningSlot the eveningSlot to set
-	 */
-	public void setEveningSlot(boolean eveningSlot) {
-		this.eveningSlot = eveningSlot;
-	}
-
-	public boolean getAfternoonSlot() {
-		return afternoonSlot;
-	}
-
-	public void setAfternoonSlot(boolean afternoonSlot) {
-		this.afternoonSlot = afternoonSlot;
-	}
-	
 }

@@ -20,6 +20,7 @@ package com.konakart.bl.modules.ordertotal.rewardpoints;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -32,6 +33,7 @@ import com.konakart.app.Order;
 import com.konakart.app.OrderTotal;
 import com.konakart.app.Promotion;
 import com.konakart.appif.KKEngIf;
+import com.konakart.appif.OrderProductIf;
 import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.BaseOrderTotalModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
@@ -54,8 +56,8 @@ import com.workingdogs.village.DataSetException;
  */
 public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInterface
 {
-    // Module name must be the same as the class name although it can be all in lowercase
-    private static String code = "ot_reward_points";
+    /** Module name must be the same as the class name although it can be all in lowercase */
+    public static String code = "ot_reward_points";
 
     private static String bundleName = BaseModule.basePackage
             + ".ordertotal.rewardpoints.RewardPoints";
@@ -160,8 +162,8 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
         ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap, locale);
         if (rb == null)
         {
-            throw new KKException("A resource file cannot be found for the country "
-                    + locale.getCountry());
+            throw new KKException(
+                    "A resource file cannot be found for the country " + locale.getCountry());
         }
 
         // Get the promotions
@@ -171,8 +173,8 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
         {
             if (promArray.length > 1)
             {
-                log
-                        .warn("There is more than one active Reward Points promotion module. Only one of these modules will be used.");
+                log.warn(
+                        "There is more than one active Reward Points promotion module. Only one of these modules will be used.");
             }
 
             Promotion promotion = promArray[0];
@@ -216,6 +218,22 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
             // Remove shipping charges if configured to not include
             if (!includeShipping && order.getShippingQuote() != null)
             {
+                // Determine whether there is a shipping discount
+                BigDecimal shippingDiscount = null;
+                if (getOrderTotalList() != null)
+                {
+                    for (Iterator<OrderTotal> iterator = getOrderTotalList().iterator(); iterator
+                            .hasNext();)
+                    {
+                        OrderTotal ot1 = iterator.next();
+                        if (ot1.getClassName().equals("ot_shipping_discount"))
+                        {
+                            shippingDiscount = ot1.getValue();
+                            break;
+                        }
+                    }
+                }
+
                 if (applyBeforeTax && order.getShippingQuote().getTotalExTax() != null)
                 {
                     orderValue = orderValue.subtract(order.getShippingQuote().getTotalExTax());
@@ -223,6 +241,34 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
                 {
                     orderValue = orderValue.subtract(order.getShippingQuote().getTotalIncTax());
                 }
+
+                // If there was a shipping discount we add it back to the order value
+                if (shippingDiscount != null)
+                {
+                    orderValue = orderValue.add(shippingDiscount);
+                }
+            }
+
+            // Adjust the amount if there is a payment charge
+            BigDecimal paymentCharge = null;
+            if (getOrderTotalList() != null)
+            {
+                for (Iterator<OrderTotal> iterator = getOrderTotalList().iterator(); iterator
+                        .hasNext();)
+                {
+                    OrderTotal ot1 = iterator.next();
+                    if (ot1.getClassName().equals("ot_payment_charge"))
+                    {
+                        paymentCharge = ot1.getValue();
+                        break;
+                    }
+                }
+            }
+
+            // If there is a payment charge we deduct it from the order value
+            if (paymentCharge != null)
+            {
+                orderValue = orderValue.subtract(paymentCharge);
             }
 
             // If promotion doesn't cover any of the products in the order then leave
@@ -233,6 +279,7 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
             }
 
             ot = new OrderTotal();
+            ot.setPromotionId(promotion.getId());
             ot.setSortOrder(sd.getSortOrder());
             ot.setClassName(code);
             ot.setPromotions(new Promotion[]
@@ -294,6 +341,49 @@ public class RewardPoints extends BaseOrderTotalModule implements OrderTotalInte
             ot.setText(points.toString());
             ot.setTitle(rb.getString(MODULE_ORDER_TOTAL_REWARD_POINTS_TITLE) + ":");
             order.setPointsAwarded(points.intValue());
+
+            // Set the points per product on each order total
+            for (int j = 0; j < promotion.getApplicableProducts().length; j++)
+            {
+                OrderProductIf op = promotion.getApplicableProducts()[j];
+
+                BigDecimal opValue = null;
+                if (applyBeforeTax)
+                {
+                    opValue = op.getFinalPriceExTax();
+                } else
+                {
+                    opValue = op.getFinalPriceIncTax();
+                }
+
+                if (opValue != null)
+                {
+                    BigDecimal pointsPerProduct = (opValue.multiply(pointsMultiplier));
+
+                    // Points for each product
+                    if (op.getQuantity() > 1)
+                    {
+                        pointsPerProduct = pointsPerProduct.divide(new BigDecimal(op.getQuantity()));
+
+                    }
+                    pointsPerProduct = pointsPerProduct.setScale(0, BigDecimal.ROUND_HALF_UP);
+                    if (op.getRefundPoints() > 0)
+                    {
+                        op.setRefundPoints(op.getRefundPoints() + pointsPerProduct.intValue());
+                    } else
+                    {
+                        op.setRefundPoints(pointsPerProduct.intValue());
+                    }
+                }
+            }
+
+            if (promotion.getCoupon() != null)
+            {
+                setCouponIds(order, Integer.toString(promotion.getCoupon().getId()));
+            }
+
+            setPromotionIds(order, Integer.toString(ot.getPromotionId()));
+
             return ot;
         }
 

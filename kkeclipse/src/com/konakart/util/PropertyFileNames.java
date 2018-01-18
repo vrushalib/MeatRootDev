@@ -57,11 +57,9 @@ public class PropertyFileNames
     public static final int KONAKART_JSON_SERVER_PROPERTIES_FILE = 9;
 
     /** Property File code */
-    // Just a placeholder for the future - no JSON on the Admin side at the moment
     public static final int KONAKARTADMIN_JSON_CLIENT_PROPERTIES_FILE = 10;
 
     /** Property File code */
-    // Just a placeholder for the future - no JSON on the Admin side at the moment
     public static final int KONAKARTADMIN_JSON_SERVER_PROPERTIES_FILE = 11;
 
     /** Property File code */
@@ -91,6 +89,12 @@ public class PropertyFileNames
     /** Property File code */
     public static final int KONAKART_JOBS_PROPERTIES_FILE = 20;
 
+    /** Property File code */
+    public static final int KONAKART_JAXWS_CLIENT_PROPERTIES_FILE = 21;
+    
+    /** Property File code */
+    public static final int KONAKARTADMIN_JAXWS_CLIENT_PROPERTIES_FILE = 22;
+    
     /**
      * Returns the properties file name for the property file indicated by the propertyFileCode
      * parameter.
@@ -102,65 +106,93 @@ public class PropertyFileNames
      *            <li>
      *            PropertyFileNames.KONAKART_SERVER_PROPERTIES_FILE = Properties file used by the
      *            KonaKart Engine on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_SERVER_PROPERTIES_FILE = Properties file used by
      *            the KonaKart Admin Engine on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_GWT_PROPERTIES_FILE = Properties file used by the
      *            KonaKart Admin App client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_WS_CLIENT_PROPERTIES_FILE = Properties file used by the
      *            KonaKart Web Service on the client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_WS_SERVER_PROPERTIES_FILE = Properties file used by the
      *            KonaKart Web Service on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_WS_CLIENT_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin Web Service on the client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_WS_SERVER_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin Web Service on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_JSON_CLIENT_PROPERTIES_FILE = Properties file used by
      *            the KonaKart JSON Service on the client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_JSON_SERVER_PROPERTIES_FILE = Properties file used by
      *            the KonaKart JSON Service on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_JSON_CLIENT_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin JSON Service on the client side. Note that this is just a
      *            placeholder because there is currently no JSON server on the Admin side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_JSON_SERVER_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin JSON Service on the server side. Note that this is just a
      *            placeholder because there is currently no JSON server on the Admin side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_GWT_PROPERTIES_FILE = Properties file used by the
      *            KonaKart GWT Application (One Page Checkout) on the client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_APPENG_CLIENT_PROPERTIES_FILE = Properties file used by
      *            the KonaKart Client Engine on the client side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_APPENG_SERVER_PROPERTIES_FILE = Properties file used by
      *            the KonaKart Client Engine on the server side.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_RMI_CLIENT_PROPERTIES_FILE = Properties file used by
      *            the KonaKart Client Side of the RMI Engine.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_RMI_SERVER_PROPERTIES_FILE = Properties file used by
      *            the KonaKart Server Side of the RMI Engine.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_RMI_CLIENT_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin Client Side of the RMI Engine.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKARTADMIN_RMI_SERVER_PROPERTIES_FILE = Properties file used
      *            by the KonaKart Admin Server Side of the RMI Engine.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_VELOCITY_PROPERTIES_FILE = Velocity Properties file used
      *            by the KonaKart Server.
+     *            </li>
      *            <li>
      *            PropertyFileNames.KONAKART_JOBS_PROPERTIES_FILE = Jobs Properties file used
      *            by Quartz jobs in the KonaKartAdmin Server.
+     *            </li>
+     *            <li>
+     *            PropertyFileNames.KONAKART_JAXWS_CLIENT_PROPERTIES_FILE = Properties file used by the
+     *            KonaKart JAXWS Service on the client side.
+     *            </li>
+     *            <li>
+     *            PropertyFileNames.KONAKARTADMIN_JAXWS_CLIENT_PROPERTIES_FILE = Properties file used by the
+     *            KonaKart Admin JAXWS Service on the client side.
+     *            </li>
      *            </ul>
      * @param def
      *            Default value
@@ -267,6 +299,16 @@ public class PropertyFileNames
         }
 
         if (propertyFileCode == PropertyFileNames.KONAKART_JOBS_PROPERTIES_FILE)
+        {
+            return def;
+        }
+
+        if (propertyFileCode == PropertyFileNames.KONAKART_JAXWS_CLIENT_PROPERTIES_FILE)
+        {
+            return def;
+        }
+
+        if (propertyFileCode == PropertyFileNames.KONAKARTADMIN_JAXWS_CLIENT_PROPERTIES_FILE)
         {
             return def;
         }

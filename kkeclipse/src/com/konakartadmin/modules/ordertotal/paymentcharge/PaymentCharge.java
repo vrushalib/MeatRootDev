@@ -91,7 +91,7 @@ public class PaymentCharge extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('true', 'false')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(

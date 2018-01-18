@@ -20,11 +20,13 @@ package com.konakart.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.validator.EmailValidator;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.app.NotificationOptions;
+import com.konakart.app.SSOToken;
+import com.konakart.appif.SSOTokenIf;
 
 /**
  * Gets called to subscribe to the newsletter
@@ -38,7 +40,7 @@ public class SubscribeNewsletterSubmitAction extends BaseAction
     private String msg;
 
     private boolean error = false;
-    
+
     private String xsrf_token;
 
     public String execute()
@@ -61,14 +63,33 @@ public class SubscribeNewsletterSubmitAction extends BaseAction
                 setupResponseForSSLRedirect(response, redirForward);
                 return null;
             }
-            
-            EmailValidator validator =  EmailValidator.getInstance();
+
+            EmailValidator validator = EmailValidator.getInstance();
             if (!validator.isValid(emailAddr))
             {
-                msg = "Enter a valid email address";
+                msg = kkAppEng.getMsg("subscribe.newsletter.valid.email");
                 error = true;
                 return SUCCESS;
             }
+
+            /*
+             * If you only want to make the subscription after confirmation, you must save an
+             * SSOToken with the customer id. The secret key must be passed in a mail (within a
+             * link) to the customer so that when he clicks on the link he calls
+             * SubscribeNewsletterConfirmSubmitAction. e.g. http
+             * ://localhost:8780/konakart/SubscribeNewsletterConfirm.action?key=70168e16-eb49-45c4-
+             * b47b-e2a2f8c0e6f5
+             */
+            // SSOTokenIf token = new SSOToken();
+            // token.setCustomerId(custId);
+            // if (custId > 0)
+            // {
+            // token.setSessionId(kkAppEng.getSessionId());
+            // }
+            // token.setCustom1(emailAddr); // email address
+            // String secretKey = kkAppEng.getEng().saveSSOToken(token);
+            // msg = kkAppEng.getMsg("subscribe.newsletter.reg.email");
+            // System.out.println("key = " + secretKey);
 
             NotificationOptions options = new NotificationOptions();
             options.setEmailAddr(emailAddr);
@@ -86,16 +107,17 @@ public class SubscribeNewsletterSubmitAction extends BaseAction
             } catch (Exception e)
             {
                 String userExists = "KKUserExistsException";
-                if ((e.getCause() != null && e.getCause().getClass().getName().indexOf(userExists) > -1)
+                if ((e.getCause() != null
+                        && e.getCause().getClass().getName().indexOf(userExists) > -1)
                         || (e.getMessage() != null && e.getMessage().indexOf(userExists) > -1))
                 {
-                    msg = "Sign in to register";
+                    msg = kkAppEng.getMsg("subscribe.newsletter.sign.in");
                 }
                 error = true;
                 return SUCCESS;
             }
 
-            msg = "Registration was successful";
+            msg = kkAppEng.getMsg("subscribe.newsletter.reg.ok");
 
             return SUCCESS;
 
@@ -148,7 +170,8 @@ public class SubscribeNewsletterSubmitAction extends BaseAction
     }
 
     /**
-     * @param error the error to set
+     * @param error
+     *            the error to set
      */
     public void setError(boolean error)
     {
@@ -164,7 +187,8 @@ public class SubscribeNewsletterSubmitAction extends BaseAction
     }
 
     /**
-     * @param xsrf_token the xsrf_token to set
+     * @param xsrf_token
+     *            the xsrf_token to set
      */
     public void setXsrf_token(String xsrf_token)
     {

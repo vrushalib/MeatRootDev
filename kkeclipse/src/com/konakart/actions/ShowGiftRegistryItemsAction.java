@@ -142,10 +142,10 @@ public class ShowGiftRegistryItemsAction extends BaseAction
                         // Create a WishListUIItem
                         WishListUIItem item = new WishListUIItem(wli.getId(), wli.getProduct()
                                 .getId(), wli.getProduct().getName(), kkAppEng.getProdImage(
-                                wli.getProduct(), KKAppEng.IMAGE_SMALL), wli.getFinalPriceExTax(),
-                                wli.getFinalPriceIncTax(), wli.getPriority(),
-                                wli.getQuantityDesired(), wli.getQuantityReceived(),
-                                wli.getComments());
+                                wli.getProduct(), wli.getOpts(), KKAppEng.IMAGE_SMALL),
+                                wli.getFinalPriceExTax(), wli.getFinalPriceIncTax(),
+                                wli.getPriority(), wli.getQuantityDesired(),
+                                wli.getQuantityReceived(), wli.getComments());
                         // Set the options of the new WishListUIItem
                         if (wli.getOpts() != null && wli.getOpts().length > 0)
                         {

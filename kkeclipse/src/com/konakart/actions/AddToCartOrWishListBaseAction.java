@@ -27,8 +27,10 @@ import com.konakart.al.json.OptionJson;
 import com.konakart.al.json.WishListJson;
 import com.konakart.app.Basket;
 import com.konakart.app.KKException;
+import com.konakart.app.Option;
 import com.konakart.app.WishListItem;
 import com.konakart.appif.BasketIf;
+import com.konakart.appif.CategoryIf;
 import com.konakart.appif.CustomerIf;
 import com.konakart.appif.OptionIf;
 import com.konakart.appif.ProductIf;
@@ -43,6 +45,21 @@ public class AddToCartOrWishListBaseAction extends BaseAction
     private static final long serialVersionUID = 1L;
 
     protected int prodId = -1;
+
+    // name used for analytics
+    protected String prodName = null;
+
+    // name used for analytics
+    protected String prodManuName = null;
+
+    // name used for analytics
+    protected String prodCatName = null;
+
+    // String describing options used for analytics
+    protected String prodOptionString = null;
+
+    // quantity used for analytics
+    protected int prodQty = 0;
 
     // When not null, need to forward to prod details page to set options
     protected String redirectURL = null;
@@ -101,6 +118,41 @@ public class AddToCartOrWishListBaseAction extends BaseAction
                 b.setOpts(opts);
                 b.setProductId(prod.getId());
                 kkAppEng.getBasketMgr().addToBasket(b, /* refresh */true);
+
+                // Instantiate values for analytics
+                if (kkAppEng.getAnalyticsCode() != null && kkAppEng.getAnalyticsCode().length() > 0)
+                {
+                    prodName = kkAppEng.removeSingleQuotes(prod.getName());
+                    prodManuName = kkAppEng.removeSingleQuotes(prod.getManufacturerName());
+                    CategoryIf cat = kkAppEng.getCategoryMgr().getCatFromId(prod.getCategoryId());
+                    if (cat != null)
+                    {
+                        prodCatName = kkAppEng.removeSingleQuotes(cat.getName()); 
+                    }                    
+                    prodQty = quantity;
+                    if (opts != null)
+                    {
+                        StringBuffer sb = new StringBuffer();
+                        for (int i = 0; i < opts.length; i++)
+                        {
+                            OptionIf opt = opts[i];
+                            if (opt.getType() == Option.TYPE_SIMPLE)
+                            {
+                                if (i > 0)
+                                {
+                                    sb.append("/");
+                                }
+                                sb.append(opt.getName());
+                                sb.append(":");
+                                sb.append(opt.getValue());
+                            }
+                        }
+                        if (sb.length() > 0)
+                        {
+                            prodOptionString = kkAppEng.removeSingleQuotes(sb.toString());
+                        }
+                    }
+                }
             }
 
             BasketIf[] basketItems = kkAppEng.getCustomerMgr().getCurrentCustomer()
@@ -137,8 +189,8 @@ public class AddToCartOrWishListBaseAction extends BaseAction
                             }
                             if (opt.getCustomerPrice() != null)
                             {
-                                optj.setFormattedCustPrice(kkAppEng.formatPrice(opt
-                                        .getCustomerPrice()));
+                                optj.setFormattedCustPrice(
+                                        kkAppEng.formatPrice(opt.getCustomerPrice()));
                             }
                             optArray[j] = optj;
                         }
@@ -149,7 +201,8 @@ public class AddToCartOrWishListBaseAction extends BaseAction
                     if (b.getProduct() != null)
                     {
                         bj.setProdName(b.getProduct().getName());
-                        String imgSrc = kkAppEng.getProdImage(b.getProduct(), KKAppEng.IMAGE_TINY);
+                        String imgSrc = kkAppEng.getProdImage(b.getProduct(), b.getOpts(),
+                                KKAppEng.IMAGE_TINY);
                         bj.setProdImgSrc(imgSrc);
                     }
                 }
@@ -231,8 +284,8 @@ public class AddToCartOrWishListBaseAction extends BaseAction
                                     }
                                     if (opt.getCustomerPrice() != null)
                                     {
-                                        optj.setFormattedCustPrice(kkAppEng.formatPrice(opt
-                                                .getCustomerPrice()));
+                                        optj.setFormattedCustPrice(
+                                                kkAppEng.formatPrice(opt.getCustomerPrice()));
                                     }
                                     optArray[k] = optj;
                                 }
@@ -242,7 +295,7 @@ public class AddToCartOrWishListBaseAction extends BaseAction
                             if (w.getProduct() != null)
                             {
                                 wj.setProdName(w.getProduct().getName());
-                                String imgSrc = kkAppEng.getProdImage(w.getProduct(),
+                                String imgSrc = kkAppEng.getProdImage(w.getProduct(), w.getOpts(),
                                         KKAppEng.IMAGE_TINY);
                                 wj.setProdImgSrc(imgSrc);
                             }
@@ -277,9 +330,9 @@ public class AddToCartOrWishListBaseAction extends BaseAction
          * If the customer isn't logged in, or is logged in but not registered then he may not be
          * allowed to add products to the wish list.
          */
-        if (!allowWLBool
-                && ((custId < 0) || (kkAppEng.getCustomerMgr().getCurrentCustomer() != null && kkAppEng
-                        .getCustomerMgr().getCurrentCustomer().getType() == com.konakart.bl.CustomerMgr.CUST_TYPE_NON_REGISTERED_CUST)))
+        if (!allowWLBool && ((custId < 0) || (kkAppEng.getCustomerMgr().getCurrentCustomer() != null
+                && kkAppEng.getCustomerMgr().getCurrentCustomer()
+                        .getType() == com.konakart.bl.CustomerMgr.CUST_TYPE_NON_REGISTERED_CUST)))
         {
             /*
              * In the Javascript we work out the redirect URL so that it works also when we are
@@ -527,6 +580,89 @@ public class AddToCartOrWishListBaseAction extends BaseAction
     public void setWlItems(WishListJson[] wlItems)
     {
         this.wlItems = wlItems;
+    }
+
+    /**
+     * @return the prodName
+     */
+    public String getProdName()
+    {
+        return prodName;
+    }
+
+    /**
+     * @param prodName
+     *            the prodName to set
+     */
+    public void setProdName(String prodName)
+    {
+        this.prodName = prodName;
+    }
+
+    /**
+     * @return the prodOptionString
+     */
+    public String getProdOptionString()
+    {
+        return prodOptionString;
+    }
+
+    /**
+     * @param prodOptionString
+     *            the prodOptionString to set
+     */
+    public void setProdOptionString(String prodOptionString)
+    {
+        this.prodOptionString = prodOptionString;
+    }
+
+    /**
+     * @return the prodQty
+     */
+    public int getProdQty()
+    {
+        return prodQty;
+    }
+
+    /**
+     * @param prodQty
+     *            the prodQty to set
+     */
+    public void setProdQty(int prodQty)
+    {
+        this.prodQty = prodQty;
+    }
+
+    /**
+     * @return the prodManuName
+     */
+    public String getProdManuName()
+    {
+        return prodManuName;
+    }
+
+    /**
+     * @param prodManuName the prodManuName to set
+     */
+    public void setProdManuName(String prodManuName)
+    {
+        this.prodManuName = prodManuName;
+    }
+
+    /**
+     * @return the prodCatName
+     */
+    public String getProdCatName()
+    {
+        return prodCatName;
+    }
+
+    /**
+     * @param prodCatName the prodCatName to set
+     */
+    public void setProdCatName(String prodCatName)
+    {
+        this.prodCatName = prodCatName;
     }
 
 }

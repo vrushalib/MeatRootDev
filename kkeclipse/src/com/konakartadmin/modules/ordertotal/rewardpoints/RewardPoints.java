@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -100,7 +100,7 @@ public class RewardPoints extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -155,7 +155,7 @@ public class RewardPoints extends OrderTotalModule
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Calculate points on amount before tax",
+        /* title */"Calc points on amount",
         /* key */"MODULE_ORDER_TOTAL_REWARD_POINTS_APPLY_BEFORE_TAX",
         /* value */"custom4",
         /* description */"Determines whether the calculation for determining the"
@@ -163,7 +163,7 @@ public class RewardPoints extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -179,7 +179,7 @@ public class RewardPoints extends OrderTotalModule
         /* dateAdd */now);
         
         configs[i] = new KKConfiguration(
-                /* title */"Include shipping cost in calculation",
+                /* title */"Include shipping cost",
                 /* key */"MODULE_ORDER_TOTAL_REWARD_POINTS_INCLUDE_SHIPPING",
                 /* value */"custom6",
                 /* description */"Determines whether to include the shipping cost"
@@ -187,9 +187,8 @@ public class RewardPoints extends OrderTotalModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"invisible",
-                /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+                /* setFun */"choice('true'='Yes','false'='No')",
                 /* dateAdd */now);
-
 
         return configs;
     }

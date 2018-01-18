@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -84,7 +84,7 @@ public class Cod extends PaymentModule
         configs[i++] = new KKConfiguration("Enable Cash On Delivery Module",
                 "MODULE_PAYMENT_COD_STATUS", "True",
                 "Do you want to accept Cash On Delivery payments?", 6, 1, "",
-                "tep_cfg_select_option(array('True', 'False'),", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Payment Zone", "MODULE_PAYMENT_COD_ZONE", "0",
                 "If a zone is selected, only enable this payment method for that zone.", 6, 2,
                 "tep_get_zone_class_title", "tep_cfg_pull_down_zone_classes(", now);

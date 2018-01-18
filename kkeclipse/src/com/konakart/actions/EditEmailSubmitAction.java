@@ -24,6 +24,8 @@ import org.apache.struts2.ServletActionContext;
 
 import com.konakart.al.KKAppEng;
 import com.konakart.app.Customer;
+import com.konakart.app.KKException;
+import com.konakart.app.KKUserExistsException;
 import com.konakart.appif.CustomerIf;
 
 /**
@@ -35,6 +37,8 @@ public class EditEmailSubmitAction extends BaseAction
     private static final long serialVersionUID = 1L;
 
     private String emailAddr;
+
+    private String username;
 
     private String password;
 
@@ -84,14 +88,24 @@ public class EditEmailSubmitAction extends BaseAction
 
             // Copy the inputs from the form to a customer object
             cust.setEmailAddr(escapeFormInput(getEmailAddr()));
+            cust.setUsername(escapeFormInput(getUsername()));
 
             // Call the engine edit customer method
             try
             {
                 kkAppEng.getCustomerMgr().editCustomer(cust);
-            } catch (Exception e)
+            } catch (KKException e)
             {
-                addActionError(kkAppEng.getMsg("edit.customer.body.user.exists"));
+                /*
+                 * An exception could occur if the user already exists 
+                 */
+                if (e.getCode() == KKUserExistsException.DUPLICATE_USERNAME)
+                {
+                    addActionError(kkAppEng.getMsg("edit.customer.body.user.exists.username"));
+                } else
+                {
+                    addActionError(kkAppEng.getMsg("edit.customer.body.user.exists"));
+                }
                 return "ApplicationError";
             }
 
@@ -138,6 +152,23 @@ public class EditEmailSubmitAction extends BaseAction
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername()
+    {
+        return username;
+    }
+
+    /**
+     * @param username
+     *            the username to set
+     */
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 
 }

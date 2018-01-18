@@ -296,7 +296,11 @@ public class ShippingMgr extends BaseMgr implements ShippingMgrIf
                     {
                         ShippingInterface shippingModule = getShippingModuleForName(moduleName);
                         shippingModule.setStaticVariables();
-                    } catch (Exception e)
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Created Shipping Module : " + moduleName);
+                        }
+                    } catch (Throwable e)
                     {
                         log.error("Could not instantiate the Shipping Module " + moduleName
                                 + " in order to refresh its configuration.", e);
@@ -639,8 +643,8 @@ public class ShippingMgr extends BaseMgr implements ShippingMgrIf
                 return null;
             }
 
-            moduleName = getJavaModuleName(moduleName);
-            ShippingInterface shippingModule = getShippingModuleForName(moduleName);
+            String jModuleName = getJavaModuleName(moduleName);
+            ShippingInterface shippingModule = getShippingModuleForName(jModuleName);
             if (shippingModule.isAvailable())
             {
                 ShippingQuote quote = shippingModule.getQuote((Order) order, info);

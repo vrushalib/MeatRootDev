@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -84,7 +84,7 @@ public class Free extends ShippingModule
         int i = 0;
         configs[i++] = new KKConfiguration("Enable Local Collection", "MODULE_SHIPPING_FREE_STATUS",
                 "True", "Do you want to offer free local collection?", 6, 0, "",
-                "tep_cfg_select_option(array('True', 'False'),", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Sort Order", "MODULE_SHIPPING_FREE_SORT_ORDER", "0",
                 "Sort order of display.", 6, 0, "", "", now);
 

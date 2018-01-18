@@ -39,6 +39,7 @@ import com.konakart.appif.OrderProductIf;
 import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.BaseOrderTotalModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
+import com.konakart.util.JavaUtils;
 import com.workingdogs.village.DataSetException;
 
 /**
@@ -118,7 +119,14 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
         {
             staticData = new StaticData();
             staticDataHM.put(getStoreId(), staticData);
+        } else
+        {
+            if (!updateStaticVariablesNow(staticData.getLastUpdatedMS()))
+            {
+                return;
+            }
         }
+
         conf = getConfiguration(MODULE_ORDER_TOTAL_BUY_X_GET_Y_FREE_SORT_ORDER);
         if (conf == null)
         {
@@ -126,6 +134,21 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
         } else
         {
             staticData.setSortOrder(new Integer(conf.getValue()).intValue());
+        }
+
+        staticData.setLastUpdatedMS(System.currentTimeMillis());
+
+        if (log.isInfoEnabled())
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(JavaUtils.dumpAllStackTraces(".*JavaUtils.dumpAllStackTraces.*",
+                        "(.*AllStackTraces.*|.*java.lang.Thread..*)"));
+            }
+            String staticD = "Configuration data for " + code + " on " + getStoreId();
+            staticD += "\n\t\t SortOrder          = " + staticData.getSortOrder();
+            staticD += "\n\t\t LastUpdated        = " + staticData.getLastUpdatedMS();
+            log.info(staticD);
         }
     }
 
@@ -155,6 +178,13 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
      * for doing this is to get a line item of the order for each discounted product. We still need
      * to populate the order total that we return with the total discount amount because this will
      * be used to compare this promotion with other promotions in order to decide which one to use.
+     * <p>
+     * The returned OrderTotal custom attributes are populated as follows:
+     * <ul>
+     * <li>custom1 = Product Id</li>
+     * <li>custom2 = Product SKU</li>
+     * <li>custom3 = Encoded Product Id containing the product id and ids of the options.</li>
+     * </ul>
      * 
      * @param order
      * @param dispPriceWithTax
@@ -226,10 +256,11 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
 
                 if (log.isDebugEnabled())
                 {
-                    log.debug("buyProdQuantity             = " + buyProdQuantity);
-                    log.debug("freeProdQuantity            = " + freeProdQuantity);
-                    log.debug("minTotalOrderVal            = " + minTotalOrderVal);
-                    log.debug("applyBeforeTax              = " + applyBeforeTax);
+                    String dbg = "\n\t buyProdQuantity             = " + buyProdQuantity;
+                    dbg += "\n\t freeProdQuantity            = " + freeProdQuantity;
+                    dbg += "\n\t minTotalOrderVal            = " + minTotalOrderVal;
+                    dbg += "\n\t applyBeforeTax              = " + applyBeforeTax;
+                    log.debug(dbg);
                 }
 
                 // Don't bother going any further if there is no free products
@@ -257,6 +288,7 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                 }
 
                 ot = new OrderTotal();
+                ot.setPromotionId(promotion.getId());
                 ot.setSortOrder(sd.getSortOrder());
                 ot.setClassName(code);
                 ot.setPromotions(new Promotion[]
@@ -293,6 +325,9 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                     int buyPlusFree = buyProdQuantity + freeProdQuantity;
                     if (op != null && op.getQuantity() >= buyPlusFree)
                     {
+                        String encodedProdId = getBasketMgr().createEncodedProduct(
+                                op.getProductId(), op.getOpts());
+
                         // Get the current total price of the product (divide by quantity)
                         BigDecimal currentPrice = null;
                         BigDecimal qty = new BigDecimal(op.getQuantity());
@@ -314,11 +349,12 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
 
                         if (log.isDebugEnabled())
                         {
-                            log.debug("buyPlusFree                 = " + buyPlusFree);
-                            log.debug("currentPrice per item       = " + currentPrice);
-                            log.debug("Qty                         = " + op.getQuantity());
-                            log.debug("discount per buy/free Group = " + discount);
-                            log.debug("overall discount            = " + discount);
+                            String dbg = "\n\t buyPlusFree                 = " + buyPlusFree;
+                            dbg += "\n\t currentPrice per item       = " + currentPrice;
+                            dbg += "\n\t Qty                         = " + op.getQuantity();
+                            dbg += "\n\t discount per buy/free Group = " + discountPerBuyFreeGroup;
+                            dbg += "\n\t overall discount            = " + discount;
+                            log.debug(dbg);
                         }
 
                         // Determine whether it is the first discounted product or not
@@ -346,6 +382,9 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                             ot.setText("-" + formattedDiscount);
                             // Title looks like "-10EUR Philips TV"
                             ot.setTitle("-" + formattedDiscount + " " + op.getName());
+                            ot.setCustom1(Integer.toString(op.getProductId()));
+                            ot.setCustom2(op.getSku());
+                            ot.setCustom3(encodedProdId);
                         } else
                         {
                             // Set the order total attributes
@@ -387,11 +426,16 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
                          * Create a new Order Total module for each product
                          */
                         OrderTotal singleOt = new OrderTotal();
+                        singleOt.setPromotionId(promotion.getId());
                         singleOt.setSortOrder(sd.getSortOrder());
                         singleOt.setClassName(code);
                         singleOt.setValue(discount);
                         singleOt.setText("-" + formattedDiscount);
                         singleOt.setTitle("-" + formattedDiscount + " " + op.getName() + ":");
+                        singleOt.setCustom1(Integer.toString(op.getProductId()));
+                        singleOt.setCustom2(op.getSku());
+                        singleOt.setCustom3(encodedProdId);
+
                         otList.add(singleOt);
                     }
                 }
@@ -427,6 +471,9 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
         // Call a helper method to decide which OrderTotal we should return
         OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
 
+        // Modify the refund values of each product 
+        setRefundValues(order, retOT, applyBeforeTax);
+
         return retOT;
     }
 
@@ -455,6 +502,26 @@ public class BuyXGetYFree extends BaseOrderTotalModule implements OrderTotalInte
     protected class StaticData
     {
         private int sortOrder = -1;
+
+        // lastUpdatedMS
+        private long lastUpdatedMS = -1;
+
+        /**
+         * @return the lastUpdatedMS
+         */
+        public long getLastUpdatedMS()
+        {
+            return lastUpdatedMS;
+        }
+
+        /**
+         * @param lastUpdatedMS
+         *            the lastUpdatedMS to set
+         */
+        public void setLastUpdatedMS(long lastUpdatedMS)
+        {
+            this.lastUpdatedMS = lastUpdatedMS;
+        }
 
         /**
          * @return the sortOrder

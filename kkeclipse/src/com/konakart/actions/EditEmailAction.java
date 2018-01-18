@@ -35,6 +35,8 @@ public class EditEmailAction extends BaseAction
 
     private String emailAddr;
 
+    private String username;
+
     public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
@@ -66,6 +68,7 @@ public class EditEmailAction extends BaseAction
             if (cust != null)
             {
                 emailAddr = noNull(cust.getEmailAddr());
+                username = noNull(cust.getUsername());
             }
 
             kkAppEng.getNav().add(kkAppEng.getMsg("header.customer.editemail"), request);
@@ -93,5 +96,22 @@ public class EditEmailAction extends BaseAction
     public void setEmailAddr(String emailAddr)
     {
         this.emailAddr = emailAddr;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername()
+    {
+        return username;
+    }
+
+    /**
+     * @param username
+     *            the username to set
+     */
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 }

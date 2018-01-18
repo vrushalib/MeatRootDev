@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -13,9 +13,6 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-//
-// Original version written by Steven Lohrenz (steven@stevenlohrenz.com) 
-// based on a KonaKart example.  
 //
 
 package com.konakartadmin.modules.payment.bluepay;
@@ -97,7 +94,7 @@ public class Bluepay extends PaymentModule
         /* groupId */groupId,
         /* sort Order */i,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i++] = new KKConfiguration(
@@ -163,7 +160,7 @@ public class Bluepay extends PaymentModule
         /* groupId */groupId,
         /* sort Order */i,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -174,7 +171,7 @@ public class Bluepay extends PaymentModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"",
-                /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now);
 
         return configs;

@@ -41,6 +41,7 @@ import com.konakart.bl.modules.ordertotal.thomson.Thomson.StaticData;
 import com.konakart.blif.MultiStoreMgrIf;
 import com.konakart.db.KKBasePeer;
 import com.konakart.db.KKCriteria;
+import com.konakart.db.KKRecord;
 import com.konakart.om.BaseIpnHistoryPeer;
 import com.konakart.util.ExceptionUtils;
 
@@ -151,10 +152,24 @@ public class HeaderLoggingHandler implements SOAPHandler<SOAPMessageContext>
                 {
                     KKCriteria insertC = getNewCriteria(false);
 
+                    String fullMsg = streamOut.toString();
+                    
+                    if (KKRecord.isDB2())
+                    {
+                        // We have a limit of 4000 characters on DB2 so we may have to truncate
+                        
+                        log.info("Thomson message length       = " + fullMsg.length());
+                        if (fullMsg != null && fullMsg.length()>4000)
+                        {
+                            fullMsg = fullMsg.substring(0, 3995) + "...";
+                            log.warn("Thomson message truncated to = " + fullMsg.length());
+                        }
+                    }
+                    
                     // Insert the ipn_history record
 
                     insertC.addForInsert(BaseIpnHistoryPeer.GATEWAY_FULL_RESPONSE,
-                            streamOut.toString());
+                            fullMsg);
                     insertC.addForInsert(BaseIpnHistoryPeer.GATEWAY_TRANSACTION_ID, getOrder()
                             .getLifecycleId());
                     insertC.addForInsert(BaseIpnHistoryPeer.KONAKART_RESULT_DESCRIPTION, "Tax "

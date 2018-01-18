@@ -40,6 +40,8 @@ public class QuickSearchAction extends BaseAction
 
     private boolean searchInDesc = false;
 
+    private int catId = -1;
+
     public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
@@ -50,6 +52,7 @@ public class QuickSearchAction extends BaseAction
             int custId;
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
+            kkAppEng.setSearchParentCategoryId(catId);
 
             custId = this.loggedIn(request, response, kkAppEng, null);
 
@@ -76,7 +79,14 @@ public class QuickSearchAction extends BaseAction
             ps.setReturnCategoryFacets(true);
             ps.setReturnManufacturerFacets(true);
             ps.setManufacturerId(ProductSearch.SEARCH_ALL);
-            ps.setCategoryId(ProductSearch.SEARCH_ALL);
+            if (catId > -1)
+            {
+                ps.setCategoryId(catId);
+                ps.setSearchInSubCats(true);
+            } else
+            {
+                ps.setCategoryId(ProductSearch.SEARCH_ALL);
+            }
             ps.setWhereToSearch((searchInDesc) ? ProductSearch.SEARCH_IN_PRODUCT_DESCRIPTION : 0);
             ps.setTokenizeSolrInput(true);
             // Set facets if not using slider. Use default values for now
@@ -92,7 +102,7 @@ public class QuickSearchAction extends BaseAction
                 ps.setSearchText(getSearchText());
             }
             ProductsIf prods = kkAppEng.getProductMgr().fetchProducts(null, ps);
-            
+
             // Try to get some spelling suggestions if no results returned
             if (prods != null && getSearchText() != null && getSearchText().length() > 0
                     && (prods.getProductArray() == null || prods.getProductArray().length == 0)
@@ -151,4 +161,22 @@ public class QuickSearchAction extends BaseAction
     {
         this.searchInDesc = searchInDesc;
     }
+
+    /**
+     * @return the catId
+     */
+    public int getCatId()
+    {
+        return catId;
+    }
+
+    /**
+     * @param catId
+     *            the catId to set
+     */
+    public void setCatId(int catId)
+    {
+        this.catId = catId;
+    }
+
 }

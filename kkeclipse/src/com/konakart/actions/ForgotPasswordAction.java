@@ -45,7 +45,7 @@ public class ForgotPasswordAction extends BaseAction
             custId = this.loggedIn(request, response, kkAppEng, null);
 
             // Ensure we are using the correct protocol. Redirect if not.
-            String redirForward = checkSSL(kkAppEng, request, custId, /* forceSSL */false);
+            String redirForward = checkSSL(kkAppEng, request, custId, /* forceSSL */true);
             if (redirForward != null)
             {
                 setupResponseForSSLRedirect(response, redirForward);

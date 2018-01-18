@@ -41,11 +41,11 @@ public class GlobalCollectCustomBase implements GlobalCollectCustomIf
     
     /**
      * Constructor
-     * @param _eng a KKENgIf engine
+     * @param kkEng a KKENgIf engine
      */
-    public GlobalCollectCustomBase(KKEngIf _eng)
+    public GlobalCollectCustomBase(KKEngIf kkEng)
     {
-        this.eng = _eng;
+        this.eng = kkEng;
     }
 
     public int getNumberOfInstallments(OrderIf order)

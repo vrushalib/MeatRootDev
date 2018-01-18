@@ -131,7 +131,16 @@ public class EditAddrSubmitAction extends BaseAction
             addr.setTelephoneNumber1(escapeFormInput(getTelephoneNumber1()));
             addr.setEmailAddr(escapeFormInput(getEmailAddrOptional()));
             addr.setIsPrimary(isSetAsPrimaryBool());
-            addr.setState(escapeFormInput(getState()));
+            if (kkAppEng.getCustomerMgr().getSelectedZones() == null
+                    || kkAppEng.getCustomerMgr().getSelectedZones().length == 0)
+            {
+                addr.setState(escapeFormInput(getState()));
+            } else
+            {
+                // Don't escape since we try to match the state
+                addr.setState(getState());
+            }
+
 
             kkAppEng.getCustomerMgr().editCustomerAddress(addr);
 

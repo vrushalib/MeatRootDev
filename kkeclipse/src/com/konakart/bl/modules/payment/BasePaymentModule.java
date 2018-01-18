@@ -33,10 +33,12 @@ import com.konakart.app.PaymentDetails;
 import com.konakart.appif.AddressIf;
 import com.konakart.appif.NameValueIf;
 import com.konakart.appif.PaymentDetailsIf;
+import com.konakart.bl.Session;
 import com.konakart.bl.modules.BaseModule;
 import com.konakart.blif.MultiStoreMgrIf;
 import com.konakart.db.KKBasePeer;
 import com.konakart.db.KKCriteria;
+import com.konakart.om.BaseSessionsPeer;
 import com.konakart.om.BaseZonesToGeoZonesPeer;
 import com.workingdogs.village.Record;
 
@@ -120,6 +122,64 @@ public class BasePaymentModule extends BaseModule
         {
             log.error("Unexpected exception in isGeoZoneMappedToCountry method", e);
             return false;
+        }
+    }
+
+    /**
+     * Look up the sessionId for the specified customerId. You may need to add an index on the
+     * customer_id column for this to work efficiently if you have many records in the session
+     * table. You should also run maintenance jobs on the session table to remove old sessions.
+     * 
+     * @param customerId
+     * @return the sessionId if found or null
+     */
+    protected String getCustomerSessionIdByCustomerId(int customerId)
+    {
+        if (customerId == -1)
+        {
+            return null;
+        }
+
+        try
+        {
+            // Find the sessionId by custoerId
+
+            KKCriteria c = getNewCriteria(isMultiStoreShareCustomers());
+
+            c.addSelectColumn(BaseSessionsPeer.SESSKEY);
+            c.addSelectColumn(BaseSessionsPeer.EXPIRY);
+            c.add(BaseSessionsPeer.CUSTOMER_ID, customerId);
+
+            List<Record> rows = KKBasePeer.doSelect(c);
+
+            if (rows.isEmpty())
+            {
+                throw new KKException("No session for customerId " + customerId + " was found");
+            }
+
+            // We'll just use the first session that hasn't expired...
+
+            for (int s = 0; s < rows.size(); s++)
+            {
+                Record rec = rows.get(s);
+                Session sess = new Session(rec, c);
+                if (!sess.hasExpired())
+                {
+                    if (log.isInfoEnabled())
+                    {
+                        log.info("Found sessionId " + sess.getSessKey() + " for CustomerId "
+                                + customerId);
+                    }
+                    return sess.getSessKey();
+                }
+            }
+
+            log.warn("No unexpired sessions found for customerId " + customerId);
+            return null;
+        } catch (Exception e)
+        {
+            log.error("Unexpected exception in getCustomerSessionIdByCustomerId", e);
+            return null;
         }
     }
 

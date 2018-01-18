@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2006-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -68,7 +68,9 @@ public class ChronoPayAction extends BaseGatewayAction
     private static final String cs2 = "cs2";
 
     // Transaction results
-    private static final String onetime = "onetime";
+    private static final String ONETIME = "onetime";
+
+    private static final String PURCHASE = "Purchase";
 
     // Return codes and descriptions
     private static final int RET0 = 0;
@@ -312,7 +314,9 @@ public class ChronoPayAction extends BaseGatewayAction
             // If successful, we update the inventory as well as changing the state of the
             // order.
             String comment = null;
-            if (transactionType != null && transactionType.equalsIgnoreCase(onetime))
+            if (transactionType != null
+                    && (transactionType.equalsIgnoreCase(ONETIME) || transactionType
+                            .equalsIgnoreCase(PURCHASE)))
             {
                 comment = ORDER_HISTORY_COMMENT_OK + transactionId;
                 kkAppEng.getEng().updateOrder(sessionId, ipnHistory.getOrderId(),

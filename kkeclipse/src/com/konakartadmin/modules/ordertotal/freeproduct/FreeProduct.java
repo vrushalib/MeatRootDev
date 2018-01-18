@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -79,7 +79,7 @@ public class FreeProduct extends OrderTotalModule
     {
         if (configs == null)
         {
-            configs = new KKConfiguration[7];
+            configs = new KKConfiguration[8];
         }
 
         if (configs[0] != null && !Utils.isBlank(configs[0].getConfigurationKey()))
@@ -100,7 +100,7 @@ public class FreeProduct extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -155,7 +155,7 @@ public class FreeProduct extends OrderTotalModule
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Calculate minimum order value on amount before tax",
+        /* title */"Calc min order value",
         /* key */"MODULE_ORDER_TOTAL_FREE_PRODUCT_APPLY_BEFORE_TAX",
         /* value */"custom4",
         /* description */"Determines whether the minimum order value is taken"
@@ -163,7 +163,7 @@ public class FreeProduct extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -175,6 +175,17 @@ public class FreeProduct extends OrderTotalModule
         /* sortO */i++,
         /* useFun */"invisible",
         /* setFun */"integer(1,null)",
+        /* dateAdd */now);
+
+        configs[i] = new KKConfiguration(
+        /* title */"Disable if prod out of stock",
+        /* key */"MODULE_ORDER_TOTAL_FREE_PRODUCT_APPLY_BEFORE_TAX",
+        /* value */"custom6",
+        /* description */"Determines whether the promotion is disabled if the "+"product is not in stock",
+        /* groupId */groupId,
+        /* sortO */i++,
+        /* useFun */"invisible",
+        /* setFun */"choice('true'='Yes','false'='No')",
         /* dateAdd */now);
 
         return configs;

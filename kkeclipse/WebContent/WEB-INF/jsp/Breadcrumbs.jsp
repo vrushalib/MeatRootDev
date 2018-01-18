@@ -18,7 +18,8 @@
 --%>
 <%@include file="Taglibs.jsp" %>
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
-
+<% com.konakart.al.ProductMgr prodMgr = kkEng.getProductMgr();%>
+<% prodMgr.saveNavigationForTimestamp();%>
  <div id="breadcrumbs">
 	<%if (kkEng.getNav().getNavigation().length > 0){%>
     	<span class="breadcrumb-item"><a href="Welcome.action"><kk:msg  key="header.top"/></a></span>

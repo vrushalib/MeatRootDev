@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -95,7 +95,7 @@ public class Flat extends ShippingModule
         int i = 0;
         configs[i++] = new KKConfiguration("Enable Flat Shipping", "MODULE_SHIPPING_FLAT_STATUS",
                 "True", "Do you want to offer flat rate shipping?", 6, 0, "",
-                "tep_cfg_select_option(array('True', 'False'),", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Shipping Cost", "MODULE_SHIPPING_FLAT_COST", "5.00",
                 "The shipping cost for all orders using this shipping method.", 6, 0, "", "", now);
         configs[i++] = new KKConfiguration("Tax Class", "MODULE_SHIPPING_FLAT_TAX_CLASS", "0",

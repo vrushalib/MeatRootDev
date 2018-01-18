@@ -34,6 +34,7 @@ import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.shipping.BaseShippingModule;
 import com.konakart.bl.modules.shipping.ShippingInfo;
 import com.konakart.bl.modules.shipping.ShippingInterface;
+import com.konakart.util.JavaUtils;
 import com.workingdogs.village.DataSetException;
 
 /**
@@ -122,8 +123,8 @@ public class Flat extends BaseShippingModule implements ShippingInterface
         checkForProducts(info);
 
         // Get the resource bundle
-        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap, info
-                .getLocale());
+        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap,
+                info.getLocale());
         if (rb == null)
         {
             throw new KKException("A resource file cannot be found for the country "
@@ -177,16 +178,39 @@ public class Flat extends BaseShippingModule implements ShippingInterface
         {
             staticData = new StaticData();
             staticDataHM.put(getStoreId(), staticData);
+        } else
+        {
+            if (!updateStaticVariablesNow(staticData.getLastUpdatedMS()))
+            {
+                return;
+            }
         }
 
         staticData.setSortOrder(getConfigurationValueAsIntWithDefault(
                 MODULE_SHIPPING_FLAT_SORT_ORDER, 0));
         staticData.setTaxClass(getConfigurationValueAsIntWithDefault(
                 MODULE_SHIPPING_FLAT_TAX_CLASS, 0));
-        staticData.setZone(getConfigurationValueAsIntWithDefault(
-                MODULE_SHIPPING_FLAT_ZONE, 0));
-        staticData.setCost(getConfigurationValueAsBigDecimalWithDefault(
-                MODULE_SHIPPING_FLAT_COST, new BigDecimal(0)));
+        staticData.setZone(getConfigurationValueAsIntWithDefault(MODULE_SHIPPING_FLAT_ZONE, 0));
+        staticData.setCost(getConfigurationValueAsBigDecimalWithDefault(MODULE_SHIPPING_FLAT_COST,
+                new BigDecimal(0)));
+
+        staticData.setLastUpdatedMS(System.currentTimeMillis());
+
+        if (log.isInfoEnabled())
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(JavaUtils.dumpAllStackTraces(".*JavaUtils.dumpAllStackTraces.*",
+                        "(.*AllStackTraces.*|.*java.lang.Thread..*)"));
+            }
+            String staticD = "Configuration data for " + code + " on " + getStoreId();
+            staticD += "\n\t\t SortOrder          = " + staticData.getSortOrder();
+            staticD += "\n\t\t taxClass           = " + staticData.getTaxClass();
+            staticD += "\n\t\t Cost               = " + staticData.getCost();
+            staticD += "\n\t\t Zone               = " + staticData.getZone();
+            staticD += "\n\t\t LastUpdated        = " + staticData.getLastUpdatedMS();
+            log.info(staticD);
+        }
     }
 
     /**
@@ -236,6 +260,26 @@ public class Flat extends BaseShippingModule implements ShippingInterface
 
         private BigDecimal cost;
 
+        // lastUpdatedMS
+        private long lastUpdatedMS = -1;
+
+        /**
+         * @return the lastUpdatedMS
+         */
+        public long getLastUpdatedMS()
+        {
+            return lastUpdatedMS;
+        }
+
+        /**
+         * @param lastUpdatedMS
+         *            the lastUpdatedMS to set
+         */
+        public void setLastUpdatedMS(long lastUpdatedMS)
+        {
+            this.lastUpdatedMS = lastUpdatedMS;
+        }
+        
         /**
          * @return the sortOrder
          */

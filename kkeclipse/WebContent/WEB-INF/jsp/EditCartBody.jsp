@@ -28,8 +28,14 @@
 <% com.konakart.al.ProductMgr prodMgr = kkEng.getProductMgr();%>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <% com.konakart.al.RewardPointMgr rewardPointMgr = kkEng.getRewardPointMgr();%>
-<% Boolean flag = false; // To check if cart contains only addon products %>
-<% final String addon = "addon"; %>
+
+<s:set scope="request" var="showEstimateWarning" value="showEstimateWarning"/> 
+<%boolean showEstimateWarning = (Boolean)(request.getAttribute("showEstimateWarning")); %>
+<s:set scope="request" var="couponCodeWarning" value="couponCodeWarning"/> 
+<%String couponCodeWarning = (String)(request.getAttribute("couponCodeWarning")); %>
+<s:set scope="request" var="giftCertCodeWarning" value="giftCertCodeWarning"/> 
+<%String giftCertCodeWarning = (String)(request.getAttribute("giftCertCodeWarning")); %>
+
 
 <script type="text/javascript">
 
@@ -49,12 +55,6 @@ $(function() {
 		    $("#form1 input[name='prodQty']").each(function() {
 		        $(this).rules("add", { required: true, digits: true, maxlength: 7 });
 		     }); 
-		}
- 	    
- 	   if ($("#continue-button").length ){
-			$("#addon-message").hide();
-		}else {
-			$("#addon-message").show();
 		}
 	
 		var qtyMap = {};
@@ -162,10 +162,29 @@ $(function() {
 				  redirect(getURL("EditCartSubmit.action", new Array("action","q","id",basketId,"qty",qty)));
 			  }
 		});
-		
+		$('.remove').click(function() {
+			  var elem = $(this);
+			  var id = this.id;
+			  var data = (id).split('-');
+			  var basketId = data[1];
+			  var productId = data[2];
+			  var productName = data[3];
+			  if (basketId == null) {
+				  document.getElementById('form1').submit();
+			  } else {
+				if (typeof(ga) != 'undefined' && ga != null){
+				  ga('ec:addProduct', {
+				    'id': productId,
+				    'name': productName
+				  });
+				  ga('ec:setAction', 'remove'); 
+				  ga('send', 'event', 'UX', 'click', 'remove from cart');  	
+				}
+				redirect(getURL("EditCartSubmit.action", new Array("action","r","id",basketId)));
+			  }
+		});
 	});
 </script>
-
    		<h1 id="page-title"><kk:msg  key="edit.cart.body.editcart"/></h1>
  	    		<div id="checkout-area" class="content-area rounded-corners">
 	    		<%if (currentCustomer.getBasketItems() == null || currentCustomer.getBasketItems().length == 0){ %>
@@ -178,7 +197,7 @@ $(function() {
 					        </s:iterator>  
 		    			</div>  
 					</s:if>		    		    		
-					<div id="addon-message" style="display: none;"><kk:msg key="edit.cart.body.addon"/></div><br>
+							    		
 		    		<form action="EditCartSubmit.action" id="form1" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 						<input type="hidden" name="goToCheckout" id="goToCheckout" value="" />
@@ -188,6 +207,7 @@ $(function() {
 	    						<tr>
 	    							<td class="narrow-col"><kk:msg  key="edit.cart.body.item"/></td>
 	    							<td class="wide-col"></td>
+	    							
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.price"/></td>
 	    							<td class="narrow-col right"><kk:msg  key="edit.cart.body.total"/></td>
 	    							<td class="narrow-col center"></td>
@@ -196,23 +216,20 @@ $(function() {
 	    					<tbody>
 								<% for (int k = 0; k < currentCustomer.getBasketItems().length; k++){ %>
 									<% BasketIf item = currentCustomer.getBasketItems()[k];%>
-									<%-- Check if cart contains only 'addon products'.If yes, user should not be able to checkout --%>
-									<% if(item.getProduct().getCustom1() == null || !item.getProduct().getCustom1().equalsIgnoreCase(addon)){
-										flag = true;
-									}%>
+									<% if (item.getProduct() == null) continue;%>
 		    						<tr>
 		    							<td>
 		    								<%if ((item.getQuantity() > item.getQuantityInStock()) && prodMgr.isStockCheck()) { %>
 													<div class="items-left red"><kk:msg  key="product.tile.out.of.stock"/></div>
 													<% outOfStock=true; %>
 											<% } %>
-		    								<img class="product-image" src="<%=kkEng.getProdImage(item.getProduct(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title="<%=item.getProduct().getName()%>"/>
+		    								<img class="product-image" src="<%=kkEng.getProdImage(item.getProduct(), item.getOpts(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title="<%=item.getProduct().getName()%>"/>
 		    							</td>
-		    							<td>		    								
+		    							<td class="basket-body">		    								
 		    								<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'  class="text-link"><%=item.getProduct().getName()%>
 		    									<kk:prodOptions options="<%=item.getOpts()%>"/>
 											</a>
-											<input type="text" class="qty-input" name="prodQty" id="q-<%=item.getId()%>" value="<%=item.getQuantity()%>">
+											<label><kk:msg  key="common.quantity"/></label><input type="text" class="qty-input" name="prodQty" id="q-<%=item.getId()%>" value="<%=item.getQuantity()%>">
 		    								<a id='<%="b-"+item.getId()%>' class="update-button small-rounded-corners"><kk:msg  key="common.update"/></a>
 		    								<span class="validation-msg"></span>
 		    							</td>
@@ -233,7 +250,7 @@ $(function() {
 				    						</td>
 											<td class="total-price right"><%=kkEng.formatPrice(item.getFinalPriceExTax())%></td>
 										<% } %>		    							
-		    							<td class="center"><a class="remove fa fa-times-circle" href='<%="EditCartSubmit.action?action=r&id="+item.getId()%>' title='<%=kkEng.getMsg("common.remove.item")%>'></a></td>
+		    							<td class="center"><a class="remove fa fa-times-circle" id='<%="r-"+item.getId()+"-"+item.getProduct().getId()+"-"+kkEng.removeSingleQuotes(item.getProduct().getName())%>' title='<%=kkEng.getMsg("common.remove.item")%>'></a></td>
 		    					    </tr>
 								<%}%>
 	    						<tr id="costs-and-promotions">
@@ -244,7 +261,7 @@ $(function() {
 													<label><kk:msg  key="checkout.common.couponcode"/></label>
 													<input type="text" name="couponCode" id="couponCode" value="<s:property value="couponCode" />"/>
 													<a id="couponCodeUpdate" class="update-button small-rounded-corners" onmouseover="resetGoToCheckout()"><kk:msg  key="common.update"/></a>
-													<span class="validation-msg"></span>
+													<span class="validation-msg"><%=couponCodeWarning%></span>
 												</div>
 											<% } %>
 											<%if (kkEng.getConfigAsBoolean("DISPLAY_GIFT_CERT_ENTRY",false)) { %>
@@ -252,7 +269,7 @@ $(function() {
 													<label><kk:msg  key="checkout.common.giftcertcode"/></label>
 													<input type="text" name="giftCertCode" id="giftCertCode" value="<s:property value="giftCertCode" />"/>
 													<a id="giftCertCodeUpdate" class="update-button small-rounded-corners" onmouseover="resetGoToCheckout()"><kk:msg  key="common.update"/></a>
-													<span class="validation-msg"></span>
+													<span class="validation-msg"><%=giftCertCodeWarning%></span>
 												</div>
 											<% } %>
 											<%if (kkEng.getConfigAsBoolean("ENABLE_REWARD_POINTS",false)) { %>			
@@ -283,7 +300,7 @@ $(function() {
 																<%}%>
 															</td>
 															<td class="cost-overview-amounts right">
-																<%if (ot.getClassName().equals("ot_reward_points")){%>
+																<%if (ot.getClassName().equals("ot_reward_points") || ot.getClassName().equals("ot_product_reward_points")){%>
 																	<%=ot.getValue()%><br/>
 																<%}else if (ot.getClassName().equals("ot_free_product")){%>
 																	<%=ot.getText()%><br/>
@@ -309,17 +326,16 @@ $(function() {
 												</tr>		    																		
 	    									</table>										
 										<% } %>
+										<%if (showEstimateWarning){ %>
+											<div class="cart-total-warning"><kk:msg  key="edit.cart.body.estimates"/></div>
+										<% } %>
 	    							</td>
 									<td></td>
 	    						</tr>	    						
 	    					</tbody>	    				
 	    				</table>
 						<div >
-						<%if(flag == true){ %>
-							<a onmouseover="setGoToCheckout()" onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.checkout"/></span></a>
-						<%}else{ %>
-							<a href="welcome.action" id="back-button" class="button small-rounded-corners"><span><kk:msg  key="common.back"/></span></a>
-						<%}%>						
+							<a onmouseover="setGoToCheckout()" onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.checkout"/></span></a>						
 						</div>
 					</form>		
 				<% } %>	    	

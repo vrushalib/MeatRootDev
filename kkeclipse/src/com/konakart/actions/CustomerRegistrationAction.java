@@ -42,6 +42,8 @@ public class CustomerRegistrationAction extends BaseAction
 
     private String emailAddr;
 
+    private String username;
+
     private String telephoneNumber;
 
     private String telephoneNumber1;
@@ -70,7 +72,7 @@ public class CustomerRegistrationAction extends BaseAction
     private int productNotifications;
 
     private String company;
-    
+
     private String taxId;
 
     private String streetAddress;
@@ -110,12 +112,14 @@ public class CustomerRegistrationAction extends BaseAction
     private boolean allowNoRegister = false;
 
     private boolean forceReg = false;
-    
+
     /**
      * Entry point when country has been changed but in force registration mode
+     * 
      * @return Returns the output of the execute method
      */
-    public String forceRegistration(){
+    public String forceRegistration()
+    {
         forceReg = true;
         return execute();
     }
@@ -797,11 +801,29 @@ public class CustomerRegistrationAction extends BaseAction
     }
 
     /**
-     * @param taxId the taxId to set
+     * @param taxId
+     *            the taxId to set
      */
     public void setTaxId(String taxId)
     {
         this.taxId = taxId;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername()
+    {
+        return username;
+    }
+
+    /**
+     * @param username
+     *            the username to set
+     */
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 
 }

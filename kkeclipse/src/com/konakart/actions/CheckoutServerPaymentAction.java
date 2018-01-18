@@ -72,7 +72,7 @@ public class CheckoutServerPaymentAction extends BaseAction
                 int orderId;
                 try
                 {
-                    orderId = new Integer(orderIdStr).intValue();
+                    orderId = Integer.parseInt(orderIdStr);
                 } catch (Exception e)
                 {
                     if (log.isDebugEnabled())
@@ -87,7 +87,8 @@ public class CheckoutServerPaymentAction extends BaseAction
                 kkAppEng.getCustomerMgr().loginBySession(sessionId);
 
                 // get the order
-                OrderIf o = kkAppEng.getEng().getOrder(sessionId, orderId, kkAppEng.getLangId());
+                OrderIf o = kkAppEng.getEng().getOrderWithOptions(sessionId, orderId,
+                        kkAppEng.getLangId(), kkAppEng.getOrderMgr().getFetchOrderOptions());
                 if (o == null)
                 {
                     if (log.isDebugEnabled())
@@ -97,13 +98,12 @@ public class CheckoutServerPaymentAction extends BaseAction
                     }
                     return null;
                 }
-                
+
                 // Get a fully populated PaymentDetails object and attach it to the order
                 PaymentDetailsIf pd = kkAppEng.getEng().getPaymentDetails(sessionId,
-                        o.getPaymentModuleCode(), orderId, null,
-                        kkAppEng.getLangId());
-                o.setPaymentDetails(pd);                                
-                kkAppEng.getOrderMgr().setCheckoutOrder(o);                               
+                        o.getPaymentModuleCode(), orderId, null, kkAppEng.getLangId());
+                o.setPaymentDetails(pd);
+                kkAppEng.getOrderMgr().setCheckoutOrder(o);
             }
 
             custId = this.loggedIn(request, response, kkAppEng, "Checkout");

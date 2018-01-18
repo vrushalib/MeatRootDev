@@ -25,8 +25,11 @@
 <% com.konakart.al.RewardPointMgr rewardPointMgr = kkEng.getRewardPointMgr();%>
 <% com.konakart.appif.DigitalDownloadIf[] downloads = productMgr.getDigitalDownloads();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
+<% boolean canChangeAddress = customerMgr.isCanChangeAddress();%>
+<% com.konakart.appif.CustomerIf adminUser = kkEng.getAdminUser();%>
 
  		<%boolean manageCCAuthNetSIM=kkEng.getConfigAsBoolean("MODULE_PAYMENT_AUTHORIZENET_ENABLE_CIM", false, false); %>
+ 		<%boolean manageCCSagePaymentsJS=kkEng.getConfigAsBoolean("MODULE_PAYMENT_SAGEPAYMENTSJS_USE_VAULT", false, false); %>
    		<h1 id="page-title"><kk:msg  key="after.login.body.myaccountinfo"/></h1>
 	    		<div id="my-account" class="content-area rounded-corners">
 	    			<s:if test="hasActionErrors()">
@@ -50,9 +53,16 @@
 	    					</div>	
 							<div class="my-account-area-content">
 							<%if (cust.getAddresses() != null && cust.getAddresses().length > 0){ %>
-								<%=kkEng.removeCData(cust.getAddresses()[0].getFormattedAddress())%>
-								<br/><br/><%=cust.getEmailAddr() %>
-								<br/><%=cust.getTelephoneNumber() %>
+								<%if (customerMgr.isNoAddress()){ %>
+									<%=cust.getEmailAddr() %><br/>
+									<a href="FirstAddr.action" class="text-link"><kk:msg  key="after.login.body.add.address"/></a>									
+								<% } else { %>
+									<%=kkEng.removeCData(cust.getAddresses()[0].getFormattedAddress())%>
+									<br/><br/><%=cust.getEmailAddr() %>
+								<% } %>
+								<%if (!customerMgr.isNoTelephone()){ %>
+									<br/><%=cust.getTelephoneNumber() %>
+								<% } %>
 							<% } %>
 							</div>	
 						</div>	
@@ -112,14 +122,17 @@
 					    							<td class="last-order-icons">
 					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
 					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
-					    							<%--	<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
+					    								<a class="text-link fa fa-truck order-action" title='<%=kkEng.getMsg("common.track")%>'></a>	
 													<%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
 														<%} else {%>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
-													<% } %> --%>
+													<% } %>
+													<%if (adminUser != null && kkEng.getConfigAsBoolean("ALLOW_EDIT_ORDER",false)) {%>	
+															<a title='<%=kkEng.getMsg("common.edit")%>' class="text-link fa fa-edit order-action" href='<%="EditOrder.action?orderId="+order.getId()%>'></a>
+													<% } %>
 													</td>
 					    						</tr>
 				    						</tbody>
@@ -165,14 +178,17 @@
 					    							<td class="last-order-icons">
 					    								<a class="text-link fa fa-eye order-action" title='<%=kkEng.getMsg("common.view")%>' href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'></a>
 					    								<a class="text-link fa fa-repeat order-action" title='<%=kkEng.getMsg("common.repeat")%>' href='<%="RepeatOrder.action?orderId="+order.getId()%>'></a>
-					    						<%--		<a class="text-link fa fa-truck order-actio" title='<%=kkEng.getMsg("common.track")%>'></a>	
+					    								<a class="text-link fa fa-truck order-action" title='<%=kkEng.getMsg("common.track")%>'></a>	
 													<%if (enableInvoice) {%>	
 														<%if (kkEng.isPortlet()){ %>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'></a>
 														<%} else {%>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
-													<% } %> --%>
+													<% } %>
+													<%if (adminUser != null && kkEng.getConfigAsBoolean("ALLOW_EDIT_ORDER",false)) {%>	
+															<a title='<%=kkEng.getMsg("common.edit")%>' class="text-link fa fa-edit order-action" href='<%="EditOrder.action?orderId="+order.getId()%>'></a>
+													<% } %>
 													</td>
 					    						</tr>
 				    						</tbody>
@@ -223,13 +239,24 @@
 							<div id="addressbook" class="my-account-area">
 								<h3><kk:msg  key="after.login.body.personal.information"/></h3>
 								<div class="my-account-area-content">
+								<%if (kkEng.getCustomerMgr().getLoginType() != null && 
+									(customerMgr.getLoginType().equals(com.konakart.al.CustomerMgr.FACEBOOK) 
+									|| customerMgr.getLoginType().equals(com.konakart.al.CustomerMgr.GOOGLEPLUS)  
+									|| customerMgr.getLoginType().equals(com.konakart.al.CustomerMgr.PAYPAL))) { %>
+									<a href="#" id="send-password-link" class="text-link"><kk:msg  key="after.login.body.sendpassword"/></a>
+								<% } %>	
 									<a href="EditEmail.action" class="text-link"><kk:msg  key="after.login.body.changeemail"/></a>
 									<a href="ChangePassword.action" class="text-link"><kk:msg  key="after.login.body.changepassword"/></a>
 									<a href="EditCustomer.action" class="text-link"><kk:msg  key="after.login.body.changeaccountinfo"/></a>
-									<a href="AddressBook.action" class="text-link"><kk:msg  key="after.login.body.changeaddrbook"/></a>
+									<%if (!customerMgr.isNoAddress() && customerMgr.isCanChangeAddress()){ %>
+										<a href="AddressBook.action" class="text-link"><kk:msg  key="after.login.body.changeaddrbook"/></a>
+									<% } %>									
 									<%if (manageCCAuthNetSIM) { %>
 										<a href="AuthorizeNetManageCreditCards.action" id="authNetManageCreditCards" class="text-link"><kk:msg  key="after.login.body.manageCreditCards"/></a>
 								    <% } %>
+									<%if (manageCCSagePaymentsJS) { %>
+										<a href="SagePaymentsJSManageVault.action" class="text-link"><kk:msg  key="after.login.body.manageCreditCards"/></a>
+								    <% } %>									
 								</div>
 							</div>
 							<%if (rewardPointMgr.isEnabled()) { %>				
@@ -322,4 +349,68 @@
 										
 					<div id="divAuthorizeNetPopupScreen" style="display:none;"></div>
 					
-			    <% } %>    		
+			    <% } %>    
+
+  	    	<div id="send-email-dialog" title="<kk:msg  key="after.login.body.confirmation"/>" class="content-area rounded-corners">
+	    		<div>
+					<div class="form-section">
+						<div class="form-section-title no-margin">
+							<kk:msg  key="after.login.body.sendpassword.confirmation" arg0="<%=cust.getEmailAddr()%>"/>									
+						</div>
+						<div class="confirm-dialog-buttons">
+							<a onclick='closeConfirmDialog();' class="button small-rounded-corners">
+								<span ><kk:msg  key="common.close"/></span>
+							</a>															
+							<a onclick='sendEmail();' class="button small-rounded-corners">
+								<span ><kk:msg  key="common.confirm"/></span>
+							</a>
+						</div>															
+					</div>
+		    	</div>
+		    </div>
+		    
+			<form action="ForgotPasswordSubmit.action" id='sendPasswordForm' method="post">
+				<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
+				<input id="emailAddr" name="emailAddr" type="hidden"/>
+			</form>
+
+
+<script type="text/javascript">	
+
+function closeConfirmDialog() {
+	$("#send-email-dialog").dialog('close');
+}
+
+function sendEmail() {
+	document.getElementById('emailAddr').value = "<%=cust.getEmailAddr()%>";
+	document.getElementById('sendPasswordForm').submit();
+}
+
+$(function() {
+	
+    if ($("#form1").length) {
+		$("#form1").validate(validationRules);
+	}
+		
+	$("#send-email-dialog").dialog({
+		autoOpen: false,
+		width: "90%",
+		modal: "true",
+		hide: "blind",
+		open: function( event, ui ) {
+			var width = $( "#send-email-dialog" ).width();
+			if (width > 400) {
+				$( "#send-email-dialog" ).dialog( "option", "width", 400 );
+			}
+		}
+	});
+	
+	$("#send-password-link").click(function() {
+		$("#send-email-dialog").dialog( "open" );
+		return false;
+	});
+	
+});
+
+</script>
+			    		

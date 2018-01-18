@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -84,7 +84,7 @@ public class PickUpInStore extends ShippingModule
         int i = 0;
         configs[i++] = new KKConfiguration("Enable Pick up in Store", "MODULE_SHIPPING_PICKUP_IN_STORE_STATUS",
                 "True", "Do you want to offer Pick up in Store?", 6, 0, "",
-                "choice('True', 'False'),", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Sort Order", "MODULE_SHIPPING_PICKUP_IN_STORE_SORT_ORDER", "0",
                 "Sort order of display.", 6, 0, "", "", now);
 

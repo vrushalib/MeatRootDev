@@ -162,7 +162,11 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
                     {
                         PaymentInterface paymentModule = getPaymentModuleForName(moduleName);
                         paymentModule.setStaticVariables();
-                    } catch (Exception e)
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Created Payment Module : " + moduleName);
+                        }
+                    } catch (Throwable e)
                     {
                         log.error("Could not instantiate the Payment Module " + moduleName
                                 + " in order to refresh its configuration.", e);
@@ -252,7 +256,7 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
                 for (int p = 0; p < paymentDetails.length; p++)
                 {
                     PaymentDetails pd = paymentDetails[p];
-                    if (pd.getSubCode().equals(subCode))
+                    if (pd.getSubCode() != null && pd.getSubCode().equals(subCode))
                     {
                         if (log.isDebugEnabled())
                         {
@@ -644,7 +648,6 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
      */
     protected void addCurrencyToOrder(Order order) throws Exception
     {
-
         // Ensure that the currency object is instantiated
         if (order.getCurrency() == null)
         {
@@ -704,9 +707,9 @@ public class PaymentMgr extends BaseMgr implements PaymentMgrIf
      * @throws InvocationTargetException
      * @throws ClassNotFoundException
      */
-    protected PaymentInterface getPaymentModuleForName(String moduleName) throws IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException,
-            ClassNotFoundException
+    protected PaymentInterface getPaymentModuleForName(String moduleName)
+            throws IllegalArgumentException, InstantiationException, IllegalAccessException,
+            InvocationTargetException, ClassNotFoundException
     {
         Class<?> paymentModuleClass = Class.forName(moduleName);
         PaymentInterface paymentModule = null;

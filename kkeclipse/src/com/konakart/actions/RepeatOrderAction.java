@@ -81,7 +81,7 @@ public class RepeatOrderAction extends BaseAction
             try
             {
                 kkAppEng.getOrderMgr().repeatOrder(orderId, /* addToCurrentBasket */false, /* copyCustomFields */
-                true);
+                true, /* edit */false);
 
                 /*
                  * The order just created is in kkAppEng.getOrderMgr().getCheckoutOrder(). The
@@ -91,7 +91,7 @@ public class RepeatOrderAction extends BaseAction
 
                 // Customize an address
                 // kkAppEng.getOrderMgr().getCheckoutOrder().setBillingFormattedAddress(
-                // "Peter Smith<br>12, Sunny Lane,<br>Stoke On Trent,<br>Staffs");
+                // "Peter Smith<br>12, Sunny Lane,<br>Stoke On Trent,<br>Staffordshire");
             } catch (KKNotInStockException e)
             {
                 return "ShowCart";

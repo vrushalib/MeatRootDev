@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2006-2017 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -30,7 +30,6 @@ import com.konakart.al.KKAppException;
  */
 public class WriteReviewAction extends BaseAction
 {
-
     private static final long serialVersionUID = 1L;
 
     public String execute()
@@ -62,7 +61,7 @@ public class WriteReviewAction extends BaseAction
                         "The product Id for the review cannot be set to null because the selectedProduct is also set to null");
             } else if (prodId != null && kkAppEng.getProductMgr().getSelectedProduct() != null)
             {
-                int prodIdInt = new Integer(prodId).intValue();
+                int prodIdInt = Integer.parseInt(prodId);
 
                 if (kkAppEng.getProductMgr().getSelectedProduct().getId() != prodIdInt)
                 {
@@ -70,7 +69,7 @@ public class WriteReviewAction extends BaseAction
                 }
             } else if (prodId != null && kkAppEng.getProductMgr().getSelectedProduct() == null)
             {
-                kkAppEng.getProductMgr().fetchSelectedProduct(new Integer(prodId).intValue());
+                kkAppEng.getProductMgr().fetchSelectedProduct(Integer.parseInt(prodId));
             }
 
             // Ensure we are using the correct protocol. Redirect if not.
@@ -91,6 +90,5 @@ public class WriteReviewAction extends BaseAction
         {
             return super.handleException(request, e);
         }
-
     }
 }

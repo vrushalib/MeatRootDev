@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -99,7 +99,7 @@ public class BuyXGetYFree extends OrderTotalModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"",
-                /* setFun */"choice('True', 'False')",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -152,7 +152,7 @@ public class BuyXGetYFree extends OrderTotalModule
                 /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Apply discount before tax",
+        /* title */"Apply discount",
         /* key */"MODULE_ORDER_TOTAL_BUY_X_GET_Y_FREE_APPLY_BEFORE_TAX",
         /* value */"custom4",
         /* description */"Determines whether all calculations are"
@@ -160,7 +160,7 @@ public class BuyXGetYFree extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         return configs;

@@ -185,6 +185,12 @@ public class CommideaVanguard extends BasePaymentModule implements PaymentInterf
         {
             staticData = new StaticData();
             staticDataHM.put(getStoreId(), staticData);
+        } else
+        {
+            if (!updateStaticVariablesNow(staticData.getLastUpdatedMS()))
+            {
+                return;
+            }
         }
 
         conf = getConfiguration(MODULE_PAYMENT_COMMIDEA_VANGUARD_REQUEST_URL);
@@ -376,21 +382,64 @@ public class CommideaVanguard extends BasePaymentModule implements PaymentInterf
         }
         staticData.setCountryCode(countryCode);
 
-        Boolean getTokenId = getConfigurationValueAsBool(
-                MODULE_PAYMENT_COMMIDEA_VANGUARD_RETURN_TOKEN_ID, false);
-        if (getTokenId == null)
+        conf = getConfiguration(MODULE_PAYMENT_COMMIDEA_VANGUARD_RETURN_TOKEN_ID);
+        if (conf == null || conf.getValue() == null || !(conf.getValue().equalsIgnoreCase("true")
+                || conf.getValue().equalsIgnoreCase("false")))
         {
             throw new KKException(
                     "The Configuration MODULE_PAYMENT_COMMIDEA_VANGUARD_RETURN_TOKEN_ID must be set "
                             + "to true or false.");
         }
-        staticData.setGetTokenId(getTokenId.booleanValue());
+        boolean getTokenId = getConfigurationValueAsBool(
+                MODULE_PAYMENT_COMMIDEA_VANGUARD_RETURN_TOKEN_ID, false);
 
-        staticData.setSortOrder(getConfigurationValueAsIntWithDefault(
-                MODULE_PAYMENT_COMMIDEA_VANGUARD_ZONE, 0));
+        staticData.setGetTokenId(getTokenId);
+
+        staticData.setSortOrder(
+                getConfigurationValueAsIntWithDefault(MODULE_PAYMENT_COMMIDEA_VANGUARD_ZONE, 0));
 
         staticData.setSortOrder(getConfigurationValueAsIntWithDefault(
                 MODULE_PAYMENT_COMMIDEA_VANGUARD_SORT_ORDER, 0));
+
+        staticData.setLastUpdatedMS(System.currentTimeMillis());
+
+        if (log.isInfoEnabled())
+        {
+            if (log.isDebugEnabled())
+            {
+                // Uncomment to see stack
+                // log.debug(JavaUtils.dumpAllStackTraces(".*JavaUtils.dumpAllStackTraces.*",
+                // "(.*AllStackTraces.*|.*java.lang.Thread..*)"));
+            }
+            String staticD = "Configuration data for " + COMMIDEA_VANGUARD_GATEWAY_CODE + " on "
+                    + getStoreId();
+            staticD += "\n\t\t Enabled?               = " + isAvailable();
+            staticD += "\n\t\t SortOrder              = " + staticData.getSortOrder();
+            staticD += "\n\t\t 3D Redirect URL        = " + staticData.getRedirectUrl3D();
+            staticD += "\n\t\t CC Redirect URL        = " + staticData.getRedirectUrlCC();
+            staticD += "\n\t\t Request URL            = " + staticData.getRequestUrl();
+            staticD += "\n\t\t CC Post URL            = " + staticData.getCcDetailPostUrl();
+            staticD += "\n\t\t System Id              = " + staticData.getSystemId();
+            staticD += "\n\t\t System GUID            = " + staticData.getSystemGuid();
+            staticD += "\n\t\t Passcode               = " + staticData.getPasscode();
+            staticD += "\n\t\t Account Id             = " + staticData.getAccountId();
+            staticD += "\n\t\t Account Passcode       = " + staticData.getAccountPasscode();
+            staticD += "\n\t\t Currency Code          = " + staticData.getCurrencyCode();
+            staticD += "\n\t\t Merchant URL           = " + staticData.getMerchantURL();
+            staticD += "\n\t\t Merchant Name          = " + staticData.getMerchantName();
+            staticD += "\n\t\t Procesing Identifier   = " + staticData.getProcessingIdentifier();
+            staticD += "\n\t\t Acquirer Id            = " + staticData.getAcquirerId();
+            staticD += "\n\t\t VISA Merchant Bank Id  = " + staticData.getVisaBankId();
+            staticD += "\n\t\t VISA Merchant Number   = " + staticData.getVisaNumber();
+            staticD += "\n\t\t VISA Merchant Password = " + staticData.getVisaPassword();
+            staticD += "\n\t\t MC Merchant Bank Id    = " + staticData.getMcBankId();
+            staticD += "\n\t\t MC Merchant Number     = " + staticData.getMcNumber();
+            staticD += "\n\t\t MC Merchant Password   = " + staticData.getMcPassword();
+            staticD += "\n\t\t Return Token Id        = " + staticData.getTokenId;
+            staticD += "\n\t\t Zone                   = " + staticData.getZone();
+            staticD += "\n\t\t LastUpdated            = " + staticData.getLastUpdatedMS();
+            log.info(staticD);
+        }
     }
 
     /**
@@ -472,10 +521,10 @@ public class CommideaVanguard extends BasePaymentModule implements PaymentInterf
         parmList.add(new NameValue("mkaccountid", sd.getAccountId()));
         parmList.add(new NameValue("accountpasscode", sd.getAccountPasscode()));
         parmList.add(new NameValue("ccDetailPostUrl", sd.getCcDetailPostUrl()));
-        parmList.add(new NameValue("returnurl", sd.getRedirectUrlCC().replaceFirst(
-                hostPortSubstitute, info.getHostAndPort())));
-        parmList.add(new NameValue("TermUrl", sd.getRedirectUrl3D().replaceFirst(
-                hostPortSubstitute, info.getHostAndPort())));
+        parmList.add(new NameValue("returnurl",
+                sd.getRedirectUrlCC().replaceFirst(hostPortSubstitute, info.getHostAndPort())));
+        parmList.add(new NameValue("TermUrl",
+                sd.getRedirectUrl3D().replaceFirst(hostPortSubstitute, info.getHostAndPort())));
         parmList.add(new NameValue("transactioncurrencycode", sd.getCurrencyCode()));
         parmList.add(new NameValue("currencycode", sd.getCurrencyCode()));
         parmList.add(new NameValue("terminalcountrycode", sd.getCountryCode()));
@@ -587,6 +636,9 @@ public class CommideaVanguard extends BasePaymentModule implements PaymentInterf
         private String mcPassword;
 
         private boolean getTokenId;
+
+        // lastUpdatedMS
+        private long lastUpdatedMS = -1;
 
         /**
          * @return the sortOrder
@@ -1011,6 +1063,16 @@ public class CommideaVanguard extends BasePaymentModule implements PaymentInterf
         public void setGetTokenId(boolean getTokenId)
         {
             this.getTokenId = getTokenId;
+        }
+
+        public long getLastUpdatedMS()
+        {
+            return lastUpdatedMS;
+        }
+
+        public void setLastUpdatedMS(long lastUpdatedMS)
+        {
+            this.lastUpdatedMS = lastUpdatedMS;
         }
     }
 }

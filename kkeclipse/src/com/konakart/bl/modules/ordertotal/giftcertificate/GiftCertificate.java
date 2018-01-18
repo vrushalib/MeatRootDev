@@ -221,6 +221,8 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
                 }
 
                 ot = new OrderTotal();
+                ot.setPromotionId(promotion.getId());
+                ot.setDiscountAmount(discountApplied);
                 ot.setSortOrder(sd.getSortOrder());
                 ot.setClassName(code);
                 ot.setPromotions(new Promotion[]
@@ -282,41 +284,12 @@ public class GiftCertificate extends BaseOrderTotalModule implements OrderTotalI
                 // Title looks like "10EUR Gift Certificate:"
                 ot.setTitle(formattedDiscount + " "
                         + rb.getString(MODULE_ORDER_TOTAL_GIFT_CERTIFICATE_TITLE));
-
-                /*
-                 * We need to reduce the tax amount. This is done differently depending on whether
-                 * the discount is applied to the amount before or after tax.
-                 */
-                BigDecimal total = null;
-                if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
-                        && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
-                {
-                    // Use total including shipping cost
-                    total = order.getTotalExTax();
-                } else
-                {
-                    // Use subtotal that doesn't include shipping
-                    total = order.getSubTotalExTax();
-                }
-
-                if (total != null && total.compareTo(new BigDecimal(0)) != 0
-                        && order.getTax() != null)
-                {
-                    int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
-                    BigDecimal averageTaxRate = order.getTax().divide(total, 6,
-                            BigDecimal.ROUND_HALF_UP);
-                    if (applyBeforeTax)
-                    {
-                        // Calculate the tax discount based on the average tax
-                        BigDecimal taxDiscount = discountApplied.multiply(averageTaxRate);
-                        taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
-                        ot.setTax(taxDiscount);
-                    } else
-                    {
-                        ot.setTax(getTaxFromTotal(discountApplied, averageTaxRate, scale));
-                    }
-                }
-
+                
+                // Get the tax portion of the discount
+                int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+                BigDecimal tax = getTaxForDiscount(order, discountApplied, scale, applyBeforeTax);
+                ot.setTax(tax);
+                
                 myOrderTotalList.add(ot);
             }
         } else

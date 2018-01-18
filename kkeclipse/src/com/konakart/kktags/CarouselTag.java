@@ -137,6 +137,7 @@ public class CarouselTag extends BaseTag
                 append(sb, "}", debug);
                 append(sb, "});", debug);
                 append(sb, "});", debug);
+
                 append(sb, "</script>", debug);
 
                 /*
@@ -146,13 +147,7 @@ public class CarouselTag extends BaseTag
                 append(sb, "<div class=\"item-area wide rounded-corners\">", debug);
                 append(sb, "<div class=\"item-area-header\">", debug);
                 append(sb, "<h2 class=\"item-area-title\">", debug);
-				if (prods[0].getCategoryId() > 0) {
-					append(sb, "<a href=\"SelectCat.action?catId="+ prods[0].getCategoryId() + "\">", debug);
-					append(sb, title, debug);
-					append(sb, "</a>", debug);
-				} else {
-					append(sb, title, debug);
-				}
+                append(sb, title, debug);
                 append(sb, "</h2>", debug);
 
                 append(sb, "<div class=\"item-area-navigation jcarousel-wrapper\">", debug);

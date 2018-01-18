@@ -31,13 +31,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.SessionAware;
 import org.apache.struts2.portlet.context.PortletActionContext;
 
+import com.google.common.html.HtmlEscapers;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppEng.SessionCheckData;
 import com.konakart.al.KKAppException;
@@ -49,7 +49,9 @@ import com.konakart.appif.CustomerEventIf;
 import com.konakart.appif.CustomerIf;
 import com.konakart.appif.CustomerTagIf;
 import com.konakart.appif.KKCookieIf;
+import com.konakart.appif.LoginResultIf;
 import com.konakart.bl.ConfigConstants;
+import com.konakart.liferay.SingleSignOnIf;
 import com.konakart.servlet.AppEngServlet;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
@@ -234,11 +236,13 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
 
             // Insert event
             insertCustomerEvent(kkAppEng, ACTION_NEW_CUSTOMER_VISIT);
+
         }
 
         kkAppEng.setPageTitle(kkAppEng.getMsg("seo.default.title"));
         kkAppEng.setMetaDescription(kkAppEng.getMsg("seo.default.meta.description"));
         kkAppEng.setMetaKeywords(kkAppEng.getMsg("seo.default.meta.keywords"));
+        kkAppEng.getMetaList().clear();
 
         /* Save a copy in the base action */
         appEng = kkAppEng;
@@ -259,14 +263,34 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
     private String getStoreIdFromRequest(HttpServletRequest request)
     {
         /*
-         * If the server name could contain store1.localhost or store2.localhost which both point to
-         * localhost, we could get the store id from the server name.
+         * In multi-store mode we extract the storeId from the serverName attribute of the request.
+         * In this simple implementation we look for "storeX.store." and return the first part
+         * (storeX in this example) as the storeId.
          */
-        /*
-         * if (request != null && request.getServerName() != null) { String[] nameArray =
-         * request.getServerName().split("\\."); if (nameArray.length > 1) { String storeId =
-         * nameArray[0]; return storeId; } }
-         */
+        if (log.isDebugEnabled())
+        {
+            log.debug("Multistore : " + AppEngServlet.isMultiStore());
+        }
+
+        if (AppEngServlet.isMultiStore())
+        {
+            if (request != null && request.getServerName() != null)
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("ServerName : " + request.getServerName());
+                }
+                String[] nameArray = request.getServerName().split("\\.");
+                if (nameArray.length >= 2 && nameArray[1].equals("store"))
+                {
+                    if (log.isInfoEnabled())
+                    {
+                        log.info("Use engine for store : " + nameArray[0]);
+                    }
+                    return nameArray[0];
+                }
+            }
+        }
 
         return AppEngServlet.getDefaultStoreId();
     }
@@ -380,55 +404,65 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
             KKAppEng kkAppEng, String forwardAfterLogin, boolean checkXSRF, String xsrfToken)
             throws KKException, KKAppException
     {
-        // If the session is null, set the forward and return a negative number.
-        if ((kkAppEng.getSessionId() == null))
-        {
-            if (forwardAfterLogin != null)
-            {
-                kkAppEng.setForwardAfterLogin(forwardAfterLogin);
-            }
-            return -1;
-        }
 
         int custId;
-        if (kkAppEng.getSessionCheckData().needToCheck())
+        if (kkAppEng.isPortlet() && kkAppEng.getLiferaySSO() != null)
         {
-        // If an exception is thrown, set the forward and return it
-            if (log.isDebugEnabled())
-            {
-                log.debug("Calling checkSession on KKEng");
-            }
-        try
-        {
-            custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
-                SessionCheckData scd = kkAppEng.getSessionCheckData();
-                scd.setCustId(custId);
-                scd.setCheckTime(System.currentTimeMillis());
-        } catch (KKException e)
-        {
-            log.debug(e.getMessage());
-            if (forwardAfterLogin != null)
-            {
-                kkAppEng.setForwardAfterLogin(forwardAfterLogin);
-            }
-
-            kkAppEng.getCustomerMgr().logout();
-
-            // Ensure that the guest customer is the one in the cookie
-            manageCookieLogout(request, response, kkAppEng);
-
-            return -1;
-        }
+            SingleSignOnIf liferaySSO = kkAppEng.getLiferaySSO();
+            custId = liferaySSO.getCustomerId(kkAppEng);
         } else
         {
-            if (log.isDebugEnabled())
+
+            // If the session is null, set the forward and return a negative number.
+            if ((kkAppEng.getSessionId() == null))
             {
-                log.debug("Using cached sessionId");
+                if (forwardAfterLogin != null)
+                {
+                    kkAppEng.setForwardAfterLogin(forwardAfterLogin);
+                }
+                return -1;
             }
-            custId = kkAppEng.getSessionCheckData().getCustId();
+
+            if (kkAppEng.getSessionCheckData().needToCheck())
+            {
+                // If an exception is thrown, set the forward and return it
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Calling checkSession on KKEng");
+                }
+                try
+                {
+                    custId = kkAppEng.getEng().checkSession(kkAppEng.getSessionId());
+                    SessionCheckData scd = kkAppEng.getSessionCheckData();
+                    scd.setCustId(custId);
+                    scd.setCheckTime(System.currentTimeMillis());
+                } catch (KKException e)
+                {
+                    log.debug(e.getMessage());
+                    if (forwardAfterLogin != null)
+                    {
+                        kkAppEng.setForwardAfterLogin(forwardAfterLogin);
+                    }
+
+                    kkAppEng.getCustomerMgr().logout();
+
+                    // Ensure that the guest customer is the one in the cookie
+                    manageCookieLogout(request, response, kkAppEng);
+
+                    return -1;
+                }
+            } else
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Using cached sessionId");
+                }
+                custId = kkAppEng.getSessionCheckData().getCustId();
+            }
         }
 
-        // Check the XSRF token for a post. Don't check anything we are redirected to after a login
+        // Check the XSRF token for a post. Don't check anything we are redirected to after a
+        // login
         // since the token wasn't available at the time of the post
         if (kkAppEng.getXsrfToken() != null && checkXSRF && request.getServletPath() != null
                 && !request.getServletPath().contains("LoginSubmit"))
@@ -437,15 +471,11 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
             if (method != null && method.equalsIgnoreCase("POST"))
             {
                 String token = (xsrfToken != null) ? xsrfToken : request.getParameter("xsrf_token");
-                //Check if a request is from PayU
-                if(request.getParameter("udf1") != null && token == null){
-                	System.out.println("Payu response call login");
-                	return custId;
+                if (token == null || !token.equals(kkAppEng.getXsrfToken()))
+                {
+                    log.warn("Possible XSRF attack for customer with id = " + custId);
+                    return -1;
                 }
-                if(token == null || !token.equals(kkAppEng.getXsrfToken())){
-	                    log.warn("Possible XSRF attack for customer with id = " + custId);
-	                    return -1;
-	           }
             }
         }
 
@@ -1161,30 +1191,29 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
      * 
      * @param kkAppEng
      * @param request
-     * @param emailAddr
+     * @param loginUsername
      * @param password
-     * @return Return the session id
+     * @return Return a LoginResult object containing the session id if successful
      * @throws KKException
      * @throws KKAppException
      */
-    protected String login(KKAppEng kkAppEng, HttpServletRequest request, String emailAddr,
+    protected LoginResultIf login(KKAppEng kkAppEng, HttpServletRequest request, String loginUsername,
             String password) throws KKException, KKAppException
     {
         if (!kkAppEng.isPortlet())
         {
-        // Change the session
-        changeSession(request);
+            // Change the session
+            changeSession(request);
 
             // Set this session to null to avoid struts interceptors from throwing an exception
-            // because
-        // the session is invalid
-        ActionContext context = ActionContext.getContext();
-        context.setSession(null);
+            // because the session is invalid
+            ActionContext context = ActionContext.getContext();
+            context.setSession(null);
         }
 
         // Login and return the new session
-        String sessionId = kkAppEng.getCustomerMgr().login(emailAddr, password);
-        return sessionId;
+        LoginResultIf ret = kkAppEng.getCustomerMgr().login(loginUsername, password);
+        return ret;
     }
 
     /**
@@ -1195,7 +1224,7 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
      *            HttpServletRequest
      */
 
-    private void changeSession(HttpServletRequest request)
+    protected void changeSession(HttpServletRequest request)
     {
         /* Used to temporarily store objects from current session */
         HashMap<String, Object> currentSessionMap = new HashMap<String, Object>();
@@ -1325,6 +1354,29 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
     }
 
     /**
+     * Returns the base URL
+     * 
+     * @param request
+     *            The HttpServletRequest
+     * @param addContext
+     *            If true the result looks like http://localhost:8780/konakart otherwise it's like
+     *            http://localhost:8780
+     * 
+     * @return Returns the base URL
+     */
+    public String getBaseURL(HttpServletRequest request, boolean addContext)
+    {
+        String requestURL = request.getRequestURL().toString();
+        String requestURI = request.getRequestURI().toString();
+        String base = requestURL.substring(0, requestURL.length() - requestURI.length());
+        if (addContext)
+        {
+            base += request.getContextPath();
+        }
+        return base;
+    }
+
+    /**
      * @return the jspEng
      */
     public KKAppEng getJspEng()
@@ -1342,52 +1394,24 @@ public class BaseAction extends ActionSupport implements ServletRequestAware, Se
     }
 
     /**
-     * Common method used to strip unwanted characters from form input strings
+     * Common method used to encode certain characters. The default is now to use the Guava Escaper
+     * that only escapes the following five dangerous ASCII characters {@code '"&<>} since most
+     * people use UTF-8 encoding. If you want to encode many more HTML characters you can use the
+     * Apache StringEscapeUtils as follows
+     * <p>
+     * return StringEscapeUtils.escapeHtml4(inputStr);
      * 
      * @param inputStr
      * @return Returns the cleaned string
      */
     protected String escapeFormInput(String inputStr)
     {
-        return StringEscapeUtils.escapeHtml4(inputStr);
+        if (inputStr == null)
+        {
+            return null;
+        }
+        String ret = HtmlEscapers.htmlEscaper().escape(inputStr);
+        return ret;
     }
-
-    // /**
-    // * The following method provides an example of how you can get user information from Liferay.
-    // * You can use this information to determine whether the customer has already registered with
-    // * KonaKart or to register the customer using the KonaKart APIs.
-    // *
-    // * @param kkAppEng
-    // * @throws KKAppException
-    // */
-    // private void liferaySSO(KKAppEng kkAppEng) throws KKAppException
-    // {
-    // try
-    // {
-    // RenderRequest renderReq = PortletActionContext.getRenderRequest();
-    // ThemeDisplay themeDisplay = (ThemeDisplay) renderReq
-    // .getAttribute(WebKeys.THEME_DISPLAY);
-    // User user = themeDisplay.getUser();
-    // List<Address> addresses = user.getAddresses();
-    //
-    // if (user != null && addresses != null && addresses.size() > 0
-    // && addresses.get(0) != null)
-    // {
-    // // Determine whether the customer is already registered
-    // boolean doesExist = kkAppEng.getEng().doesCustomerExistForEmail(
-    // user.getEmailAddress());
-    // if (doesExist)
-    // {
-    // // Add code here
-    // } else
-    // {
-    // // Add code here
-    // }
-    // }
-    // } catch (Exception e)
-    // {
-    // throw new KKAppException(e);
-    // }
-    // }
 
 }

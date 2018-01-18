@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -85,7 +85,7 @@ public class Table extends ShippingModule
         int i = 0;
         configs[i++] = new KKConfiguration("Enable Table Method", "MODULE_SHIPPING_TABLE_STATUS",
                 "True", "Do you want to offer table rate shipping?", 6, 0, "",
-                "tep_cfg_select_option(array('True', 'False'),", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration(
                 "Shipping Table",
                 "MODULE_SHIPPING_TABLE_COST",
@@ -97,7 +97,7 @@ public class Table extends ShippingModule
                 "MODULE_SHIPPING_TABLE_MODE",
                 "weight",
                 "The shipping cost is based on the order total or the total weight of the items ordered.",
-                6, 0, "", "tep_cfg_select_option(array('weight', 'price'),", now);
+                6, 0, "", "choice('weight', 'price')", now);
         configs[i++] = new KKConfiguration("Handling Fee", "MODULE_SHIPPING_TABLE_HANDLING", "0",
                 "Handling fee for this shipping method.", 6, 0, "", "", now);
         configs[i++] = new KKConfiguration("Tax Class", "MODULE_SHIPPING_TABLE_TAX_CLASS", "0",

@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2006-2017 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -54,7 +54,7 @@ public class DeleteAddrAction extends BaseAction
 
             if (addrId != null)
             {
-                kkAppEng.getCustomerMgr().setSelectedAddrFromId(new Integer(addrId).intValue());
+                kkAppEng.getCustomerMgr().setSelectedAddrFromId(Integer.parseInt(addrId));
             }
 
             // Ensure we are using the correct protocol. Redirect if not.

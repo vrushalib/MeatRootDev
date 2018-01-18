@@ -38,6 +38,7 @@ import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
 import com.konakart.bl.modules.payment.BasePaymentModule;
 import com.konakart.bl.modules.payment.PaymentInfo;
 import com.konakart.bl.modules.payment.PaymentInterface;
+import com.konakart.util.DateUtils;
 
 /**
  * Caledon module. This payment module allows for credit card credentials to be collected directly
@@ -208,8 +209,8 @@ public class Caledon extends BasePaymentModule implements PaymentInterface
         }
 
         // Get the resource bundle
-        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap, info
-                .getLocale());
+        ResourceBundle rb = getResourceBundle(mutex, bundleName, resourceBundleMap,
+                info.getLocale());
         if (rb == null)
         {
             throw new KKException("A resource file cannot be found for the country "
@@ -258,7 +259,11 @@ public class Caledon extends BasePaymentModule implements PaymentInterface
         }
 
         parmList.add(new NameValue("AMT", String.valueOf(total)));
-        parmList.add(new NameValue("REF", order.getId()));
+        // parmList.add(new NameValue("REF", order.getId()));
+        // Needed to add a random String to avoid duplicate transaction problems
+        parmList.add(new NameValue("REF", order.getId() + "-"
+                + DateUtils.getFriendlyFileTimestamp().replace("_", "-").replace(".", "-") + "-"
+                + getRandomText(5)));
 
         // Put the parameters into an array
         NameValue[] nvArray = new NameValue[parmList.size()];
@@ -276,7 +281,7 @@ public class Caledon extends BasePaymentModule implements PaymentInterface
         pDetails.setCustom2(sd.getAmexPwd());
         pDetails.setCustom3(sd.getOthersTermId());
         pDetails.setCustom4(sd.getOthersPwd());
-        
+
         if (log.isDebugEnabled())
         {
             log.debug(pDetails.toString());

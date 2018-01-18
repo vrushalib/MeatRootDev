@@ -33,7 +33,6 @@ import org.w3c.dom.Text;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
 import com.konakart.app.CreditCard;
-import com.konakart.app.KKException;
 import com.konakart.appif.CustomerIf;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.PaymentDetailsIf;

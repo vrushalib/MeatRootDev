@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2006-2017 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -99,7 +99,7 @@ public class EditAddrAction extends BaseAction
 
             if (addrId != null)
             {
-                kkAppEng.getCustomerMgr().setSelectedAddrFromId(new Integer(addrId).intValue());
+                kkAppEng.getCustomerMgr().setSelectedAddrFromId(Integer.parseInt(addrId));
                 if (kkAppEng.getCustomerMgr().getSelectedAddr() != null)
                 {
                     kkAppEng.getCustomerMgr().setSelectedCountry(
@@ -161,7 +161,6 @@ public class EditAddrAction extends BaseAction
         {
             return super.handleException(request, e);
         }
-
     }
 
     /**
@@ -464,6 +463,4 @@ public class EditAddrAction extends BaseAction
     {
         this.emailAddrOptional = emailAddrOptional;
     }
-
-
 }

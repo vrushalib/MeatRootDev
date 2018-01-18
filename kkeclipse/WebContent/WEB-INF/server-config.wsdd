@@ -25,6 +25,7 @@
 <handler type="java:org.apache.axis.handlers.http.URLMapper" name="URLMapper"/>
 <handler type="java:org.apache.axis.transport.local.LocalResponder" name="LocalResponder"/>
 <handler type="java:org.apache.axis.handlers.SimpleAuthenticationHandler" name="Authenticate"/>
+<handler type="java:com.konakart.ws.KKWSLogHandler" name="KKWSLog"/>
 
 <service name="AdminService" provider="java:MSG">
  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
@@ -40,9 +41,13 @@
 
 <transport name="http">
  <requestFlow>
+  <handler type="KKWSLog"/>
   <handler type="URLMapper"/>
   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
  </requestFlow>
+ <responseFlow>
+  <handler type="KKWSLog"/>
+ </responseFlow>
 </transport>
 
 <transport name="local">
@@ -66,18 +71,19 @@
 
       For ease of reference, a complete set of the methods is:
 
-      addAddressToCustomer, addCustomDataToSession, addCustomerNotifications, addPoints,
-      addProductNotificationToCustomer, addTax, addToBasket, addToBasketWithOptions,
+      addAddressToCustomer, addCreditCardToCustomer, addCustomDataToSession, addCustomerNotifications,
+      addPoints, addProductNotificationToCustomer, addTax, addToBasket, addToBasketWithOptions,
       addToCustomerTag, addToCustomerTagForGuest, addToWishList, addToWishListWithOptions,
       changeDeliveryAddress, changeOrderStatus, changePassword, checkCoupon, checkSession,
-      createAndSaveOrder, createOrder, createOrderWithOptions, createWishList, createWishListWithOptions,
-      custom, customSecure, deleteAddressFromCustomer, deleteCookie, deleteCustomerNotifications,
-      deleteCustomerTag, deleteCustomerTagForGuest, deleteOrderIdForSecretKey, deletePoints,
-      deleteProductNotificationFromCustomer, deleteReservedPoints, deleteWishList,
-      deleteWishListWithOptions, doesCustomerExistForEmail, editConfiguration, editCustomer,
-      editCustomerAddress, editDigitalDownload, editWishList, editWishListWithOptions,
-      enableCustomer, evaluateExpression, evaluateExpressionForGuest, forceRegisterCustomer,
-      freeReservedPoints, getAddressFormatTemplate, getAddressesPerCustomer, getAddressesPerManufacturer,
+      createAndSaveOrder, createOrder, createOrderWithOptions, createProductQuantityEncodedKeyFromEncodedProductId,
+      createWishList, createWishListWithOptions, custom, customSecure, deleteAddressFromCustomer,
+      deleteCookie, deleteCreditCard, deleteCustomerNotifications, deleteCustomerTag,
+      deleteCustomerTagForGuest, deleteOrderIdForSecretKey, deletePoints, deleteProductNotificationFromCustomer,
+      deleteReservedPoints, deleteWishList, deleteWishListWithOptions, doesCustomerExistForEmail,
+      editConfiguration, editCreditCard, editCustomer, editCustomerAddress, editCustomerWithOptions,
+      editDigitalDownload, editWishList, editWishListWithOptions, enableCustomer, evaluateExpression,
+      evaluateExpressionForGuest, externalLogin, forceRegisterCustomer, freeReservedPoints,
+      getAddressFormatTemplate, getAddressesPerCustomer, getAddressesPerManufacturer,
       getAddressesPerProduct, getAddressesPerStore, getAllCookies, getAllCountries,
       getAllCurrencies, getAllCustomerGroups, getAllLanguages, getAllManufacturers,
       getAllOrderStatuses, getAllProducts, getAllProductsWithOptions, getAllPromotions,
@@ -85,52 +91,55 @@
       getBasketItemsPerCustomer, getBasketItemsPerCustomerWithOptions, getBestSellers,
       getBestSellersWithOptions, getBookableProductConflict, getBookingsPerCustomer,
       getBookingsPerProduct, getBundlesThatProductBelongsTo, getBundlesThatProductsBelongTo,
-      getCategoriesPerManufacturer, getCategoriesPerProduct, getCategory, getCategoryTree,
-      getCategoryTreeWithOptions, getConfigData, getConfiguration, getConfigurationValue,
-      getConfigurationValueAsBigDecimal, getConfigurationValueAsBigDecimalWithDefault,
-      getConfigurationValueAsBool, getConfigurationValueAsInt, getConfigurationValueAsIntWithDefault,
-      getConfigurations, getContent, getContentType, getContentTypes, getContents,
-      getCookie, getCountry, getCountryPerName, getCouponPerId, getCouponsPerCode,
-      getCurrency, getCustomDataFromSession, getCustomer, getCustomerGroup, getCustomerTag,
-      getCustomerTagForGuest, getCustomerTagValue, getCustomerTagValueForGuest, getCustomerTags,
-      getCustomerTagsForGuest, getDefaultAddressPerCustomer, getDefaultCurrency, getDefaultCustomer,
-      getDefaultLanguage, getDigitalDownloadById, getDigitalDownloads, getDigitalDownloadsWithOptions,
+      getCatalogPerKey, getCategoriesPerManufacturer, getCategoriesPerProduct, getCategory,
+      getCategoryTree, getCategoryTreeWithOptions, getConfigData, getConfiguration,
+      getConfigurationNoCache, getConfigurationValue, getConfigurationValueAsBigDecimal,
+      getConfigurationValueAsBigDecimalWithDefault, getConfigurationValueAsBool, getConfigurationValueAsInt,
+      getConfigurationValueAsIntWithDefault, getConfigurations, getContent, getContentType,
+      getContentTypes, getContents, getCookie, getCountry, getCountryPerName, getCouponPerId,
+      getCouponsPerCode, getCreditCardsPerCustomer, getCurrency, getCustomDataFromSession,
+      getCustomer, getCustomerGroup, getCustomerTag, getCustomerTagForGuest, getCustomerTagValue,
+      getCustomerTagValueForGuest, getCustomerTags, getCustomerTagsForGuest, getCustomerWithOptions,
+      getDefaultAddressPerCustomer, getDefaultCurrency, getDefaultCustomer, getDefaultLanguage,
+      getDigitalDownloadById, getDigitalDownloads, getDigitalDownloadsWithOptions,
       getEngConf, getExpression, getExpressionForGuest, getGeoZonesPerZone, getIpnHistory,
       getKKEvents, getKonaKartVersion, getKonakartTimeStamp, getLanguagePerCode, getLanguagePerId,
       getLanguages, getManufacturer, getManufacturerPerProduct, getManufacturers, getManufacturersPerCategory,
       getMessages, getMsgValue, getOrder, getOrderHistory, getOrderHistoryWithOptions,
-      getOrderIdFromSecretKey, getOrderStatus, getOrderTotals, getOrdersPerCustomer,
-      getPaymentDetails, getPaymentDetailsCustom, getPaymentDetailsPerOrder, getPaymentGateway,
-      getPaymentGateways, getPaymentSchedule, getPdf, getProduct, getProductImages,
-      getProductNotificationsPerCustomer, getProductNotificationsPerCustomerWithOptions,
+      getOrderIdFromSecretKey, getOrderStatus, getOrderTotals, getOrderWithOptions,
+      getOrdersPerCustomer, getOrdersPerCustomerWithOptions, getPaymentDetails, getPaymentDetailsCustom,
+      getPaymentDetailsPerOrder, getPaymentGateway, getPaymentGateways, getPaymentSchedule,
+      getPdf, getProduct, getProductImages, getProductNotificationsPerCustomer, getProductNotificationsPerCustomerWithOptions,
       getProductPerSku, getProductPerSkuWithOptions, getProductQuantity, getProductQuantityWithOptions,
       getProductWithOptions, getProductsFromIdsWithOptions, getProductsPerCategory,
       getProductsPerCategoryPerManufacturer, getProductsPerCategoryPerManufacturerWithOptions,
       getProductsPerCategoryWithOptions, getProductsPerManufacturer, getProductsPerManufacturerWithOptions,
-      getPromotionsPerCoupon, getPromotionsPerProducts, getPunchOutMessage, getRelatedProducts,
-      getRelatedProductsWithOptions, getReview, getReviews, getReviewsPerProduct, getRewardPoints,
-      getRewardPointsWithOptions, getSSOToken, getSecretKeyForOrderId, getShippingQuote,
-      getShippingQuotes, getSku, getSpecialsPerCategory, getStatusText, getStore, getStoreIds,
-      getSubscriptionsPerCustomer, getSuggestedSearchItems, getSuggestedSpellingItems,
-      getTag, getTagGroup, getTagGroupsPerCategory, getTagGroupsPerCategoryWithOptions,
+      getPromotion, getPromotionsPerCoupon, getPromotionsPerProducts, getPunchOutMessage,
+      getRelatedProducts, getRelatedProductsWithOptions, getReview, getReviews, getReviewsPerProduct,
+      getRewardPoints, getRewardPointsWithOptions, getSSOToken, getSecretKeyForOrderId,
+      getShippingQuote, getShippingQuotes, getSku, getSpecialsPerCategory, getStatusText,
+      getStore, getStoreIds, getSubscriptionsPerCustomer, getSuggestedSearchItems,
+      getSuggestedSpellingItems, getTag, getTagGroup, getTagGroupsPerCategory, getTagGroupsPerCategoryWithOptions,
       getTagsPerCategory, getTax, getTaxRate, getTempCustomerId, getWishList, getWishListItems,
       getWishListItemsWithOptions, getWishListWithItems, getWishListWithItemsWithOptions,
       getWishListWithOptions, getZonesPerCountry, insertBooking, insertCustomerEvent,
       insertCustomerTag, insertCustomerTagForGuest, insertDigitalDownload, insertKKEvent,
-      insertSubscription, isEmailValid, login, loginByAdmin, logout, mergeBaskets,
-      mergeBasketsWithOptions, mergeWishListsWithOptions, pointsAvailable, postMessageToQueue,
-      processKKEvents, readMessageFromQueue, registerCustomer, removeBasketItemsPerCustomer,
-      removeFromBasket, removeFromWishList, removeFromWishListWithOptions, reservePoints,
-      saveIpnHistory, saveOrder, saveSSOToken, searchForOrdersPerCustomer, searchForProducts,
-      searchForProductsWithOptions, searchForSubscriptionsPerCustomer, searchForWishLists,
-      searchForZones, sendNewPassword, sendNewPassword1, sendOrderConfirmationEmail,
-      sendOrderConfirmationEmail1, sendTemplateEmailToCustomer, sendTemplateEmailToCustomer1,
-      sendWelcomeEmail, sendWelcomeEmail1, setCookie, setCreditCardDetailsOnOrder,
-      setDefaultAddressPerCustomer, setEndpoint, setRewardPointReservationId, updateBasket,
-      updateBasketWithOptions, updateBasketWithStockInfo, updateBasketWithStockInfoWithOptions,
-      updateCachedConfigurations, updateDigitalDownloadCount, updateDigitalDownloadCountById,
-      updateInventory, updateInventoryWithOptions, updateManufacturerViewedCount, updateOrder,
-      updateProductViewedCount, updateSubscription, validatePassword, writeReview
+      insertSubscription, isEmailValid, login, loginByAdmin, loginWithOptions, logout,
+      mergeBaskets, mergeBasketsWithOptions, mergeWishListsWithOptions, pointsAvailable,
+      postMessageToQueue, processKKEvents, readMessageFromQueue, registerCustomer,
+      removeBasketItemsPerCustomer, removeFromBasket, removeFromWishList, removeFromWishListWithOptions,
+      removeStockReservationsForBasketItems, removeStockReservationsForIds, removeStockReservationsForOrderProducts,
+      reservePoints, reserveStock, saveIpnHistory, saveOrder, saveOrderWithOptions,
+      saveSSOToken, searchForOrdersPerCustomer, searchForProducts, searchForProductsWithOptions,
+      searchForSubscriptionsPerCustomer, searchForWishLists, searchForZones, sendNewPassword,
+      sendNewPassword1, sendOrderConfirmationEmail, sendOrderConfirmationEmail1, sendTemplateEmailToCustomer,
+      sendTemplateEmailToCustomer1, sendWelcomeEmail, sendWelcomeEmail1, setCookie,
+      setCreditCardDetailsOnOrder, setDefaultAddressPerCustomer, setEndpoint, setNewPassword,
+      setRewardPointReservationId, updateBasket, updateBasketWithOptions, updateBasketWithStockInfo,
+      updateBasketWithStockInfoWithOptions, updateCachedConfigurations, updateDigitalDownloadCount,
+      updateDigitalDownloadCountById, updateInventory, updateInventoryWithOptions,
+      updateManufacturerViewedCount, updateOrder, updateProductViewedCount, updateSubscription,
+      validatePassword, writeReview
   -->
 
   <service name="KKWebServiceEng" provider="java:RPC" style="rpc" use="encoded">
@@ -143,63 +152,12 @@
       <parameter name="typeMappingVersion" value="1.2"/>
       <parameter name="allowedMethods" value="none"/>
 
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Review"
-        type="java:com.konakart.wsapp.Review[]"
-        innerType="cmp-ns:Review" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_OrderShipment"
-        type="java:com.konakart.wsapp.OrderShipment[]"
-        innerType="cmp-ns:OrderShipment" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Bookings"
-        type="java:com.konakart.wsapp.Bookings"
+        qname="ns:ExternalLoginInput"
+        type="java:com.konakart.wsapp.ExternalLoginInput"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Subscription"
-        type="java:com.konakart.wsapp.Subscription[]"
-        innerType="cmp-ns:Subscription" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Country"
-        type="java:com.konakart.wsapp.Country[]"
-        innerType="cmp-ns:Country" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Country"
-        type="java:com.konakart.wsapp.Country"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Email"
-        type="java:com.konakart.wsapp.Email"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_MiscPrice"
-        type="java:com.konakart.wsapp.MiscPrice[]"
-        innerType="cmp-ns:MiscPrice" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <arrayMapping
@@ -209,26 +167,17 @@
         innerType="cmp-ns:ProdCustAttr" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_MiscPrice"
+        type="java:com.konakart.wsapp.MiscPrice[]"
+        innerType="cmp-ns:MiscPrice" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:MqResponse"
         type="java:com.konakart.wsapp.MqResponse"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:SuggestedSearchItem"
-        type="java:com.konakart.wsapp.SuggestedSearchItem"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:EngineConfig"
-        type="java:com.konakart.wsapp.EngineConfig"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -251,24 +200,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PaymentDetails"
-        type="java:com.konakart.wsapp.PaymentDetails"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:AddToBasketOptions"
         type="java:com.konakart.wsapp.AddToBasketOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:WishList"
-        type="java:com.konakart.wsapp.WishList"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -280,6 +213,14 @@
         innerType="cmp-ns:Currency" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ContentType"
+        type="java:com.konakart.wsapp.ContentType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_RewardPoint"
@@ -289,39 +230,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ContentType"
-        type="java:com.konakart.wsapp.ContentType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:OrderUpdate"
-        type="java:com.konakart.wsapp.OrderUpdate"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CreateOrderOptions"
-        type="java:com.konakart.wsapp.CreateOrderOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_NameNumber"
-        type="java:com.konakart.wsapp.NameNumber[]"
-        innerType="cmp-ns:NameNumber" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ProductRelationship"
-        type="java:com.konakart.wsapp.ProductRelationship"
+        qname="ns:EditCustomerOptions"
+        type="java:com.konakart.wsapp.EditCustomerOptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -334,6 +244,13 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_CreditCard"
+        type="java:com.konakart.wsapp.CreditCard[]"
+        innerType="cmp-ns:CreditCard" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:BookableProduct"
@@ -342,25 +259,12 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_CreditCard"
-        type="java:com.konakart.wsapp.CreditCard[]"
-        innerType="cmp-ns:CreditCard" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_MiscItem"
-        type="java:com.konakart.wsapp.MiscItem[]"
-        innerType="cmp-ns:MiscItem" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_KKCookie"
-        type="java:com.konakart.wsapp.KKCookie[]"
-        innerType="cmp-ns:KKCookie" xmlns:cmp-ns="http://wsapp.konakart.com"
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:LoginResult"
+        type="java:com.konakart.wsapp.LoginResult"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -373,18 +277,17 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CustomerEvent"
-        type="java:com.konakart.wsapp.CustomerEvent"
+        qname="ns:LoginInput"
+        type="java:com.konakart.wsapp.LoginInput"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PromotionResult"
-        type="java:com.konakart.wsapp.PromotionResult"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_KKCookie"
+        type="java:com.konakart.wsapp.KKCookie[]"
+        innerType="cmp-ns:KKCookie" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -413,47 +316,9 @@
       />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_soapenc_string"
-        type="java:java.lang.String[]"
-        innerType="cmp-ns:string" xmlns:cmp-ns="http://schemas.xmlsoap.org/soap/encoding/"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Tag"
-        type="java:com.konakart.wsapp.Tag[]"
-        innerType="cmp-ns:Tag" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_DigitalDownload"
         type="java:com.konakart.wsapp.DigitalDownload[]"
         innerType="cmp-ns:DigitalDownload" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:FetchTagGroupOptions"
-        type="java:com.konakart.wsapp.FetchTagGroupOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:OrderStatusHistory"
-        type="java:com.konakart.wsapp.OrderStatusHistory"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:TagGroup"
-        type="java:com.konakart.wsapp.TagGroup"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -483,6 +348,640 @@
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:CategoryTreeOptions"
         type="java:com.konakart.wsapp.CategoryTreeOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ConfigData"
+        type="java:com.konakart.wsapp.ConfigData"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:EmailOptions"
+        type="java:com.konakart.wsapp.EmailOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_TaxRate"
+        type="java:com.konakart.wsapp.TaxRate[]"
+        innerType="cmp-ns:TaxRate" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:TierPrice"
+        type="java:com.konakart.wsapp.TierPrice"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SSOToken"
+        type="java:com.konakart.wsapp.SSOToken"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:NameNumber"
+        type="java:com.konakart.wsapp.NameNumber"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Order"
+        type="java:com.konakart.wsapp.Order[]"
+        innerType="cmp-ns:Order" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:IpnHistory"
+        type="java:com.konakart.wsapp.IpnHistory"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CustomerSearch"
+        type="java:com.konakart.wsapp.CustomerSearch"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Address"
+        type="java:com.konakart.wsapp.Address"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SuggestedSpellingItem"
+        type="java:com.konakart.wsapp.SuggestedSpellingItem"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:FetchDigitalDownloadOptions"
+        type="java:com.konakart.wsapp.FetchDigitalDownloadOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Booking"
+        type="java:com.konakart.wsapp.Booking[]"
+        innerType="cmp-ns:Booking" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_OrderProduct"
+        type="java:com.konakart.wsapp.OrderProduct[]"
+        innerType="cmp-ns:OrderProduct" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:OrderShipmentProduct"
+        type="java:com.konakart.wsapp.OrderShipmentProduct"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:TaxRate"
+        type="java:com.konakart.wsapp.TaxRate"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CreditCardOptions"
+        type="java:com.konakart.wsapp.CreditCardOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PdfOptions"
+        type="java:com.konakart.wsapp.PdfOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CouponOptions"
+        type="java:com.konakart.wsapp.CouponOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PromotionOptions"
+        type="java:com.konakart.wsapp.PromotionOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Product"
+        type="java:com.konakart.wsapp.Product"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Booking"
+        type="java:com.konakart.wsapp.Booking"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Review"
+        type="java:com.konakart.wsapp.Review"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Zone"
+        type="java:com.konakart.wsapp.Zone[]"
+        innerType="cmp-ns:Zone" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_WishListItem"
+        type="java:com.konakart.wsapp.WishListItem[]"
+        innerType="cmp-ns:WishListItem" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Subscriptions"
+        type="java:com.konakart.wsapp.Subscriptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Manufacturer"
+        type="java:com.konakart.wsapp.Manufacturer[]"
+        innerType="cmp-ns:Manufacturer" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PriceFacetOptions"
+        type="java:com.konakart.wsapp.PriceFacetOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SnippetOptions"
+        type="java:com.konakart.wsapp.SnippetOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Coupon"
+        type="java:com.konakart.wsapp.Coupon"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SuggestedSearchOptions"
+        type="java:com.konakart.wsapp.SuggestedSearchOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:FetchPromotionOptions"
+        type="java:com.konakart.wsapp.FetchPromotionOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:OrderStatus"
+        type="java:com.konakart.wsapp.OrderStatus"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Products"
+        type="java:com.konakart.wsapp.Products"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_ShippingQuote"
+        type="java:com.konakart.wsapp.ShippingQuote[]"
+        innerType="cmp-ns:ShippingQuote" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Orders"
+        type="java:com.konakart.wsapp.Orders"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:WishListItems"
+        type="java:com.konakart.wsapp.WishListItems"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Promotion"
+        type="java:com.konakart.wsapp.Promotion[]"
+        innerType="cmp-ns:Promotion" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Tag"
+        type="java:com.konakart.wsapp.Tag"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ProductImages"
+        type="java:com.konakart.wsapp.ProductImages"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Content"
+        type="java:com.konakart.wsapp.Content[]"
+        innerType="cmp-ns:Content" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ContentSearch"
+        type="java:com.konakart.wsapp.ContentSearch"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ProdCustAttr"
+        type="java:com.konakart.wsapp.ProdCustAttr"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PunchOutOptions"
+        type="java:com.konakart.wsapp.PunchOutOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CustomerTag"
+        type="java:com.konakart.wsapp.CustomerTag"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PdfResult"
+        type="java:com.konakart.wsapp.PdfResult"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ContentTypeDescription"
+        type="java:com.konakart.wsapp.ContentTypeDescription"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_KKPriceFacet"
+        type="java:com.konakart.wsapp.KKPriceFacet[]"
+        innerType="cmp-ns:KKPriceFacet" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ManufacturerSearch"
+        type="java:com.konakart.wsapp.ManufacturerSearch"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Category"
+        type="java:com.konakart.wsapp.Category[]"
+        innerType="cmp-ns:Category" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Order"
+        type="java:com.konakart.wsapp.Order"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Basket"
+        type="java:com.konakart.wsapp.Basket"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Manufacturer"
+        type="java:com.konakart.wsapp.Manufacturer"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_TagGroup"
+        type="java:com.konakart.wsapp.TagGroup[]"
+        innerType="cmp-ns:TagGroup" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_KKEvent"
+        type="java:com.konakart.wsapp.KKEvent[]"
+        innerType="cmp-ns:KKEvent" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_OrderShipment"
+        type="java:com.konakart.wsapp.OrderShipment[]"
+        innerType="cmp-ns:OrderShipment" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Review"
+        type="java:com.konakart.wsapp.Review[]"
+        innerType="cmp-ns:Review" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Bookings"
+        type="java:com.konakart.wsapp.Bookings"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Subscription"
+        type="java:com.konakart.wsapp.Subscription[]"
+        innerType="cmp-ns:Subscription" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:FetchCustomerOptions"
+        type="java:com.konakart.wsapp.FetchCustomerOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Country"
+        type="java:com.konakart.wsapp.Country[]"
+        innerType="cmp-ns:Country" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Country"
+        type="java:com.konakart.wsapp.Country"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Email"
+        type="java:com.konakart.wsapp.Email"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SuggestedSearchItem"
+        type="java:com.konakart.wsapp.SuggestedSearchItem"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:FetchOrderOptions"
+        type="java:com.konakart.wsapp.FetchOrderOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:EngineConfig"
+        type="java:com.konakart.wsapp.EngineConfig"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PaymentDetails"
+        type="java:com.konakart.wsapp.PaymentDetails"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:WishList"
+        type="java:com.konakart.wsapp.WishList"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:OrderUpdate"
+        type="java:com.konakart.wsapp.OrderUpdate"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CreateOrderOptions"
+        type="java:com.konakart.wsapp.CreateOrderOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_NameNumber"
+        type="java:com.konakart.wsapp.NameNumber[]"
+        innerType="cmp-ns:NameNumber" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:SaveOrderOptions"
+        type="java:com.konakart.wsapp.SaveOrderOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:ProductRelationship"
+        type="java:com.konakart.wsapp.ProductRelationship"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_MiscItem"
+        type="java:com.konakart.wsapp.MiscItem[]"
+        innerType="cmp-ns:MiscItem" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:CustomerEvent"
+        type="java:com.konakart.wsapp.CustomerEvent"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:PromotionResult"
+        type="java:com.konakart.wsapp.PromotionResult"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_soapenc_string"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://schemas.xmlsoap.org/soap/encoding/"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <arrayMapping
+        xmlns:ns="http://ws.konakart.com"
+        qname="ns:ArrayOf_tns1_Tag"
+        type="java:com.konakart.wsapp.Tag[]"
+        innerType="cmp-ns:Tag" xmlns:cmp-ns="http://wsapp.konakart.com"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:OrderStatusHistory"
+        type="java:com.konakart.wsapp.OrderStatusHistory"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:FetchTagGroupOptions"
+        type="java:com.konakart.wsapp.FetchTagGroupOptions"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:TagGroup"
+        type="java:com.konakart.wsapp.TagGroup"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://wsapp.konakart.com"
+        qname="ns:Catalog"
+        type="java:com.konakart.wsapp.Catalog"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -520,64 +1019,10 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ConfigData"
-        type="java:com.konakart.wsapp.ConfigData"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:EmailOptions"
-        type="java:com.konakart.wsapp.EmailOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_TaxRate"
-        type="java:com.konakart.wsapp.TaxRate[]"
-        innerType="cmp-ns:TaxRate" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:GeoZone"
         type="java:com.konakart.wsapp.GeoZone"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:TierPrice"
-        type="java:com.konakart.wsapp.TierPrice"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:SSOToken"
-        type="java:com.konakart.wsapp.SSOToken"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:NameNumber"
-        type="java:com.konakart.wsapp.NameNumber"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Order"
-        type="java:com.konakart.wsapp.Order[]"
-        innerType="cmp-ns:Order" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <arrayMapping
@@ -600,30 +1045,6 @@
         qname="ns:ArrayOf_tns1_IpnHistory"
         type="java:com.konakart.wsapp.IpnHistory[]"
         innerType="cmp-ns:IpnHistory" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:IpnHistory"
-        type="java:com.konakart.wsapp.IpnHistory"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CustomerSearch"
-        type="java:com.konakart.wsapp.CustomerSearch"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Address"
-        type="java:com.konakart.wsapp.Address"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -657,29 +1078,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:SuggestedSpellingItem"
-        type="java:com.konakart.wsapp.SuggestedSpellingItem"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Booking"
-        type="java:com.konakart.wsapp.Booking[]"
-        innerType="cmp-ns:Booking" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:FetchDigitalDownloadOptions"
-        type="java:com.konakart.wsapp.FetchDigitalDownloadOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_PaymentDetails"
@@ -697,32 +1095,9 @@
       />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_OrderProduct"
-        type="java:com.konakart.wsapp.OrderProduct[]"
-        innerType="cmp-ns:OrderProduct" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:OrderShipmentProduct"
-        type="java:com.konakart.wsapp.OrderShipmentProduct"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_Basket"
         type="java:com.konakart.wsapp.Basket[]"
         innerType="cmp-ns:Basket" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:TaxRate"
-        type="java:com.konakart.wsapp.TaxRate"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <arrayMapping
@@ -741,16 +1116,16 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ZoneSearch"
-        type="java:com.konakart.wsapp.ZoneSearch"
+        qname="ns:NameValue"
+        type="java:com.konakart.wsapp.NameValue"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:NameValue"
-        type="java:com.konakart.wsapp.NameValue"
+        qname="ns:ZoneSearch"
+        type="java:com.konakart.wsapp.ZoneSearch"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -802,22 +1177,6 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CouponOptions"
-        type="java:com.konakart.wsapp.CouponOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PdfOptions"
-        type="java:com.konakart.wsapp.PdfOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:OrderShipment"
         type="java:com.konakart.wsapp.OrderShipment"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -826,24 +1185,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PromotionOptions"
-        type="java:com.konakart.wsapp.PromotionOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:ContentSearchResult"
         type="java:com.konakart.wsapp.ContentSearchResult"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Product"
-        type="java:com.konakart.wsapp.Product"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -864,46 +1207,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Booking"
-        type="java:com.konakart.wsapp.Booking"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Review"
-        type="java:com.konakart.wsapp.Review"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Zone"
-        type="java:com.konakart.wsapp.Zone[]"
-        innerType="cmp-ns:Zone" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:MiscPrice"
         type="java:com.konakart.wsapp.MiscPrice"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_WishListItem"
-        type="java:com.konakart.wsapp.WishListItem[]"
-        innerType="cmp-ns:WishListItem" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Subscriptions"
-        type="java:com.konakart.wsapp.Subscriptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -912,21 +1217,6 @@
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:KKConfiguration"
         type="java:com.konakart.wsapp.KKConfiguration"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Manufacturer"
-        type="java:com.konakart.wsapp.Manufacturer[]"
-        innerType="cmp-ns:Manufacturer" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PriceFacetOptions"
-        type="java:com.konakart.wsapp.PriceFacetOptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -948,22 +1238,6 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:SnippetOptions"
-        type="java:com.konakart.wsapp.SnippetOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Coupon"
-        type="java:com.konakart.wsapp.Coupon"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:CustomerGroup"
         type="java:com.konakart.wsapp.CustomerGroup"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
@@ -972,24 +1246,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:SuggestedSearchOptions"
-        type="java:com.konakart.wsapp.SuggestedSearchOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:OrderStatus"
-        type="java:com.konakart.wsapp.OrderStatus"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Products"
-        type="java:com.konakart.wsapp.Products"
+        qname="ns:StockReservationOptions"
+        type="java:com.konakart.wsapp.StockReservationOptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -999,13 +1257,6 @@
         qname="ns:ArrayOf_tns1_CustomerGroup"
         type="java:com.konakart.wsapp.CustomerGroup[]"
         innerType="cmp-ns:CustomerGroup" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_ShippingQuote"
-        type="java:com.konakart.wsapp.ShippingQuote[]"
-        innerType="cmp-ns:ShippingQuote" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -1025,8 +1276,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Orders"
-        type="java:com.konakart.wsapp.Orders"
+        qname="ns:CreditCard"
+        type="java:com.konakart.wsapp.CreditCard"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1035,14 +1286,6 @@
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:BookableProductOptions"
         type="java:com.konakart.wsapp.BookableProductOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CreditCard"
-        type="java:com.konakart.wsapp.CreditCard"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1064,31 +1307,16 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:WishListItems"
-        type="java:com.konakart.wsapp.WishListItems"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
         qname="ns:NotificationOptions"
         type="java:com.konakart.wsapp.NotificationOptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Promotion"
-        type="java:com.konakart.wsapp.Promotion[]"
-        innerType="cmp-ns:Promotion" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Tag"
-        type="java:com.konakart.wsapp.Tag"
+        qname="ns:ExternalLoginResult"
+        type="java:com.konakart.wsapp.ExternalLoginResult"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1098,14 +1326,6 @@
         qname="ns:ArrayOf_tns1_ContentType"
         type="java:com.konakart.wsapp.ContentType[]"
         innerType="cmp-ns:ContentType" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ProductImages"
-        type="java:com.konakart.wsapp.ProductImages"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -1146,13 +1366,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Language"
-        type="java:com.konakart.wsapp.Language[]"
-        innerType="cmp-ns:Language" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:MqOptions"
@@ -1163,17 +1376,9 @@
       />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Content"
-        type="java:com.konakart.wsapp.Content[]"
-        innerType="cmp-ns:Content" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ProductImagesOptions"
-        type="java:com.konakart.wsapp.ProductImagesOptions"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        qname="ns:ArrayOf_tns1_Language"
+        type="java:com.konakart.wsapp.Language[]"
+        innerType="cmp-ns:Language" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -1186,24 +1391,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ContentSearch"
-        type="java:com.konakart.wsapp.ContentSearch"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ProdCustAttr"
-        type="java:com.konakart.wsapp.ProdCustAttr"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PunchOutOptions"
-        type="java:com.konakart.wsapp.PunchOutOptions"
+        qname="ns:ProductImagesOptions"
+        type="java:com.konakart.wsapp.ProductImagesOptions"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1220,14 +1409,6 @@
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:Category"
         type="java:com.konakart.wsapp.Category"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:CustomerTag"
-        type="java:com.konakart.wsapp.CustomerTag"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1255,35 +1436,11 @@
         innerType="cmp-ns:OrderStatus" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:PdfResult"
-        type="java:com.konakart.wsapp.PdfResult"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ContentTypeDescription"
-        type="java:com.konakart.wsapp.ContentTypeDescription"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_KKPriceFacet"
-        type="java:com.konakart.wsapp.KKPriceFacet[]"
-        innerType="cmp-ns:KKPriceFacet" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ManufacturerSearch"
-        type="java:com.konakart.wsapp.ManufacturerSearch"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        qname="ns:ArrayOf_tns1_Customer"
+        type="java:com.konakart.wsapp.Customer[]"
+        innerType="cmp-ns:Customer" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <arrayMapping
@@ -1303,24 +1460,9 @@
       />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_Category"
-        type="java:com.konakart.wsapp.Category[]"
-        innerType="cmp-ns:Category" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_CustomerTag"
         type="java:com.konakart.wsapp.CustomerTag[]"
         innerType="cmp-ns:CustomerTag" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Order"
-        type="java:com.konakart.wsapp.Order"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
       <typeMapping
@@ -1335,14 +1477,6 @@
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:KKPriceFacet"
         type="java:com.konakart.wsapp.KKPriceFacet"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Basket"
-        type="java:com.konakart.wsapp.Basket"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1370,14 +1504,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <typeMapping
-        xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:ShippingQuote"
-        type="java:com.konakart.wsapp.ShippingQuote"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
         qname="ns:ArrayOf_tns1_OrderShipmentProduct"
@@ -1387,8 +1513,8 @@
       />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
-        qname="ns:Manufacturer"
-        type="java:com.konakart.wsapp.Manufacturer"
+        qname="ns:ShippingQuote"
+        type="java:com.konakart.wsapp.ShippingQuote"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -1417,20 +1543,6 @@
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_TagGroup"
-        type="java:com.konakart.wsapp.TagGroup[]"
-        innerType="cmp-ns:TagGroup" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
-      <arrayMapping
-        xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_KKConfiguration"
-        type="java:com.konakart.wsapp.KKConfiguration[]"
-        innerType="cmp-ns:KKConfiguration" xmlns:cmp-ns="http://wsapp.konakart.com"
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-      />
       <typeMapping
         xmlns:ns="http://wsapp.konakart.com"
         qname="ns:CustomerRegistration"
@@ -1441,9 +1553,9 @@
       />
       <arrayMapping
         xmlns:ns="http://ws.konakart.com"
-        qname="ns:ArrayOf_tns1_KKEvent"
-        type="java:com.konakart.wsapp.KKEvent[]"
-        innerType="cmp-ns:KKEvent" xmlns:cmp-ns="http://wsapp.konakart.com"
+        qname="ns:ArrayOf_tns1_KKConfiguration"
+        type="java:com.konakart.wsapp.KKConfiguration[]"
+        innerType="cmp-ns:KKConfiguration" xmlns:cmp-ns="http://wsapp.konakart.com"
         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
       />
   </service>

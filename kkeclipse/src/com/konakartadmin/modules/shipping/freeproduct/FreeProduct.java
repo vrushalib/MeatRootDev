@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -90,7 +90,7 @@ public class FreeProduct extends ShippingModule
                 /* groupId */6,
                 /* sort Order */i,
                 /* useFun */"",
-                /* setFun */"tep_cfg_select_option(array('True', 'False'),",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now);
 
         configs[i++] = new KKConfiguration(

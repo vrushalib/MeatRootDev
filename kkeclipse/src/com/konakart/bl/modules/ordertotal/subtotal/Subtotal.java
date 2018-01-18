@@ -35,6 +35,7 @@ import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.BaseOrderTotalModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
 import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
+import com.konakart.util.JavaUtils;
 import com.workingdogs.village.DataSetException;
 
 /**
@@ -112,6 +113,12 @@ public class Subtotal extends BaseOrderTotalModule implements OrderTotalInterfac
         {
             staticData = new StaticData();
             staticDataHM.put(getStoreId(), staticData);
+        } else
+        {
+            if (!updateStaticVariablesNow(staticData.getLastUpdatedMS()))
+            {
+                return;
+            }
         }
 
         conf = getConfiguration(MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER);
@@ -121,6 +128,21 @@ public class Subtotal extends BaseOrderTotalModule implements OrderTotalInterfac
         } else
         {
             staticData.setSortOrder(new Integer(conf.getValue()).intValue());
+        }
+
+        staticData.setLastUpdatedMS(System.currentTimeMillis());
+        
+        if (log.isInfoEnabled())
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(JavaUtils.dumpAllStackTraces(".*JavaUtils.dumpAllStackTraces.*",
+                        "(.*AllStackTraces.*|.*java.lang.Thread..*)"));
+            }
+            String staticD = "Configuration data for " + code + " on " + getStoreId();
+            staticD += "\n\t\t SortOrder          = " + staticData.getSortOrder();
+            staticD += "\n\t\t LastUpdated        = " + staticData.getLastUpdatedMS();
+            log.info(staticD);
         }
     }
 
@@ -200,6 +222,26 @@ public class Subtotal extends BaseOrderTotalModule implements OrderTotalInterfac
     protected class StaticData
     {
         private int sortOrder = -1;
+
+        // lastUpdatedMS
+        private long lastUpdatedMS = -1;
+
+        /**
+         * @return the lastUpdatedMS
+         */
+        public long getLastUpdatedMS()
+        {
+            return lastUpdatedMS;
+        }
+
+        /**
+         * @param lastUpdatedMS
+         *            the lastUpdatedMS to set
+         */
+        public void setLastUpdatedMS(long lastUpdatedMS)
+        {
+            this.lastUpdatedMS = lastUpdatedMS;
+        }
 
         /**
          * @return the sortOrder

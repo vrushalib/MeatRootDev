@@ -1,5 +1,5 @@
 //
-// (c) 2014 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -91,7 +91,7 @@ public class CyberSourceSA extends PaymentModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"",
-                /* setFun */"choice('true', 'false')",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now,
                 /* return_by_api */true);
 

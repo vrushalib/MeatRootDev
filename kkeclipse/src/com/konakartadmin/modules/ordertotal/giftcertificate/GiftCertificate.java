@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -100,7 +100,7 @@ public class GiftCertificate extends OrderTotalModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"",
-                /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -166,7 +166,7 @@ public class GiftCertificate extends OrderTotalModule
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Min order value before tax",
+        /* title */"Calc min order value",
         /* key */"MODULE_ORDER_TOTAL_GIFT_CERTIFICATE_APPLY_BEFORE_TAX",
         /* value */"custom5",
         /* description */"Determines whether minimum order value is calculated"
@@ -174,7 +174,7 @@ public class GiftCertificate extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         return configs;

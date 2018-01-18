@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -89,7 +89,7 @@ public class Zones extends ShippingModule
         int i = 0;
         configs[i++] = new KKConfiguration("Enable Zones Method", "MODULE_SHIPPING_ZONES_STATUS",
                 "True", "Do you want to offer zone rate shipping?", 6, 0, "",
-                "tep_cfg_select_option(array('True', 'False'), ", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Tax Class", "MODULE_SHIPPING_ZONES_TAX_CLASS", "0",
                 "Use the following tax class on the shipping fee.", 6, 0,
                 "tep_get_tax_class_title", "tep_cfg_pull_down_tax_classes(", now);

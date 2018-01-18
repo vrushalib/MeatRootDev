@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -13,9 +13,6 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-//
-// Original version written by Steven Lohrenz (steven@stevenlohrenz.com) 
-// based on a KonaKart example.  
 //
 
 package com.konakartadmin.modules.payment.payflowpro;
@@ -98,7 +95,7 @@ public class PayflowPro extends PaymentModule
         /* groupId */groupId,
         /* sort Order */i,
         /* useFun */"",
-        /* setFun */"choice('true', 'false')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i++] = new KKConfiguration(
@@ -170,7 +167,7 @@ public class PayflowPro extends PaymentModule
         configs[i++] = new KKConfiguration(
         /* title */"Request URL",
         /* key */"MODULE_PAYMENT_PAYFLOWPRO_REQUEST_URL",
-        /* value */"https://pilot-payflowpro.paypal.com/transaction",
+        /* value */"https://pilot-payflowpro.paypal.com",
         /* description */"URL used by KonaKart to send the transaction details",
         /* groupId */groupId,
         /* sortO */i,
@@ -187,7 +184,7 @@ public class PayflowPro extends PaymentModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('true', 'false')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         return configs;

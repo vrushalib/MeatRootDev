@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="100">
+
+    <Properties>
+        <Property name="KonaKartLog">../logs/KonaKart.log</Property>
+    </Properties>
+
+    <Appenders>
+        <File name="FILE" fileName="${KonaKartLog}" append="true">
+            <PatternLayout pattern="%d{dd-MMM HH:mm:ss} %-5p (%F:%M:%L) %m%n"/>
+        </File>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{dd-MMM HH:mm:ss} %-5p (%F:%M:%L) %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.konakart" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/> 
+            <!-- KonaKart File Logger
+            <AppenderRef ref="FILE"/>
+            End of KonaKart File Logger -->
+         </Logger>
+
+        <Logger name="com.konakartadmin" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <!-- KonaKart File Logger
+            <AppenderRef ref="FILE"/>
+            End of KonaKart File Logger -->
+        </Logger>
+
+        <!-- KonaKart Persistence layer - Set to INFO to see the SQL (Set to TRACE to see more detail) -->
+        <Logger name="com.konakart.db" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <!-- KonaKart File Logger
+            <AppenderRef ref="FILE"/>
+            End of KonaKart File Logger -->
+        </Logger>
+        <!-- KonaKart Persistence layer - Set to INFO for brief start-up information -->
+        <Logger name="com.konakart.db.KKTorque" level="INFO" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+
+        <!-- Base Managers
+        <Logger name="com.konakartadmin.bl.AdminBaseMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="com.konakart.bl.BaseMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Base Managers -->
+
+        <!-- Admin Portlet
+        <Logger name="com.konakartadmin.portlet" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Admin Portlet -->
+
+        <!-- Admin Server
+        <Logger name="com.konakartadmin.server" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Admin Server -->
+
+        <!-- Admin Servlet
+        <Logger name="com.konakartadmin.servlet" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Admin Servlet -->
+
+        <!-- KonaKart XML Importer
+        <Logger name="com.konakart.importer.xml" level="DEBUG" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of KonaKart XML Importer -->
+
+        <!-- Payment Modules
+        <Logger name="com.konakart.bl.modules.payment" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakart.actions.gateways" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakart.actions.ipn" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.modules.payment" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Payment Modules -->
+
+        <!-- Shipping Modules
+        <Logger name="com.konakart.bl.modules.shipping" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.modules.shipping" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Shipping Modules -->
+
+        <!-- Order Total Modules
+        <Logger name="com.konakart.bl.modules.ordertotal" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.modules.ordertotal" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Order Total Modules -->
+
+        <!-- Others Modules
+        <Logger name="com.konakart.bl.modules.others" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.modules.others" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Others Modules -->
+
+        <!-- Storefront Actions
+        <Logger name="com.konakart.actions" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Storefront Actions -->
+
+        <!-- Struts Logging -->
+        <Logger name="freemarker" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="com.opensymphony.xwork2" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="org.apache.struts2" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <!-- End of Struts Logging -->
+
+        <!-- Order Integration Mgrs
+        <Logger name="com.konakart.bl.OrderIntegrationMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.bl.AdminOrderIntegrationMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Order Integration Mgrs -->
+
+        <!-- RMI Logging
+        <Logger name="com.konakart.rmi" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.rmi" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of RMI Logging -->
+
+        <!-- JSON Logging
+        <Logger name="com.konakart.json" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.json" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of JSON Logging -->
+
+        <!-- To log AXIS requests and responses set com.konakart.ws.KKWSLogHandler
+             to DEBUG for complete messages and INFO for just the SOAP body -->
+
+        <!-- SOAP Logging
+        <Logger name="org.apache.axis" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakart.ws" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.ws" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        
+        <Logger name="com.konakart.ws.KKWSLogHandler" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of SOAP Logging -->
+
+        <!-- JAXWS Logging
+        <Logger name="com.konakart.jws" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.jws" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of JAXWS Logging -->
+
+        <!-- KonaKart Message Queue
+        <Logger name="com.konakart.mq" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Message Queue -->
+
+        <!-- KonaKart ERP Integration
+        <Logger name="com.konakart.bl.ExportMgrEE" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakart.io.bl" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.bl.AdminImportMgrEE" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.bl.ERPQueueReader" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.bl.AdminServletMgrEE" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.servlet.ERPIncomingMsgProcessor" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakartadmin.servlet.ERPIncomingMsgProcessor" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart ERP Integration -->
+
+        <!-- KonaKart Cache Manager
+        <Logger name="com.konakart.bl.CacheMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Cache Manager -->
+
+        <!-- eCache Logging -->
+        <Logger name="net.sf.ehcache" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <!-- End of eCache Logging -->
+
+        <!-- Log4J Logging -->
+        <Logger name="org.apache.logging" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="org.apache.log4j" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <!-- End of Log4J Logging -->
+
+        <!-- Velocity Logging
+        <Logger name="org.apache.velocity.runtime.log.SimpleLog4JLogSystem" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Velocity Logging -->
+
+        <!-- KonaKart Reporting
+        <Logger name="com.konakart.reports" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="org.eclipse.birt" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Reporting -->
+
+        <!-- KonaKart Emailing
+        <Logger name="com.konakart.bl.Emailer" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="com.konakart.bl.EmailerSender" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Emailing -->
+
+        <!-- KonaKart Testing
+        <Logger name="com.konakart.test" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Testing -->
+
+        <!-- Solr Logging
+        <Logger name="org.apache.solr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Solr Logging -->
+
+        <!-- TaxCloud Logging
+        <Logger name="net.taxcloud" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of TaxCloud Logging -->
+
+        <!-- KonaKart Servlet Logging
+        <Logger name="com.konakart.servlet" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Servlet Logging -->
+
+        <!-- KonaKart Client Logging
+        <Logger name="com.konakart.clientlogging" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of KonaKart Client Logging -->
+
+        <!-- Storefront API hook Logging
+        <Logger name="com.konakart.bl.KKApiMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of Storefront API hook Logging -->
+
+        <!-- Data Integrity Checker
+        <Logger name="com.konakartadmin.utils.DataIntegrityChecker" level="INFO" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="com.konakartadmin.bl.AdminDataIntegrityMgr" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        End of Data Integrity Checker -->
+
+        <!-- Quartz Scheduler -->
+        <Logger name="org.quartz" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="org.terracotta.quartz" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="com.mchange" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <!-- End of Quartz Scheduler -->
+
+        <Logger name="org.eclipse.jetty" level="ERROR" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="com.opensymphony.xwork2" level="ERROR" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+
+        <Logger name="org.apache" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+
+        <!-- XYZ Logging
+        <Logger name="com.konakart.xyz" level="WARN" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        End of XYZ Logging -->
+
+        <Root level="DEBUG">
+            <AppenderRef ref="STDOUT"/>
+            <!-- KonaKart File Logger
+            <AppenderRef ref="FILE"/>
+            End of KonaKart File Logger -->
+        </Root>
+    </Loggers>
+
+</Configuration>

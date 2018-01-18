@@ -134,8 +134,15 @@ public class PayPalAction extends BaseGatewayAction
                 throw new Exception("The SSOToken does not contain an order id");
             }
 
+            // For custom uses, the customer's session Id is in custom2 of the token:
+            // This is provided as an example only - it isn't used in PayPal, but could be.
+            if (log.isDebugEnabled())
+            {
+                log.debug("Customer's session in PayPal callback is : " + token.getCustom2());
+            }
+            
             /*
-             * Use the session of the logged in user to initialise kkAppEng
+             * Use the session of the logged in Admin user to initialise kkAppEng
              */
             try
             {

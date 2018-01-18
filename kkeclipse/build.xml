@@ -7,17 +7,21 @@
 	<property file="build.local.properties" />
 	<property file="build.properties" />
 
+	<presetdef name="javac">
+	    <javac includeantruntime="false" />
+	</presetdef>
+
 	<import file="./ant/sharedPatternSets.xml" />
 
 	<!-- Set java.source if it hasn't already been defined -->
-	<condition property="java.source" value="1.6">
+	<condition property="java.source" value="1.7">
 		<not>
 			<isset property="java.source" />
 		</not>
 	</condition>
 
 	<!-- Set java.target if it hasn't already been defined -->
-	<condition property="java.target" value="1.6">
+	<condition property="java.target" value="1.7">
 		<not>
 			<isset property="java.target" />
 		</not>
@@ -30,7 +34,7 @@
 	<available file="${kke.custom.home}/src/com/konakart/bl/OrderIntegrationMgr.java"                property="appn.code.present" />
 	<available file="${kke.custom.home}/src/com/konakart/bl/LDAPMgr.java"                            property="appnEE.code.present" />
 	<available file="${kke.custom.home}/src/com/konakart/util/TaxUtils.java"                         property="utils.code.present" />
-	<available file="${kke.custom.home}/../../webapps/konakart/WEB-INF/lib/konakart_enterprise.jar"  property="kk.enterprise.present" />
+	<available file="${kke.custom.home}/../../webapps/konakart/WEB-INF/lib/konakart_enterprise-${konakart.version}.jar"  property="kk.enterprise.present" />
 	<available file="${kke.custom.home}/src/com/konakart/al/KKAppEng.java"                           property="appEngEE.code.present" />
 
 	<exec executable="hostname" outputproperty="host.name" />
@@ -116,7 +120,6 @@
 		<echo message="debug_javac              = ${debug_javac}" />
 		<echo message="appn.code.present        = ${appn.code.present}" />
 		<echo message="appnEE.code.present      = ${appnEE.code.present}" />
-		<echo message="engine.code.present      = ${engine.code.present}" />
 		<echo message="utils.code.present       = ${utils.code.present}" />
 	</target>
 	
@@ -181,21 +184,25 @@
 		<echo message="Create the module jars" />
 
 		<subant target="make_payment_module_jar" genericantfile="./build.xml">
+			<property name="konakart.version" value="${konakart.version}"/>
 			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/payment/"
 			        includes="*" />
 		</subant>
 
 		<subant target="make_ordertotal_module_jar" genericantfile="./build.xml">
+			<property name="konakart.version" value="${konakart.version}"/>
 			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/ordertotal/"
 			        includes="*" />
 		</subant>
 
 		<subant target="make_shipping_module_jar" genericantfile="./build.xml">
+			<property name="konakart.version" value="${konakart.version}"/>
 			<dirset dir="${kke.custom.home}/src/com/konakart/bl/modules/shipping/"
 			        includes="*" />
 		</subant>
 
 		<subant target="make_other_module_jar" genericantfile="./build.xml">
+			<property name="konakart.version" value="${konakart.version}"/>
 			<dirset dir="${kke.custom.home}/src/com/konakartadmin/modules/others/"
 			        includes="*" />
 		</subant>
@@ -226,18 +233,25 @@
 		<sequential>
 			<mkdir dir="${kke.custom.home}/jar" />
 			<basename property="mod_name" file="${basedir}" />
-			<jar destfile="${kke.custom.home}/jar/konakart_@{module.type}_${mod_name}.jar"
+			<jar destfile="${kke.custom.home}/jar/konakart_@{module.type}_${mod_name}-${konakart.version}.jar"
 				manifest="${kke.custom.home}/MANIFEST.MF">
 				<fileset dir="${kke.custom.home}/build/classes" casesensitive="false">
 					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.*" />
 					<include name="com/konakart/actions/*/${mod_name}*Action.class" />
+					<exclude name="com/konakart/actions/*/${mod_name}XMLRedirect*Action.class" />
+					<exclude name="com/konakart/actions/*/${mod_name}LoginAction.class" />
 				</fileset>
 				<fileset dir="${kke.custom.home}/src" casesensitive="false">
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/readme.txt" />
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/Readme.txt" />
+					<include name="com/konakart*/**/@{module.type}/${mod_name}/README.txt" />
 					<include name="com/konakart*/**/@{module.type}/${mod_name}/README.TXT" />
 					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.properties" />
 					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.ldif" />
 					<include name="com/konakart*/**/@{module.type}/${mod_name}/*.java" />
 					<include name="com/konakart/actions/*/${mod_name}*Action.java" />
+					<exclude name="com/konakart/actions/*/${mod_name}XMLRedirect*Action.java" />
+					<exclude name="com/konakart/actions/*/${mod_name}LoginAction.java" />
 				</fileset>
 			</jar>
 		</sequential>
@@ -255,10 +269,10 @@
 
 	<target name="make_jar_konakart_app" description="Create the konakart_app jar"
 		if="appEngEE.code.present">
-		<echo message="Create the konakart_app.jar" />
+		<echo message="Create konakart_app-${konakart.version}.jar" />
 
 		<mkdir dir="${kke.custom.home}/jar" />
-		<jar destfile="${kke.custom.home}/jar/konakart_app.jar"
+		<jar destfile="${kke.custom.home}/jar/konakart_app-${konakart.version}.jar"
 			manifest="${kke.custom.home}/MANIFEST.MF"
 			whenmanifestonly="skip">
 			<fileset dir="${kke.custom.home}/build/classes">
@@ -272,10 +286,10 @@
 
 	<target name="make_jar_custom" description="Create the konakart_custom jar"
 		if="appn.code.present">
-		<echo message="Create the konakart_custom.jar" />
+		<echo message="Create konakart_custom-${konakart.version}.jar" />
 
 		<mkdir dir="${kke.custom.home}/jar" />
-		<jar destfile="${kke.custom.home}/jar/konakart_custom.jar"
+		<jar destfile="${kke.custom.home}/jar/konakart_custom-${konakart.version}.jar"
 			manifest="${kke.custom.home}/MANIFEST.MF"
 			whenmanifestonly="skip">
 			<fileset dir="${kke.custom.home}/build/classes">
@@ -284,14 +298,14 @@
 		</jar>
 	</target>
 
-	<target name="make_jar_customEE" description="Create the konakart_customEE.jar"
+	<target name="make_jar_customEE" description="Create the konakart_customEE jar"
 		if="appnEE.code.present">
-		<echo message="Create the konakart_customEE.jar" />
+		<echo message="Create konakart_customEE-${konakart.version}.jar" />
 
 		<mkdir dir="${kke.custom.home}/jar" />
 
 		<echo message="Create the konakart_customEE.jar" />
-		<jar destfile="${kke.custom.home}/jar/konakart_customEE.jar"
+		<jar destfile="${kke.custom.home}/jar/konakart_customEE-${konakart.version}.jar"
 			manifest="${kke.custom.home}/MANIFEST.MF"
 			whenmanifestonly="skip">
 			<fileset dir="${kke.custom.home}/build/classes">
@@ -300,10 +314,10 @@
 		</jar>
 	</target>
 
-	<target name="make_jar_custom_utils" description="Create the konakart_custom_utils.jar"
+	<target name="make_jar_custom_utils" description="Create the konakart_custom_utils jar"
 		if="utils.code.present">
-		<echo message="Create the konakart_custom_utils.jar" />
-		<jar destfile="${kke.custom.home}/jar/konakart_custom_utils.jar"
+		<echo message="Create konakart_custom_utils-${konakart.version}.jar" />
+		<jar destfile="${kke.custom.home}/jar/konakart_custom_utils-${konakart.version}.jar"
 			manifest="${kke.custom.home}/MANIFEST.MF"
 			whenmanifestonly="skip">
 			<fileset dir="${kke.custom.home}/build/classes">

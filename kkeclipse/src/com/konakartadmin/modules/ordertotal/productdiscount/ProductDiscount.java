@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -100,7 +100,7 @@ public class ProductDiscount extends OrderTotalModule
                 /* groupId */groupId,
                 /* sortO */i++,
                 /* useFun */"",
-                /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+                /* setFun */"choice('true'='true','false'='false')",
                 /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -155,18 +155,18 @@ public class ProductDiscount extends OrderTotalModule
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Percent / Amount",
+        /* title */"Discount Type",
         /* key */"MODULE_ORDER_TOTAL_PRODUCT_DISCOUNT_PERCENT",
         /* value */"custom4",
-        /* description */"If true, the discount is a percentage." + " Otherwise it is an amount",
+        /* description */"The type of discount - either a percentage or an amount",
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='Percent','false'='Amount')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Apply discount before tax",
+        /* title */"Apply discount",
         /* key */"MODULE_ORDER_TOTAL_PRODUCT_DISCOUNT_APPLY_BEFORE_TAX",
         /* value */"custom5",
         /* description */"Determines whether all calculations are"
@@ -174,7 +174,7 @@ public class ProductDiscount extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         return configs;

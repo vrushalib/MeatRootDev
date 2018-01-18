@@ -35,6 +35,7 @@ import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.ordertotal.BaseOrderTotalModule;
 import com.konakart.bl.modules.ordertotal.OrderTotalInterface;
 import com.konakart.bl.modules.ordertotal.OrderTotalMgr;
+import com.konakart.util.JavaUtils;
 import com.workingdogs.village.DataSetException;
 
 /**
@@ -110,6 +111,12 @@ public class Total extends BaseOrderTotalModule implements OrderTotalInterface
         {
             staticData = new StaticData();
             staticDataHM.put(getStoreId(), staticData);
+        } else
+        {
+            if (!updateStaticVariablesNow(staticData.getLastUpdatedMS()))
+            {
+                return;
+            }
         }
 
         conf = getConfiguration(MODULE_ORDER_TOTAL_TOTAL_SORT_ORDER);
@@ -119,6 +126,21 @@ public class Total extends BaseOrderTotalModule implements OrderTotalInterface
         } else
         {
             staticData.setSortOrder(new Integer(conf.getValue()).intValue());
+        }
+
+        staticData.setLastUpdatedMS(System.currentTimeMillis());
+
+        if (log.isInfoEnabled())
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug(JavaUtils.dumpAllStackTraces(".*JavaUtils.dumpAllStackTraces.*",
+                        "(.*AllStackTraces.*|.*java.lang.Thread..*)"));
+            }
+            String staticD = "Configuration data for " + code + " on " + getStoreId();
+            staticD += "\n\t\t SortOrder          = " + staticData.getSortOrder();
+            staticD += "\n\t\t LastUpdated        = " + staticData.getLastUpdatedMS();
+            log.info(staticD);
         }
     }
 
@@ -149,18 +171,69 @@ public class Total extends BaseOrderTotalModule implements OrderTotalInterface
          * Commented code which demonstrates how this module could edit order total modules which
          * have already been called by the OrderTotalMgr.
          */
-        // if (getOrderTotalList() != null)
-        // {
-        // for (Iterator<OrderTotal> iterator = getOrderTotalList().iterator(); iterator.hasNext();)
-        // {
-        // OrderTotal ot = iterator.next();
-        // if (ot.getClassName().equals(OrderTotalMgr.ot_subtotal))
-        // {
-        // // Modify the sub-total order total
-        // }
-        // System.out.println(ot.getClassName() + " - " + ot.getText());
-        // }
-        // }
+//        if (getOrderTotalList() != null)
+//        {
+//            for (Iterator<OrderTotal> iterator = getOrderTotalList().iterator(); iterator.hasNext();)
+//            {
+//                OrderTotal ot = iterator.next();
+//                if (ot.getClassName().equals(OrderTotalMgr.ot_subtotal))
+//                {
+//                    // Modify the sub-total order total
+//                }
+//                System.out.println(ot.getClassName() + " - " + ot.getText());
+//            }
+//        }
+
+        /*
+         * Commented code which demonstrates how to get the original order when an order is being
+         * edited. This could be useful to figure out how much a customer needs to pay if he's
+         * already paid for the original order.
+         */
+//        if (order.getArchiveId() != null)
+//        {
+//            int idOfOrderToBeArchived = -1;
+//            try
+//            {
+//                idOfOrderToBeArchived = Integer.parseInt(order.getArchiveId());
+//            } catch (Exception e)
+//            {
+//                log.warn("Order (" + order.getId() + ") archiveId contains a non integer value - "
+//                        + order.getArchiveId());
+//            }
+//            if (idOfOrderToBeArchived > -1)
+//            {
+//                /*
+//                 * Fetch the order to be archived with any archived orders it may already have
+//                 */
+//                OrderSearchIf orderSearch = new OrderSearch();
+//                orderSearch.setPopulateArchivedOrdersAttribute(true);
+//                orderSearch.setOrderId(idOfOrderToBeArchived);
+//                Orders ret = getOrderMgr().searchForOrdersPerCustomer(order.getCustomerId(), /* dataDesc */
+//                null, orderSearch, LanguageMgr.DEFAULT_LANG);
+//
+//                if (ret != null && ret.getOrderArray() != null && ret.getOrderArray().length == 1
+//                        && ret.getOrderArray()[0].getOrderTotals() != null)
+//                {
+//                    /*
+//                     * Get the original total that was paid by the customer to figure out how much
+//                     * to charge now. The original order may also have an archived order etc.
+//                     */
+//                    OrderIf originalOrder = ret.getOrderArray()[0];
+//                    BigDecimal total = null;
+//                    int scale = new Integer(order.getCurrency().getDecimalPlaces()).intValue();
+//                    for (int i = 0; i < originalOrder.getOrderTotals().length; i++)
+//                    {
+//                        OrderTotal ot = (OrderTotal) originalOrder.getOrderTotals()[i];
+//                        if (ot.getClassName().equals(OrderTotalMgr.ot_total))
+//                        {
+//                            total = ot.getValue().setScale(scale, BigDecimal.ROUND_HALF_UP);
+//                            System.out.println("Total of original order is " + total.toString());
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
         OrderTotal ot;
         StaticData sd = staticDataHM.get(getStoreId());
 
@@ -216,6 +289,26 @@ public class Total extends BaseOrderTotalModule implements OrderTotalInterface
     protected class StaticData
     {
         private int sortOrder = -1;
+
+        // lastUpdatedMS
+        private long lastUpdatedMS = -1;
+
+        /**
+         * @return the lastUpdatedMS
+         */
+        public long getLastUpdatedMS()
+        {
+            return lastUpdatedMS;
+        }
+
+        /**
+         * @param lastUpdatedMS
+         *            the lastUpdatedMS to set
+         */
+        public void setLastUpdatedMS(long lastUpdatedMS)
+        {
+            this.lastUpdatedMS = lastUpdatedMS;
+        }
 
         /**
          * @return the sortOrder

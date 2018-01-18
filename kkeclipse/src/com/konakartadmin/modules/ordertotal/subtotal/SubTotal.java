@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -85,7 +85,7 @@ public class SubTotal extends OrderTotalModule
         configs[i++] = new KKConfiguration("Display Sub-Total",
                 "MODULE_ORDER_TOTAL_SUBTOTAL_STATUS", "true",
                 "Do you want to display the order sub-total cost?", 6, 1, "",
-                "tep_cfg_select_option(array('true', 'false'), ", now);
+                "choice('true'='true','false'='false')", now);
         configs[i++] = new KKConfiguration("Sort Order", "MODULE_ORDER_TOTAL_SUBTOTAL_SORT_ORDER",
                 "10", "Sort order of display.", 6, 2, "", "", now);
 

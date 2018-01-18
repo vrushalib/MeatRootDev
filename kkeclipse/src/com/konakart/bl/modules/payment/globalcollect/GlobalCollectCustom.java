@@ -30,12 +30,12 @@ public class GlobalCollectCustom extends GlobalCollectCustomBase
     /**
      * Constructor
      * 
-     * @param _eng
+     * @param kkEng
      *            a KKEngIf engine
      */
-    public GlobalCollectCustom(KKEngIf _eng)
+    public GlobalCollectCustom(KKEngIf kkEng)
     {
-        super(_eng);
+        super(kkEng);
     }
 
     /**

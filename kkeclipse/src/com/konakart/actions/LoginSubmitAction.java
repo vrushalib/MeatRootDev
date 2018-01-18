@@ -25,12 +25,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
 
+import com.konakart.al.CustomerMgr;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
 import com.konakart.app.CustomerTag;
+import com.konakart.app.ExternalLoginInput;
 import com.konakart.app.KKException;
 import com.konakart.appif.CustomerIf;
 import com.konakart.appif.CustomerTagIf;
+import com.konakart.appif.LoginResultIf;
+import com.konakart.bl.ConfigConstants;
+import com.opensymphony.xwork2.ActionContext;
 
 /**
  * Gets called after submitting the login page.
@@ -39,14 +44,19 @@ public class LoginSubmitAction extends BaseAction
 {
     private static final long serialVersionUID = 1L;
 
-    private String emailAddr;
+    private String loginUsername;
 
     private String password;
-    
+
     private String action;
+
+    private String loginToken;
+
+    private String loginType;
 
     public String execute()
     {
+        
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
 
@@ -92,13 +102,87 @@ public class LoginSubmitAction extends BaseAction
             CustomerTagIf prodsViewedTagGuest = kkAppEng.getCustomerTagMgr().getCustomerTag(
                     TAG_PRODUCTS_VIEWED);
 
-            String sessionId = login(kkAppEng, request, getEmailAddr(), getPassword());
+            // Store the loginType in the session
+            kkAppEng.setLoginType(loginType);
 
-            if (sessionId == null)
+            String sessionId = null;
+            if (loginToken != null
+                    && loginType != null
+                    && (loginType.equalsIgnoreCase(CustomerMgr.FACEBOOK) || loginType
+                            .equalsIgnoreCase(CustomerMgr.GOOGLEPLUS)|| loginType
+                            .equalsIgnoreCase(CustomerMgr.PAYPAL)))
             {
-                addActionError(kkAppEng.getMsg("login.body.login.error"));
-                return "LoginSubmitError";
+                if (!kkAppEng.isPortlet())
+                {
+                    // Change the session
+                    changeSession(request);
+                    /*
+                     * Set this session to null to avoid struts interceptors from throwing an
+                     * exception because the session is invalid
+                     */
+                    ActionContext context = ActionContext.getContext();
+                    context.setSession(null);
+                }
+
+                if (loginType.equalsIgnoreCase(CustomerMgr.FACEBOOK))
+                {
+                    ExternalLoginInput loginInfo = new ExternalLoginInput();
+                    loginInfo.setModuleClassName(kkAppEng
+                            .getConfig("MODULE_OTHER_FACEBOOK_LOGIN_CLASS"));
+                    loginInfo.setCustom1(loginToken);
+                    sessionId = kkAppEng.getCustomerMgr().externalLogin(loginInfo,
+                            CustomerMgr.FACEBOOK);
+                    if (sessionId == null)
+                    {
+                        addActionError(kkAppEng.getMsg("login.body.fb.no.auth"));
+                        return "LoginSubmitError";
+                    }
+                } else if (loginType.equalsIgnoreCase(CustomerMgr.PAYPAL))
+                {       
+                    ExternalLoginInput loginInfo = new ExternalLoginInput();
+                    loginInfo.setModuleClassName(kkAppEng
+                            .getConfig("MODULE_OTHER_PAYPAL_LOGIN_CLASS"));
+                    loginInfo.setCustom1(loginToken);
+                    
+                    sessionId = kkAppEng.getCustomerMgr().externalLogin(loginInfo,
+                            CustomerMgr.PAYPAL);
+                    if (sessionId == null)
+                    {
+                        addActionError(kkAppEng.getMsg("login.body.pp.no.auth"));
+                        return "LoginSubmitError";
+                    }
+                } else
+                {
+                    ExternalLoginInput loginInfo = new ExternalLoginInput();
+                    loginInfo.setModuleClassName(kkAppEng
+                            .getConfig("MODULE_OTHER_GOOGLEPLUS_LOGIN_CLASS"));
+                    loginInfo.setCustom1(loginToken);
+                    sessionId = kkAppEng.getCustomerMgr().externalLogin(loginInfo,
+                            CustomerMgr.GOOGLEPLUS);
+                    if (sessionId == null)
+                    {
+                        addActionError(kkAppEng.getMsg("login.body.gp.no.auth"));
+                        return "LoginSubmitError";
+                    }
+                }
+
+            } else
+            {
+                LoginResultIf ret = login(kkAppEng, request, getLoginUsername(), getPassword());
+                if (ret.isChangePassword())
+                {
+                    return "ForceChangePassword";
+                } else if (ret.isPasswordExpired())
+                {
+                    addActionError(kkAppEng.getMsg("login.body.login.expired"));
+                    return "LoginSubmitError";
+                } else if (ret.getSessionId() == null)
+                {
+                    addActionError(kkAppEng.getMsg("login.body.login.error"));
+                    return "LoginSubmitError";
+                }
             }
+
             kkAppEng.getNav().set(kkAppEng.getMsg("header.my.account"), request);
 
             /*
@@ -119,10 +203,10 @@ public class LoginSubmitAction extends BaseAction
             CustomerTagIf prodsViewedTagCust = kkAppEng.getCustomerTagMgr().getCustomerTag(
                     TAG_PRODUCTS_VIEWED);
             updateRecentlyViewedProducts(kkAppEng, prodsViewedTagGuest, prodsViewedTagCust);
-            
+
             // Ensure that the current customer has his addresses populated
             kkAppEng.getCustomerMgr().populateCurrentCustomerAddresses(/* force */false);
-            
+
             // Generate an XSRFToken
             String token = generateXSRFToken();
             kkAppEng.setXsrfToken(token);
@@ -146,7 +230,7 @@ public class LoginSubmitAction extends BaseAction
         }
 
     }
-    
+
     /**
      * create a token to protect against XSRF
      * 
@@ -166,7 +250,7 @@ public class LoginSubmitAction extends BaseAction
         String token = tokenSb.toString();
         return token;
     }
-    
+
     /**
      * Utility method
      * 
@@ -180,7 +264,7 @@ public class LoginSubmitAction extends BaseAction
         buf.append(toHexChar(data & 0x0F));
         return buf.toString();
     }
-    
+
     /**
      * Utility method
      * 
@@ -215,9 +299,10 @@ public class LoginSubmitAction extends BaseAction
         CustomerIf currentCustomer = kkAppEng.getCustomerMgr().getCurrentCustomer();
         if (currentCustomer != null)
         {
-            setKKCookie(CUSTOMER_NAME,
-                    currentCustomer.getFirstName() + " " + currentCustomer.getLastName(), request,
-                    response, kkAppEng);
+            String template = kkAppEng.getConfig(ConfigConstants.NAME_FORMAT_TEMPLATE);
+            String name = com.konakart.util.Utils.formatName(template,
+                    currentCustomer.getFirstName(), currentCustomer.getLastName());
+            setKKCookie(CUSTOMER_NAME, name, request, response, kkAppEng);
         }
 
         /*
@@ -283,7 +368,8 @@ public class LoginSubmitAction extends BaseAction
     }
 
     /**
-     * @param action the action to set
+     * @param action
+     *            the action to set
      */
     public void setAction(String action)
     {
@@ -291,18 +377,53 @@ public class LoginSubmitAction extends BaseAction
     }
 
     /**
-     * @return the emailAddr
+     * @return the loginToken
      */
-    public String getEmailAddr()
+    public String getLoginToken()
     {
-        return emailAddr;
+        return loginToken;
     }
 
     /**
-     * @param emailAddr the emailAddr to set
+     * @param loginToken
+     *            the loginToken to set
      */
-    public void setEmailAddr(String emailAddr)
+    public void setLoginToken(String loginToken)
     {
-        this.emailAddr = emailAddr;
+        this.loginToken = loginToken;
     }
+
+    /**
+     * @return the loginType
+     */
+    public String getLoginType()
+    {
+        return loginType;
+    }
+
+    /**
+     * @param loginType
+     *            the loginType to set
+     */
+    public void setLoginType(String loginType)
+    {
+        this.loginType = loginType;
+    }
+
+    /**
+     * @return the loginUsername
+     */
+    public String getLoginUsername()
+    {
+        return loginUsername;
+    }
+
+    /**
+     * @param loginUsername the loginUsername to set
+     */
+    public void setLoginUsername(String loginUsername)
+    {
+        this.loginUsername = loginUsername;
+    }
+
 }

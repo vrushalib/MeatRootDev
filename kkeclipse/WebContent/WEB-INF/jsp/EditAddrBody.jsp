@@ -22,7 +22,6 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.ZoneIf[] zoneArray = customerMgr.getSelectedZones();%>
 <% com.konakart.appif.AddressIf addr = customerMgr.getSelectedAddr();%>
-<% String[] cities = com.konakart.app.CustomAddressFields.getCities(); %>
 
 <%@include file="AddrValPopup.jsp" %>
 
@@ -79,7 +78,7 @@
 									</div>
 								</div>
 							</div>
-						<%-- 	<%if (kkEng.getConfigAsBoolean("ACCOUNT_COMPANY",false)) { %>
+							<%if (kkEng.getConfigAsBoolean("ACCOUNT_COMPANY",false)) { %>
 								<div class="form-section">
 									<h3><kk:msg  key="register.customer.body.company.details"/></h3>
 									<div class="form-section-fields">
@@ -93,7 +92,7 @@
 								</div>
 							<% } else { %>
 								<input type="hidden" name="company" value=""/>
-							<% } %> --%>
+							<% } %>
 							<div class="form-section">
 								<h3><kk:msg  key="register.customer.body.addr"/></h3>
 								<div class="form-section-fields">
@@ -124,30 +123,14 @@
 										<input type="hidden" name="suburb" value=""/>
 									<% } %>
 									<div class="form-input">
-										<label><kk:msg  key="register.customer.body.city"/></label>
-										<%--	<input type="text" value="<s:property value="city" />" id="city" name="city" /> --%>
-									    <select id="city" name="city" >
-									    <% if( cities != null && cities.length != 0) { %>
-										    <% for(int i = 0; i < cities.length; i++){ %>
-										    	   <option  value="<%=cities[i]%>" selected="selected" ><%=cities[i]%></option>
-										    <% } %>
-										<% } %>
-									    </select>
+										<label><kk:msg  key="register.customer.body.postcode"/></label>
+										<input type="text" value="<s:property value="postcode" />" name="postcode" />
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
 									</div>
 									<div class="form-input">
-										<label><kk:msg  key="register.customer.body.postcode"/></label>
-										<%--	<input type="text" value="<s:property value="postcode" />" id="postcode" name="postcode" />--%>
-										<select id="postcode" name="postcode" >
-										<% String[] codes = com.konakart.app.CustomAddressFields.getPostalCodes("Pune");%>
-									    <% if( codes != null && codes.length != 0) { %>
-									    <% java.util.Arrays.sort(codes); %>
-										    <% for(int i = 0; i < codes.length; i++){ %>
-										    	   <option  value="<%=codes[i]%>" selected="selected" ><%=codes[i]%></option>
-										    <% } %>
-										<% } %>
-									    </select>
+										<label><kk:msg  key="register.customer.body.city"/></label>
+										<input type="text" value="<s:property value="city" />" name="city" />
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
 									</div>
@@ -156,18 +139,17 @@
 											<div class="form-input">
 												<label><kk:msg  key="register.customer.body.state"/></label>
 												<select name="state" class="state">
-													<%--<option value="-1"><kk:msg  key="register.customer.body.select"/></option> --%>
+													<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
 													<s:set scope="request" var="state"  value="state"/> 						
 													<% String state = ((String)request.getAttribute("state"));%> 
-													<option  value="Maharashtra" selected="selected" >Maharashtra</option>
-												<%--	<% for (int i = 0; i < zoneArray.length; i++){ %>
+													<% for (int i = 0; i < zoneArray.length; i++){ %>
 														<% com.konakart.appif.ZoneIf zone = zoneArray[i];%>
 														<%if (state != null && state.equals(zone.getZoneName())){ %>
 															<option  value="<%=zone.getZoneName()%>" selected="selected"><%=zone.getZoneName()%></option>
 														<% } else { %>
 															<option  value="<%=zone.getZoneName()%>"><%=zone.getZoneName()%></option>
-														<% } %> 
-													<% } %> --%>
+														<% } %>
+													<% } %>
 												</select>
 												<span class="required-icon required-blue"></span>
 												<span class="validation-msg"></span>
@@ -183,11 +165,10 @@
 									<% } else { %>
 										<input type="hidden" name="state" value="-----"/>
 									<% } %>
-									<div class="form-input" style="display: none;">
+									<div class="form-input">
 										<label><kk:msg  key="register.customer.body.country"/></label>
 											<select name="countryId" class="country" onchange="javascript:changeCountry();">
-												<option value="99">India</option>
-											<%-- 	<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
+												<option value="-1"><kk:msg  key="register.customer.body.select"/></option>
 													<%com.konakart.appif.CountryIf selectedCountry = kkEng.getCustomerMgr().getSelectedCountry(); %>
 													<% com.konakart.appif.CountryIf[] countries = kkEng.getAllCountries();%>
 													<%if (countries != null){%>
@@ -199,7 +180,7 @@
 																<option value="<%=Integer.toString(country.getId())%>"><%=country.getName()%></option>
 															<% } %>														                 
 														<% } %>           
-													<% } %>		--%>															
+													<% } %>																
 											</select>
 										<span class="required-icon required-blue"></span>
 										<span class="validation-msg"></span>
@@ -252,6 +233,5 @@
 						</form>
 			    	</div>
 	    		</div>
-
 
 

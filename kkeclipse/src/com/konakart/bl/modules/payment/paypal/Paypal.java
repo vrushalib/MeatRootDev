@@ -345,6 +345,18 @@ public class Paypal extends BasePaymentModule implements PaymentInterface
         }
         ssoToken.setSessionId(sessionId);
         ssoToken.setCustom1(String.valueOf(order.getId()));
+
+        try
+        {
+            String customerSessionId = getCustomerSessionIdByCustomerId(order.getCustomerId());
+            ssoToken.setCustom2(customerSessionId);
+        } catch (Exception e)
+        {
+            // It's not fatal but we'll log the message and move on without the sessionId
+            log.warn("Problem looking up sessionId for CustomerId " + order.getCustomerId() + " : "
+                    + e.getMessage());
+        }
+
         /*
          * Save the SSOToken with a valid sessionId and the order id in custom1
          */
@@ -357,7 +369,7 @@ public class Paypal extends BasePaymentModule implements PaymentInterface
         // parmList.add(new NameValue("no_shipping", "2"));
         parmList.add(new NameValue("bn", "Kona_Cart"));
         parmList.add(new NameValue("no_note", "1"));
-        
+
         parmList.add(new NameValue("notify_url", sd.getPayPalCallbackUrl().replaceFirst(
                 hostPortSubstitute, info.getHostAndPort())));
 

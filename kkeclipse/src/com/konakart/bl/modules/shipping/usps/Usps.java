@@ -56,6 +56,7 @@ import com.konakart.bl.modules.BaseModule;
 import com.konakart.bl.modules.shipping.BaseShippingModule;
 import com.konakart.bl.modules.shipping.ShippingInfo;
 import com.konakart.bl.modules.shipping.ShippingInterface;
+import com.konakart.util.PrettyXmlPrinter;
 import com.konakart.util.Utils;
 import com.workingdogs.village.DataSetException;
 
@@ -477,7 +478,7 @@ public class Usps extends BaseShippingModule implements ShippingInterface
 
         if (log.isDebugEnabled())
         {
-            log.debug("Response from USPS = " + response + "\n\n");
+            log.debug("Response from USPS =\n" + PrettyXmlPrinter.printXml(response));
         }
 
         List<ShippingQuote> quoteList = getQuotesFromResponse(response);

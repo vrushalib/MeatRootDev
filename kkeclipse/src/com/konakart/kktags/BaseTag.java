@@ -54,18 +54,18 @@ public class BaseTag extends ComponentTagSupport
     protected static final String REL = " rel=";
 
     protected static final String HREF = " href=";
-    
-   
+
     protected KKAppEng eng;
 
     /**
      * Returns HTML for a start div
      * 
-     * @param c
+     * @param _c
      * @return Returns HTML for a start div
      */
-    protected String getStartDiv(String c)
+    protected String getStartDiv(String _c)
     {
+        String c = _c;
         if (c == null)
         {
             return "<div>";
@@ -76,12 +76,13 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start div
      * 
-     * @param c
+     * @param _c
      * @param idIn
      * @return Returns HTML for a start div
      */
-    protected String getStartDiv(String c, String idIn)
+    protected String getStartDiv(String _c, String idIn)
     {
+        String c = _c;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         String newId = (idIn == null) ? "" : ID + D_QUOTE + idIn + D_QUOTE;
         return "<div" + c + newId + " >";
@@ -90,11 +91,12 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start span
      * 
-     * @param c
+     * @param _c
      * @return Returns HTML for a start span
      */
-    protected String getStartSpan(String c)
+    protected String getStartSpan(String _c)
     {
+        String c = _c;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         return "<span" + c + " >";
     }
@@ -102,12 +104,13 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start span
      * 
-     * @param c
+     * @param _c
      * @param idIn
      * @return Returns HTML for a start span
      */
-    protected String getStartSpan(String c, String idIn)
+    protected String getStartSpan(String _c, String idIn)
     {
+        String c = _c;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         String newId = (idIn == null) ? "" : ID + D_QUOTE + idIn + D_QUOTE;
         return "<span" + c + newId + " >";
@@ -116,13 +119,15 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start span
      * 
-     * @param c
+     * @param _c
      * @param idIn
-     * @param rel
+     * @param _rel
      * @return Returns HTML for a start span
      */
-    protected String getStartSpan(String c, String idIn, String rel)
+    protected String getStartSpan(String _c, String idIn, String _rel)
     {
+        String c = _c;
+        String rel = _rel;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         String newId = (idIn == null) ? "" : ID + D_QUOTE + idIn + D_QUOTE;
         rel = (rel == null) ? "" : REL + D_QUOTE + rel + D_QUOTE;
@@ -132,12 +137,14 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start link
      * 
-     * @param c
-     * @param href
+     * @param _c
+     * @param _href
      * @return Returns HTML for a start link
      */
-    protected String getStartA(String c, String href)
+    protected String getStartA(String _c, String _href)
     {
+        String c = _c;
+        String href = _href;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         href = (href == null) ? "" : HREF + D_QUOTE + href + D_QUOTE;
         return "<a" + c + href + " >";
@@ -146,13 +153,15 @@ public class BaseTag extends ComponentTagSupport
     /**
      * Returns HTML for a start link
      * 
-     * @param c
-     * @param href
+     * @param _c
+     * @param _href
      * @param idIn
      * @return Returns HTML for a start link
      */
-    protected String getStartA(String c, String href, String idIn)
+    protected String getStartA(String _c, String _href, String idIn)
     {
+        String c = _c;
+        String href = _href;
         c = (c == null) ? "" : CLASS + D_QUOTE + c + D_QUOTE;
         String newId = (idIn == null) ? "" : ID + D_QUOTE + idIn + D_QUOTE;
         href = (href == null) ? "" : HREF + D_QUOTE + href + D_QUOTE;
@@ -346,24 +355,7 @@ public class BaseTag extends ComponentTagSupport
         } else
         {
             sb.append(data);
-   	  	 }
-   }
+        }
+    }
 
-    protected StringBuffer getStartSelect(String select,String id,String className,String name){
-      	 StringBuffer sb = new StringBuffer();
-      	
-      	
-      	 sb.append("<select id="+D_QUOTE+id+D_QUOTE+" class=" + D_QUOTE + className + D_QUOTE + "name="+D_QUOTE+name+">");
-      	 for(int i=0;i<31;i++){
-      		 sb.append("<option value="+D_QUOTE+i+D_QUOTE+">"+i+"</option>");
-      	  	 }
-      	 sb.append("</select>");
-      	 
-      	 return sb;
-
-      }
-
-    
-    
-   
 }

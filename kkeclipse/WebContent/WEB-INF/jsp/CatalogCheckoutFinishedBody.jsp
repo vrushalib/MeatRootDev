@@ -17,10 +17,10 @@
 //
 --%>
 <%@include file="Taglibs.jsp" %>
-<%@page import="java.util.Calendar"%>
+
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
-<% com.konakart.appif.OrderIf order = (com.konakart.appif.OrderIf)request.getAttribute("order");%>
+<% com.konakart.appif.OrderIf order = orderMgr.getCheckoutOrder();%>
 
  				<h1 id="page-title"><kk:msg  key="checkout.finished.orderprocessed"/></h1>			
 	    		<div class="content-area rounded-corners">
@@ -29,8 +29,7 @@
 			    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 							<div class="form-section">
 								<div class="notification-header">
-								    Order Number is <%=order.getId() %>.<br>
-									Your order has been received by MeatRoot and will be delivered on <%=order.getCustom2() %> between <%if(order.getCustom1().equalsIgnoreCase("m"))%> 7am - 10:30am <%else if(order.getCustom1().equalsIgnoreCase("a")) %> 1pm - 3pm <%else %> 6pm - 8pm. Thank you for shopping with us.
+									<kk:msg  key="checkout.finished.orderprocessedlong"/>.
 								</div>
 							</div>
 							<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
@@ -55,41 +54,87 @@
 							<div class="form-buttons-wide">
 								<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners"><span><kk:msg  key="common.continue"/></span></a>
 							</div>
-							</div>
 						</form>
 			    	</div>
 	    		</div>
 	    		
-	    		<%if (kkEng.getCustomerMgr().getCurrentCustomer() != null && kkEng.getCustomerMgr().getCurrentCustomer().getType() != 2 && kkEng.getCustomerMgr().getCurrentCustomer().getGlobalProdNotifier() == 0) { %>
-	    		<%-- <%out.println(order.getTotalIncTax()); %>  --%>
-	    		
-	    		 <div
+	<%if (kkEng.getAnalyticsCode()!=null && kkEng.getAnalyticsCode().length() > 0){%>
+		<script type="text/javascript">
+		<%if (order != null){ %>
+			<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>
+				<% for (int i = 0; i < order.getOrderProducts().length; i++){ %>
+					<% com.konakart.appif.OrderProductIf op = order.getOrderProducts()[i];%>
+					if (typeof(ga) != 'undefined' && ga != null) {
+						ga('ec:addProduct', {
+							'id': '<%=op.getProductId()%>',
+							'name': '<%=kkEng.removeSingleQuotes(op.getName())%>',
+							<%if (kkEng.displayPriceWithTax()) {%>
+								'price': '<%=op.getFinalPriceIncTax()%>',
+							<%} else {%>
+								'price': '<%=op.getFinalPriceExTax()%>',
+							<%}%>	
+							<%String optStr = "";%>
+							<%if (op.getOpts() != null && op.getOpts().length > 0) {%>
+								<% for (int j = 0; j < op.getOpts().length; j++){ %>
+									<% com.konakart.appif.OptionIf opt = op.getOpts()[j];%>	
+									<%if (opt.getType() == com.konakart.app.Option.TYPE_SIMPLE){%>
+										<%if (j>0){%>
+											<%optStr = optStr+"/";%>
+										<%}%>
+										<%optStr = optStr + kkEng.removeSingleQuotes(opt.getName()+":"+opt.getValue());%>
+									<%}%>
+								<%}%>
+								<%if (optStr.length() > 0){%>
+									'variant': '<%=optStr%>',
+								<%}%>		  
+							<%}%>	
+							<%if (op.getProduct() != null){%>
+								'brand': '<%=kkEng.removeSingleQuotes(op.getProduct().getManufacturerName())%>',
+								<%com.konakart.appif.CategoryIf cat = kkEng.getCategoryMgr().getCatFromId(op.getProduct().getCategoryId());%>
+								<%if (cat != null){%>
+									'category': '<%=kkEng.removeSingleQuotes(cat.getName())%>',
+								<%}%>
+							<%}%>		  
+							'quantity': <%=op.getQuantity()%>
+						});
+					}
+				<%}%>
+			<%}%>
 
-  id="refcandy-popsicle"
-
-  data-app-id="ijdpgu342un7laa7kzhijptcs"
-
-  data-fname=<%=kkEng.getCustomerMgr().getCurrentCustomer().getFirstName()%>
-
-  data-lname="<%=kkEng.getCustomerMgr().getCurrentCustomer().getLastName()%>"
-
-  data-email="<%=kkEng.getCustomerMgr().getCurrentCustomer().getEmailAddr()%>"
-
-  data-amount="<%=order.getTotalIncTax()%>"
-
-  data-currency="INR"
-
-  data-timestamp="<%=Calendar.getInstance().getTimeInMillis() / 1000%>"
-
-  data-external-reference-id="<%=order.getOrderNumber()%>"
-
-  data-signature="123"
-
-></div>
-	    		
-<%} %>
-	    		
-
-<script>(function(e){var t,n,r,i,s,o,u,a,f,l,c,h,p,d,v;z="script";l="refcandy-purchase-js";c="refcandy-popsicle";p="go.referralcandy.com/purchase/";t="data-app-id";r={email:"a",fname:"b",lname:"c",amount:"d",currency:"e","accepts-marketing":"f",timestamp:"g","referral-code":"h",locale:"i","external-reference-id":"k",signature:"ab"};i=e.getElementsByTagName(z)[0];s=function(e,t){if(t){return""+e+"="+encodeURIComponent(t)}else{return""}};d=function(e){return""+p+h.getAttribute(t)+".js?aa=75&"};if(!e.getElementById(l)){h=e.getElementById(c);if(h){o=e.createElement(z);o.id=l;a=function(){var e;e=[];for(n in r){u=r[n];v=h.getAttribute("data-"+n);e.push(s(u,v))}return e}();o.src=""+e.location.protocol+"//"+d(h.getAttribute(t))+a.join("&");return i.parentNode.insertBefore(o,i)}}})(document);</script>
-
-	   
+			<%String revenue = null;%>
+			<%String tax = null;%>
+			<%String shipping = null;%>
+			
+			<%if (order.getOrderTotals() != null && order.getOrderTotals().length > 0){ %>
+				<% for (int i = 0; i < order.getOrderTotals().length; i++){ %>
+					<% com.konakart.appif.OrderTotalIf ot = order.getOrderTotals()[i];%>														
+					<%if (ot.getClassName().equals("ot_total")) {%>
+						<%revenue = ot.getValue().toString();%>
+					<%}else if (ot.getClassName().equals("ot_shipping")) {%>	
+						<%shipping = ot.getValue().toString();%>
+					<%}else if (ot.getClassName().equals("ot_tax")) {%>
+						<%tax = ot.getValue().toString();%>
+					<%}%>		    																		
+				<%}%>
+			<%}%>
+			
+			if (typeof(ga) != 'undefined' && ga != null) {
+				ga('ec:setAction', 'purchase', {
+				  'id': '<%=order.getId()%>',
+				  <% if (shipping != null){ %>
+				  	'shipping': '<%=shipping%>',
+				  <%}%>
+				  <% if (tax != null){ %>
+				  	'tax': '<%=tax%>',
+				  <%}%>
+				  <% if (revenue != null){ %>
+				  	'revenue': '<%=revenue%>'
+				  <%}%>
+				});
+				ga('send', 'pageview');	
+			}
+		<%}%>
+		
+    
+		</script>	
+	<% } %>			    		

@@ -69,13 +69,6 @@ public class RemoveAllTagsFromFilterAction extends BaseAction
             {
             }
 
-            if (kkAppEng.getProductMgr().getProdTimestamp() != timestamp)
-            {
-                kkAppEng.getProductMgr().reset();
-                kkAppEng.getProductMgr().setExpiredResultSet(true);
-                return SUCCESS;
-            }
-
             ProductFilter filter = new ProductFilter();
             filter.setRemoveAllTags(true);
             kkAppEng.getProductMgr().filterProducts(filter, timestamp);

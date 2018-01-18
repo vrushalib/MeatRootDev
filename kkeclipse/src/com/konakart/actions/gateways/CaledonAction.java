@@ -49,8 +49,14 @@ import com.konakart.util.RegExpUtils;
 /**
  * This class is an Action class for sending credit card details to Caledon and receiving
  * confirmation Typical replies:<br/>
- * TEXT=DECLINED (DUP) &CODE=1007<br/>
- * TEXT=T68414 $12.34&AUTH=T68414&CODE=0000<br/>
+ * 
+ * <pre>
+ * {@code
+ * TEXT=DECLINED (DUP) &CODE=1007
+ * TEXT=T68414 $12.34&AUTH=T68414&CODE=0000
+ * }
+ * </pre>
+ * 
  * <p>
  * Note that for testing they need you to use a credit card Expiry Date of August 2014 (still the
  * case despite the date is now after that expiry date - correct in January 2015).

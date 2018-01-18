@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -100,7 +100,7 @@ public class RedeemPoints extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
@@ -155,7 +155,7 @@ public class RedeemPoints extends OrderTotalModule
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(
-        /* title */"Determine min order value on amount before tax",
+        /* title */"Calc min order value",
         /* key */"MODULE_ORDER_TOTAL_REDEEM_POINTS_APPLY_BEFORE_TAX",
         /* value */"custom4",
         /* description */"Determines whether the minimum order value is taken"
@@ -163,7 +163,7 @@ public class RedeemPoints extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"invisible",
-        /* setFun */"tep_cfg_select_option(array('true', 'false'), ",
+        /* setFun */"choice('true'='BeforeTax','false'='AfterTax')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(

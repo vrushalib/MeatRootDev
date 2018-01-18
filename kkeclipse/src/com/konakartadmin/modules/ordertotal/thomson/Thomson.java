@@ -90,7 +90,7 @@ public class Thomson extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now,
         /* returnByApi */true);
 
@@ -102,7 +102,7 @@ public class Thomson extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now,
         /* returnByApi */true);
 
@@ -114,7 +114,7 @@ public class Thomson extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now,
         /* returnByApi */true);
 
@@ -203,7 +203,7 @@ public class Thomson extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
         
         configs[i] = new KKConfiguration(
@@ -236,7 +236,7 @@ public class Thomson extends OrderTotalModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('True', 'False')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         configs[i] = new KKConfiguration(

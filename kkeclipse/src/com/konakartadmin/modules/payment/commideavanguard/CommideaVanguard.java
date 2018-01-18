@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -91,7 +91,7 @@ public class CommideaVanguard extends PaymentModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('true', 'false')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
         // 2
@@ -190,11 +190,11 @@ public class CommideaVanguard extends PaymentModule
         /* setFun */"",
         /* dateAdd */now);
 
-        // 10
+        // 10 
         configs[i] = new KKConfiguration(
         /* title */"Commidea Credit Card Post URL",
         /* key */"MODULE_PAYMENT_COMMIDEA_VANGUARD_CC_POST_URL",
-        /* value */"https://vg-test.cxmlpg.com/vanguard.aspx",
+        /* value */"https://vg-cst.cxmlpg.com/vanguard.aspx",
         /* description */"URL where the Commidea credit card details are posted.",
         /* groupId */groupId,
         /* sortO */i++,
@@ -390,7 +390,7 @@ public class CommideaVanguard extends PaymentModule
         /* groupId */groupId,
         /* sortO */i++,
         /* useFun */"",
-        /* setFun */"choice('true', 'false')",
+        /* setFun */"choice('true'='true','false'='false')",
         /* dateAdd */now);
 
 

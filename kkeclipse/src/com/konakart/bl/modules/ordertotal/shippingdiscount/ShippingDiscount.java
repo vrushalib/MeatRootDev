@@ -224,14 +224,28 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
                     }
                 }
 
-                // Get the order value
+                /*
+                 * Calculate the order value to determine whether to activate the promotion. The
+                 * order value is the total less the shipping. We don't use the subtotal (which
+                 * doesn't include shipping) because it also doesn't include any discounts.
+                 */
                 BigDecimal orderValue = null;
                 if (applyBeforeTax)
                 {
-                    orderValue = order.getSubTotalExTax();
+                    orderValue = order.getTotalExTax();
+                    if (order.getShippingQuote() != null
+                            && order.getShippingQuote().getTotalExTax() != null)
+                    {
+                        orderValue = orderValue.subtract(order.getShippingQuote().getTotalExTax());
+                    }
                 } else
                 {
-                    orderValue = order.getSubTotalIncTax();
+                    orderValue = order.getTotalIncTax();
+                    if (order.getShippingQuote() != null
+                            && order.getShippingQuote().getTotalIncTax() != null)
+                    {
+                        orderValue = orderValue.subtract(order.getShippingQuote().getTotalIncTax());
+                    }
                 }
 
                 // If promotion doesn't cover any of the products in the order then go on to the
@@ -243,10 +257,18 @@ public class ShippingDiscount extends BaseOrderTotalModule implements OrderTotal
                 }
 
                 ot = new OrderTotal();
+                ot.setPromotionId(promotion.getId());
                 ot.setSortOrder(sd.getSortOrder());
                 ot.setClassName(code);
                 ot.setPromotions(new Promotion[]
                 { promotion });
+                if (percentageDiscount)
+                {
+                    ot.setDiscountPercent(discountApplied);
+                } else
+                {
+                    ot.setDiscountAmount(discountApplied);
+                }
 
                 // Does promotion only apply to a min order value ?
                 if (minTotalOrderVal != null)

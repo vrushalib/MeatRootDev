@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
 
+import com.konakart.al.CustomerMgr;
 import com.konakart.al.KKAppEng;
 import com.konakart.al.KKAppException;
 import com.konakart.app.KKException;
@@ -46,7 +47,7 @@ public class DownloadInvoiceAction extends BaseAction
 
     private static final long serialVersionUID = 1L;
 
-    protected static final int DEFAULT_BUFFER_SIZE = 4096;
+    private static final int DEFAULT_BUFFER_SIZE = 4096;
 
     private String kkContentType;
 
@@ -138,8 +139,8 @@ public class DownloadInvoiceAction extends BaseAction
             }
 
             // Get the order
-            OrderIf order = kkAppEng.getEng().getOrder(kkAppEng.getSessionId(), orderId,
-                    kkAppEng.getLangId());
+            OrderIf order = kkAppEng.getEng().getOrderWithOptions(kkAppEng.getSessionId(), orderId,
+                    kkAppEng.getLangId(), kkAppEng.getOrderMgr().getFetchOrderOptions());
 
             if (order == null)
             {
@@ -321,8 +322,8 @@ public class DownloadInvoiceAction extends BaseAction
             }
 
             // Get the order
-            OrderIf order = kkAppEng.getEng().getOrder(kkAppEng.getSessionId(), orderId,
-                    kkAppEng.getLangId());
+            OrderIf order = kkAppEng.getEng().getOrderWithOptions(kkAppEng.getSessionId(), orderId,
+                    kkAppEng.getLangId(), kkAppEng.getOrderMgr().getFetchOrderOptions());
 
             // Determine whether a pdf document exists on the file system. Otherwise we create it on
             // the fly.
@@ -391,6 +392,20 @@ public class DownloadInvoiceAction extends BaseAction
         options.setReturnFileName(false);
         options.setReturnBytes(true);
         options.setCreateFile(false);
+
+        CustomerMgr custMgr = kkAppEng.getCustomerMgr();
+        if (custMgr.isCustomerTagsAvailable())
+        {
+            boolean viewChildOrders = custMgr.getTagValueAsBool(KKConstants.B2B_VIEW_CHILD_ORDERS,
+                    false);
+            boolean viewParentOrders = custMgr.getTagValueAsBool(
+                    KKConstants.B2B_VIEW_PARENT_ORDERS, false);
+            boolean viewSiblingOrders = custMgr.getTagValueAsBool(
+                    KKConstants.B2B_VIEW_SIBLING_ORDERS, false);
+            options.setIncludeParentCustomerOrders(viewParentOrders);
+            options.setIncludeSiblingCustomerOrders(viewSiblingOrders);
+            options.setIncludeChildrenCustomerOrders(viewChildOrders);
+        }
 
         PdfResult pdfResult = (PdfResult) kkAppEng.getEng()
                 .getPdf(kkAppEng.getSessionId(), options);

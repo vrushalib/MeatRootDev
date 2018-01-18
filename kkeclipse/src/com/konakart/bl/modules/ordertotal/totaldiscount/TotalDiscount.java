@@ -211,16 +211,6 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
                     continue;
                 }
 
-                // Get the order value
-                BigDecimal orderValue = null;
-                if (applyBeforeTax)
-                {
-                    orderValue = order.getSubTotalExTax();
-                } else
-                {
-                    orderValue = order.getSubTotalIncTax();
-                }
-
                 // If promotion doesn't cover any of the products in the order then go on to the
                 // next promotion
                 if (promotion.getApplicableProducts() == null
@@ -230,14 +220,31 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
                 }
 
                 ot = new OrderTotal();
+                ot.setPromotionId(promotion.getId());
                 ot.setSortOrder(sd.getSortOrder());
                 ot.setClassName(code);
                 ot.setPromotions(new Promotion[]
                 { promotion });
+                if (percentageDiscount)
+                {
+                    ot.setDiscountPercent(discountApplied);
+                } else
+                {
+                    ot.setDiscountAmount(discountApplied);
+                }
 
                 // Does promotion only apply to a min order value ?
                 if (minTotalOrderVal != null)
                 {
+                    BigDecimal orderValue = null;
+                    if (applyBeforeTax)
+                    {
+                        orderValue = order.getSubTotalExTax();
+                    } else
+                    {
+                        orderValue = order.getSubTotalIncTax();
+                    }
+
                     if (orderValue.compareTo(minTotalOrderVal) < 0)
                     {
                         // If we haven't reached the minimum amount then continue to the next
@@ -287,9 +294,34 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
 
                 if (percentageDiscount)
                 {
+                    /*
+                     * Get the current order value. If discounts have already been applied we have
+                     * to calculate the percentage discount on the current discounted total rather
+                     * than the original total.
+                     */
+                    BigDecimal currentOrderValue = null;
+                    if (applyBeforeTax)
+                    {
+                        currentOrderValue = order.getTotalExTax();
+                        if (order.getShippingQuote() != null)
+                        {
+                            currentOrderValue = currentOrderValue.subtract(order.getShippingQuote()
+                                    .getTotalExTax());
+                        }
+                    } else
+                    {
+                        currentOrderValue = order.getTotalIncTax();
+                        if (order.getShippingQuote() != null)
+                        {
+                            currentOrderValue = currentOrderValue.subtract(order.getShippingQuote()
+                                    .getTotalIncTax());
+                        }
+                    }
+
                     // Apply a percentage discount
                     discount = new BigDecimal(0);
-                    discount = (orderValue.multiply(discountApplied)).divide(new BigDecimal(100));
+                    discount = (currentOrderValue.multiply(discountApplied)).divide(new BigDecimal(
+                            100));
                     discount = discount.setScale(scale, BigDecimal.ROUND_HALF_UP);
 
                     // Set the order total attributes
@@ -312,39 +344,10 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
                             + rb.getString(MODULE_ORDER_TOTAL_TOTAL_DISCOUNT_TITLE));
                     discount = discountApplied;
                 }
-
-                /*
-                 * We need to reduce the tax amount. This is done differently depending on whether
-                 * the discount is applied to the amount before or after tax.
-                 */
-                BigDecimal total = null;
-                if (order.getShippingQuote() != null && order.getShippingQuote().getTax() != null
-                        && order.getShippingQuote().getTax().compareTo(new BigDecimal(0)) != 0)
-                {
-                    // Use total including shipping cost
-                    total = order.getTotalExTax();
-                } else
-                {
-                    // Use subtotal that doesn't include shipping
-                    total = order.getSubTotalExTax();
-                }
-
-                if (total != null && total.compareTo(new BigDecimal(0)) != 0
-                        && order.getTax() != null)
-                {
-                    BigDecimal averageTaxRate = order.getTax().divide(total, 6,
-                            BigDecimal.ROUND_HALF_UP);
-                    if (applyBeforeTax)
-                    {
-                        // Calculate the tax discount based on the average tax
-                        BigDecimal taxDiscount = discount.multiply(averageTaxRate);
-                        taxDiscount = taxDiscount.setScale(scale, BigDecimal.ROUND_HALF_UP);
-                        ot.setTax(taxDiscount);
-                    } else
-                    {
-                        ot.setTax(getTaxFromTotal(discount, averageTaxRate, scale));
-                    }
-                }
+                
+                // Get the tax portion of the discount
+                BigDecimal tax = getTaxForDiscount(order, discount, scale, applyBeforeTax);
+                ot.setTax(tax);
 
                 myOrderTotalList.add(ot);
             }
@@ -356,6 +359,9 @@ public class TotalDiscount extends BaseOrderTotalModule implements OrderTotalInt
 
         // Call a helper method to decide which OrderTotal we should return
         OrderTotal retOT = getDiscountOrderTotalFromList(order, myOrderTotalList, applyBeforeTax);
+        
+        // Modify the refund values of each product 
+        setRefundValues(order, retOT, applyBeforeTax);
 
         return retOT;
 

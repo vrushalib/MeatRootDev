@@ -1,14 +1,17 @@
 package com.konakart.al;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.konakart.app.FetchProductOptions;
+import com.konakart.app.KKException;
 import com.konakart.appif.FetchProductOptionsIf;
 import com.konakart.appif.OrderIf;
 import com.konakart.appif.OrderTotalIf;
+import com.konakart.util.KKConstants;
 
 /**
  * Callouts to add custom code to the KKAppEng
@@ -30,10 +33,20 @@ public class KKAppEngCallouts
         // System.out.println("Set product options for current customer");
         FetchProductOptionsIf fpo = new FetchProductOptions();
         fpo.setCalcQuantityForBundles(false);
+        /*
+         * Returns the image names when getting a single product. Used for different images based on
+         * options. e.g. green shirt, blue shirt etc.
+         */
+        fpo.setGetImages(true);
         // fpo.setCatalogId("cat1");
         // fpo.setUseExternalPrice(true);
         // fpo.setUseExternalQuantity(true);
         eng.setFetchProdOptions(fpo);
+
+        /*
+         * We keep a default value that we revert back to when a customer logs out
+         */
+        eng.setFetchProdOptionsDefault(fpo);
     }
 
     /**
@@ -80,13 +93,16 @@ public class KKAppEngCallouts
      * 
      * @param eng
      * @param order
-     * @return Returns true if all the necessary order total modules are present
+     * @return Returns null if all OK. Otherwise a message is returned that will be displayed to the
+     *         customer.
      */
-    public boolean validateOrderTotals(KKAppEng eng, OrderIf order)
+    public String validateOrderTotals(KKAppEng eng, OrderIf order)
     {
+        String retMsg = eng.getMsg("one.page.checkout.problem");
+
         if (order == null)
         {
-            return false;
+            return retMsg;
         }
 
         /*
@@ -111,7 +127,7 @@ public class KKAppEngCallouts
                 {
                     log.error("TaxCloud Module didn't return a value for the address: \n"
                             + order.getDeliveryFormattedAddress());
-                    return false;
+                    return retMsg;
                 }
             }
             if (eng.getConfigAsBoolean("MODULE_SHIPPING_USPS_STATUS", false, /* tryEngIfNotInCache */
@@ -122,7 +138,7 @@ public class KKAppEngCallouts
                 {
                     log.error("USPS Module didn't return a value for the address: \n"
                             + order.getDeliveryFormattedAddress());
-                    return false;
+                    return retMsg;
                 }
             }
         } else if (order.getDeliveryCountryObject().getIsoCode3().equalsIgnoreCase("CAN"))
@@ -135,7 +151,7 @@ public class KKAppEngCallouts
                 {
                     log.error("Canada Post Module didn't return a value for the address: \n"
                             + order.getDeliveryFormattedAddress());
-                    return false;
+                    return retMsg;
                 }
             }
         } else
@@ -148,7 +164,7 @@ public class KKAppEngCallouts
                 {
                     log.error("USPS International Module didn't return a value for the address: \n"
                             + order.getDeliveryFormattedAddress());
-                    return false;
+                    return retMsg;
                 }
             }
         }
@@ -161,7 +177,7 @@ public class KKAppEngCallouts
             {
                 log.error("Fedex Module didn't return a value for the address: \n"
                         + order.getDeliveryFormattedAddress());
-                return false;
+                return retMsg;
             }
         }
 
@@ -173,7 +189,7 @@ public class KKAppEngCallouts
             {
                 log.error("UPS Module didn't return a value for the address: \n"
                         + order.getDeliveryFormattedAddress());
-                return false;
+                return retMsg;
             }
         }
 
@@ -186,19 +202,94 @@ public class KKAppEngCallouts
         if (shipping == null)
         {
             log.error("No shipping module found: \n" + order.getDeliveryFormattedAddress());
-            return false;
+            return retMsg;
         }
-        
+
         /*
-         * Check that a payment method is always present on the order. 
+         * Check that a payment method is always present on the order.
          */
         if (order.getPaymentDetails() == null)
         {
             log.error("No payment method found: \n" + order.getBillingFormattedAddress());
-            return false;
+            return retMsg;
         }
 
-        return true;
+        return null;
     }
 
+    /**
+     * Ensures that the customer has the correct privileges for confirming the order
+     * 
+     * @param eng
+     * @param order
+     * @return Returns null if all OK. Otherwise a message is returned that will be displayed to the
+     *         customer.
+     * @throws KKAppException
+     * @throws KKException
+     */
+    public String validateOrderForCustomer(KKAppEng eng, OrderIf order) throws KKAppException,
+            KKException
+    {
+        if (order == null)
+        {
+            return eng.getMsg("one.page.checkout.problem");
+        }
+
+        CustomerMgr custMgr = eng.getCustomerMgr();
+        if (custMgr.isCustomerTagsAvailable())
+        {
+            /*
+             * Check order total limit
+             */
+            BigDecimal limit = custMgr.getTagValueAsBigDecimal(KKConstants.B2B_ORDER_LIMIT);
+            if (limit != null && order.getOrderTotals() != null)
+            {
+                for (int i = 0; i < order.getOrderTotals().length; i++)
+                {
+                    OrderTotalIf ot = order.getOrderTotals()[i];
+                    if (ot.getClassName() != null && ot.getClassName().equals("ot_total"))
+                    {
+                        if (ot.getValue() != null && ot.getValue().compareTo(limit) > 0)
+                        {
+                            return eng.getMsg("one.page.checkout.limit.exceeded",
+                                    eng.formatPrice(limit));
+                        }
+                    }
+                }
+            }
+            /*
+             * Check aggregate order total limit
+             */
+            BigDecimal aggregateLimit = custMgr
+                    .getTagValueAsBigDecimal(KKConstants.B2B_AGGREGATE_ORDER_LIMIT);
+            if (aggregateLimit != null && order.getOrderTotals() != null)
+            {
+                BigDecimal aggregateTotal = custMgr.getTagValueAsBigDecimal(
+                        KKConstants.B2B_AGGREGATE_ORDER_TOTAL, /* fromDB */true);
+                if (aggregateTotal == null)
+                {
+                    aggregateTotal = new BigDecimal(0);
+                }
+                limit = aggregateLimit.subtract(aggregateTotal);
+                if (limit.compareTo(BigDecimal.ZERO) <= 0)
+                {
+                    return eng.getMsg("one.page.checkout.aggregate.limit.exceeded",
+                            eng.formatPrice(aggregateLimit));
+                }
+                for (int i = 0; i < order.getOrderTotals().length; i++)
+                {
+                    OrderTotalIf ot = order.getOrderTotals()[i];
+                    if (ot.getClassName() != null && ot.getClassName().equals("ot_total"))
+                    {
+                        if (ot.getValue() != null && ot.getValue().compareTo(limit) > 0)
+                        {
+                            return eng.getMsg("one.page.checkout.aggregate.limit.will.be.exceeded",
+                                    eng.formatPrice(limit));
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

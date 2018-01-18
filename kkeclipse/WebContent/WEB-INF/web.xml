@@ -46,12 +46,30 @@
 		<param-value>false</param-value>
 	</context-param>
 	End of JBoss -->
+		
+	<!-- 
+		Global Parameters are read in this listener from the konakart.properties file for global 
+		initialization before the webapp starts 
+	-->
+	<listener>
+		<listener-class>
+			com.konakart.servlet.KKEngInitializationListener
+        </listener-class>
+	</listener>
 	
 	<listener>
 		<listener-class>
 			org.apache.axis.transport.http.AxisHTTPSessionListener
 		</listener-class>
 	</listener>
+
+	<!-- JAX Web Services
+	<listener>
+        <listener-class>
+			com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+        </listener-class>
+    </listener>
+	End of JAX Web Services -->
 
 	<!-- Used to listen out for Shutdown messages and handle the Shutdown of threads -->
 	<listener>
@@ -73,33 +91,8 @@
 			<param-name>appPropertiesPath</param-name>
 			<param-value>konakart_app.properties</param-value>
 		</init-param>
-		<init-param>
-			<param-name>mode</param-name>
-			<param-value>0</param-value>
-		</init-param>
-		<init-param>
-			<param-name>storeId</param-name>
-			<param-value>store1</param-value>
-		</init-param>
-		<init-param>
-			<param-name>customersShared</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>productsShared</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>categoriesShared</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>defaultStoreId</param-name>
-			<param-value>store1</param-value>
-		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
 	
 	<!-- Servlet for Apache Message Queue
 
@@ -108,7 +101,8 @@
 	ApacheMQ Server parameters:
 		uri                 = The broker URI
 		mqEnabled           = Enable (true) or Disable (false) the Apache Message Queue
-		mqName              = A name for this Broker to make it unique
+		mqJMXRMIPort        = The management port for JMX RMI connections (default is 1099)
+		mqName              = A name for this Broker to make it unique (. + hostname will be added)
 		mqAdminUserName     = admin username
 		mqAdminUserPassword = admin password
 		mqUserUserName      = username
@@ -117,10 +111,12 @@
 		mqStoreLimitMB      = disk space (in MB) reserved for persistent messages (using KahaDB)
 		mqTempLimitMB       = disk space (in MB) reserved for non-persistent messages
 		mqMemoryLimitMB     = JVM Memory (in MB) available for the broker
+		mqPropertiesFile    = name of the properties file containing additional configurations
+		mqRandomConnNames   = If true (the default) Connector Names are randomised
 			
 	-->
 	
-	<!-- Apache ActiveMQ 
+	<!-- Apache ActiveMQ
 	<servlet>
 		<servlet-name>KonaKartMQServlet</servlet-name>
 		<servlet-class>
@@ -135,8 +131,16 @@
 			<param-value>true</param-value>
 		</init-param>
 		<init-param>
+			<param-name>mqRandomConnNames</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mqJMXRMIPort</param-name>
+			<param-value>1099</param-value>
+		</init-param>
+		<init-param>
 			<param-name>mqName</param-name>
-			<param-value>KonaKart.Broker.1</param-value>
+			<param-value>KonaKart.Broker</param-value>
 		</init-param>
 		<init-param>
 			<param-name>mqAdminUserName</param-name>
@@ -170,9 +174,70 @@
 			<param-name>mqMemoryLimitMB</param-name>
 			<param-value>64</param-value>
 		</init-param>
+		<init-param>
+			<param-name>mqPropertiesFile</param-name>
+			<param-value>konakart.properties</param-value>
+		</init-param>
 		<load-on-startup>20</load-on-startup>
 	</servlet>
 	End of Apache ActiveMQ -->
+
+	
+	<!-- Servlet for JAXWS Storefront Controller 
+
+	Uncomment the section below if you want to use the JAXWS Storefront Controller Servlet
+
+	When sending these commands the password must match the one defined in the 
+	"password" servlet parameter below.  Remember to change this password!
+	
+	Only enable the JAXWS Storefront Controller if you need to and if you do, change the 
+	password.
+
+	JAXWS Storefront Controller commands:
+		?cmd=enableJAXWS&pwd=password
+		    Enables the JAXWS Storefront server
+		?cmd=disableJAXWS&pwd=password
+		    Disables the JAXWS Storefront server
+		?cmd=excludeInterfaces&pwd=password&Interfaces=Comma separated list of KKEngIf interfaces
+		    Sets the excludedInterfaces
+		?cmd=includeInterfaces&pwd=password&Interfaces=Comma separated list of KKEngIf interfaces
+		    Sets the includedInterfaces
+		
+	JAXWS Storefront Controller parameters:
+		jaxwsEnabled        = Enable (true) or Disable (false) the JAXWS Storefront Server
+		excludedInterfaces  = Comma separated list of KKEngIf interfaces that
+		                      are not allowed.  If not specified or left empty, 
+		                      no interfaces are excluded.
+		includedInterfaces  = Comma separated list of KKEngIf interfaces that
+		                      are allowed. If not specified or left empty, all
+		                      interfaces are allowed.
+	-->
+	
+	<!-- JAXWS Storefront Controller
+	<servlet>
+		<servlet-name>KonaKart_JAXWS_Storefront_Controller</servlet-name>
+		<servlet-class>
+			com.konakart.jws.KKJAXWSStorefrontController
+		</servlet-class>
+		<init-param>
+			<param-name>password</param-name>
+			<param-value>jack</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxwsEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<load-on-startup>29</load-on-startup>
+	</servlet>
+	End of JAXWS Storefront Controller -->
 
 	<!-- Servlet for JSON Engine
 
@@ -215,7 +280,7 @@
 	Uncomment the section below if you want to use the JSON Admin Servlet
 
 	When sending these commands the password must match the one defined in the 
-	"password" servlet parameter below.
+	"password" servlet parameter below. Remember to change this password!
 	
 	Only enable the JSON Admin server if you need to and if you do, change the 
 	password.
@@ -245,6 +310,78 @@
 	</servlet>
 	End of JSON Admin -->
 
+	<!-- Servlet for JSON Custom Store Service Engine
+
+	Uncomment the section below if you want to use the JSON Custom Store Service Engine
+		
+	JSON Server parameters:
+		jsonEnabled         = Enable (true) or Disable (false) the JSON server
+		excludedInterfaces  = Comma separated list of KKCustomStoreServiceIf interfaces that
+		                      are not allowed.  If not specified or left empty, 
+		                      no interfaces are excluded.
+		includedInterfaces  = Comma separated list of KKCustomStoreServiceIf interfaces that
+		                      are allowed. If not specified or left empty, all
+		                      interfaces are allowed.
+	-->
+	
+	<!-- JSON Custom Store Service Server
+	<servlet>
+		<servlet-name>KonaKart_JSON_CSS_Servlet</servlet-name>
+		<servlet-class>
+			com.konakart.json.KKJSONCustomStoreServiceServer
+		</servlet-class>
+		<init-param>
+			<param-name>jsonEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>excludedInterfaces</param-name>
+			<param-value></param-value>
+		</init-param>
+		<load-on-startup>30</load-on-startup>
+	</servlet>
+	End of JSON Custom Store Service Server -->
+
+	<!-- Servlet for JSON Custom Store Service Admin
+
+	Uncomment the section below if you want to use the JSON Custom Store Service Admin Servlet
+
+	When sending these commands the password must match the one defined in the 
+	"password" servlet parameter below.
+	
+	Only enable the Custom Store Service JSON Admin server if you need to and if you do, change the 
+	password.
+
+	JSON Custom Store Service Admin commands:
+		?cmd=enableJSON&pwd=password
+		    Enables the JSON server
+		?cmd=disableJSON&pwd=password
+		    Disables the JSON server
+		?cmd=excludeInterfaces&pwd=password&Interfaces=Comma separated list of KKCustomStoreServiceIf interfaces
+		    Sets the excludedInterfaces
+		?cmd=includeInterfaces&pwd=password&Interfaces=Comma separated list of KKCustomStoreServiceIf interfaces
+		    Sets the includedInterfaces
+	-->
+	
+	<!-- JSON Custom Store Service Admin
+	<servlet>
+		<servlet-name>KonaKart_JSON_CSS_Admin</servlet-name>
+		<servlet-class>
+			com.konakart.json.KKJSONCustomStoreServiceServerAdmin
+		</servlet-class>
+		<init-param>
+			<param-name>password</param-name>
+			<param-value>jason</param-value>
+		</init-param>
+		<load-on-startup>29</load-on-startup>
+	</servlet>
+	End of JSON Custom Store Service Admin -->
+
+	
 	<!-- Servlet for RMI Server
 
 	Uncomment this if you want to use RMI
@@ -279,6 +416,16 @@
 		</servlet-class>
 	</servlet>
 
+	<!-- JAX Web Services
+	<servlet>
+        <servlet-name>KKJAXWSKKEng</servlet-name>
+        <servlet-class>
+        	com.sun.xml.ws.transport.http.servlet.WSServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+	End of JAX Web Services -->
+
 	<!-- Servlet Mapping -->
 
 	<servlet-mapping>
@@ -290,11 +437,28 @@
 		<servlet-name>AxisServlet</servlet-name>
 		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
+    
+	<!-- JAX Web Services
+	<servlet-mapping>
+        <servlet-name>KKJAXWSKKEng</servlet-name>
+        <url-pattern>/KKJAXWSKKEng</url-pattern>
+    </servlet-mapping>
+	End of JAX Web Services -->
 
+	<!--
+	     Uncomment the section below if you want to use the JAXWS Storefront Service 
+	-->
+	<!-- JAXWS Storefront Controller
+	<servlet-mapping>
+		<servlet-name>KonaKart_JAXWS_Storefront_Controller</servlet-name>
+		<url-pattern>/konakartjaxwscontroller</url-pattern>
+	</servlet-mapping>
+	End of JAXWS Storefront Controller -->
+	
 	<!--
 	     Uncomment the section below if you want to use the JSON Engine
 	-->
-	<!-- JSON Server 
+	<!-- JSON Server
 	<servlet-mapping>
 		<servlet-name>KonaKart_JSON_Servlet</servlet-name>
 		<url-pattern>/konakartjson</url-pattern>
@@ -304,12 +468,32 @@
 	<!--
 	     Uncomment the section below if you want to use the JSON Admin Servlet
 	-->
-	<!-- JSON Admin 
+	<!-- JSON Admin
 	<servlet-mapping>
 		<servlet-name>KonaKart_JSON_Admin</servlet-name>
 		<url-pattern>/konakartjsonadmin</url-pattern>
 	</servlet-mapping>
 	End of JSON Admin -->
+
+	<!--
+	     Uncomment the section below if you want to use the JSON Custom Store Service Engine
+	-->
+	<!-- JSON Custom Store Service Server
+	<servlet-mapping>
+		<servlet-name>KonaKart_JSON_CSS_Servlet</servlet-name>
+		<url-pattern>/konakartjsoncss</url-pattern>
+	</servlet-mapping>
+	End of JSON Custom Store Service Server -->
+	
+	<!--
+	     Uncomment the section below if you want to use the JSON Custom Store Service Admin Servlet
+	-->
+	<!-- JSON Custom Store Service Admin
+	<servlet-mapping>
+		<servlet-name>KonaKart_JSON_CSS_Admin</servlet-name>
+		<url-pattern>/konakartjsonadmincss</url-pattern>
+	</servlet-mapping>
+	End of JSON Custom Store Service Admin -->
 
 	<!-- 
 		Currently the W3C haven't settled on a media type for WSDL;

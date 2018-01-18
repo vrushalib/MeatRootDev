@@ -53,8 +53,10 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
     /** the log */
     protected static Log log = LogFactory.getLog(OrderTotalMgr.class);
 
+    /** mutex */
     protected static String mutex = "orderTotalMgrMutex";
 
+    /** mutex */
     protected static String mutex1 = "orderTotalMgrMutex1";
 
     /** Hash Map that contains the static data */
@@ -76,7 +78,7 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
     /** ot_tax */
     public static final String ot_tax = "ot_tax";
 
-    // Configuration Keys
+    /** Configuration Key */
     protected final static String MODULE_ORDER_TOTAL_INSTALLED = "MODULE_ORDER_TOTAL_INSTALLED";
 
     // Module Class names
@@ -159,7 +161,7 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
             }
             sd.setOrderTotalModuleList(otModuleListStr);
 
-            sd.setDispPriceWithTax(mgr.getConfigurationValueAsBool(false, 
+            sd.setDispPriceWithTax(mgr.getConfigurationValueAsBool(false,
                     ConfigConstants.DISPLAY_PRICE_WITH_TAX, false));
 
             // Now we need to get a list of order total modules to refresh them all
@@ -174,7 +176,11 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
                     {
                         OrderTotalInterface orderTotalModule = getOrderTotalModuleForName(moduleName);
                         orderTotalModule.setStaticVariables();
-                    } catch (Exception e)
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("Created Order Total Module : " + moduleName);
+                        }
+                    } catch (Throwable e)
                     {
                         log.error("Could not instantiate the OrderTotal Module " + moduleName
                                 + " in order to refresh its configuration.", e);
@@ -226,9 +232,15 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
     }
 
     /**
+     * The order object is populated with an array of order totals. The order totals depend on the
+     * order total modules installed.
+     * 
      * @param order
+     *            The order object
      * @param languageId
-     * @return An array of shipping quotes
+     *            The id for the language that will be used. Value of -1 selects the default
+     *            language.
+     * @return An order object
      * @throws Exception
      */
     public Order getOrderTotals(OrderIf order, int languageId) throws Exception
@@ -362,6 +374,16 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
         {
             OrderTotal ot = iter.next();
             retArray[i++] = ot;
+        }
+        
+        if (log.isDebugEnabled())
+        {
+            log.debug("Order Totals:");
+            for (int j = 0; j < retArray.length; j++)
+            {
+                OrderTotal ot = retArray[j];
+                log.debug(ot.toString());
+            }
         }
 
         order.setOrderTotals(retArray);
@@ -530,8 +552,10 @@ public class OrderTotalMgr extends BaseMgr implements OrderTotalMgrIf
      */
     protected class StaticData
     {
+        /** Display price including tax */
         boolean dispPriceWithTax = false;
 
+        /** List of order total modules */
         List<String> orderTotalModuleList;
 
         /**

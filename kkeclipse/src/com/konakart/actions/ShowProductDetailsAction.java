@@ -166,7 +166,11 @@ public class ShowProductDetailsAction extends BaseAction
                             return SUCCESS;
                         }
 
-                        kkAppEng.getProductMgr().updateProductViewedCount(prodIdInt);
+                        if (kkAppEng.getConfigAsBoolean(ConfigConstants.UPDATE_PRODUCT_VIEWED_COUNT, false))
+                        {
+                            kkAppEng.getProductMgr().updateProductViewedCount(prodIdInt);
+                        }
+ 
                         if (!kkAppEng.getPropertyAsBoolean("prod.details.hide.also.purchased",
                                 false))
                         {
@@ -181,7 +185,14 @@ public class ShowProductDetailsAction extends BaseAction
                         kkAppEng.getReviewMgr().fetchReviews(null, search);
                         selectedProd = kkAppEng.getProductMgr().getSelectedProduct();
                         selectedCat = kkAppEng.getCategoryMgr().getCurrentCat();
+                    } else
+                    {
+                        // Reset the timestamp even if the product has been cached
+                        kkAppEng.getProductMgr().setProdTimestamp(0);
+                        // Set the category from the cached category
+                        selectedCat = kkAppEng.getProductMgr().getSelectedProductCategory();
                     }
+
                     return preparePage(request, kkAppEng, selectedProd, selectedCat);
                 }
             } else if (seoFormat == SEO_PARAMETERS)
@@ -211,7 +222,11 @@ public class ShowProductDetailsAction extends BaseAction
                 return SUCCESS;
             }
 
-            kkAppEng.getProductMgr().updateProductViewedCount(prodIdInt);
+            if (kkAppEng.getConfigAsBoolean(ConfigConstants.UPDATE_PRODUCT_VIEWED_COUNT, false))
+            {
+                kkAppEng.getProductMgr().updateProductViewedCount(prodIdInt);
+            }
+            
             if (!kkAppEng.getPropertyAsBoolean("prod.details.hide.also.purchased", false))
             {
                 kkAppEng.getProductMgr().fetchAlsoPurchasedArray();
@@ -421,6 +436,18 @@ public class ShowProductDetailsAction extends BaseAction
         keywords = keywords.replace("$name", selectedProdName);
         keywords = keywords.replace("$model", selectedProdModel);
         kkAppEng.setMetaKeywords(keywords);
+
+        // Set the image meta tag so that Facebook picks up the correct image when posting
+        if (!kkAppEng.isPortlet())
+        {
+            String baseUrl = getBaseURL(request, false);
+            if (baseUrl != null)
+            {
+                baseUrl += kkAppEng.getProdImage(selectedProd, KKAppEng.IMAGE_BIG);
+                String fbImgMeta = "<meta property=\"og:image\" content=\"" + baseUrl + "\"/>";
+                kkAppEng.getMetaList().add(fbImgMeta);
+            }
+        }
 
         // Set bread crumbs
         ArrayList<CategoryIf> catList = new ArrayList<CategoryIf>();

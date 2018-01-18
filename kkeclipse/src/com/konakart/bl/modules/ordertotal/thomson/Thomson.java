@@ -66,7 +66,7 @@ import com.sabrix.services.taxcalculationservice._2011_09_01.ZoneAddressType;
 import com.workingdogs.village.DataSetException;
 
 /**
- * Module that creates an OrderTotal object based on tax information received from the Avalara web
+ * Module that creates an OrderTotal object based on tax information received from the Thomson-Reuter web
  * service
  */
 public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
@@ -278,7 +278,8 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
 
         staticData.setBodyUsername(getConfigurationValue(MODULE_ORDER_TOTAL_THOMSON_BODY_USERNAME));
         staticData.setBodyPassword(getConfigurationValue(MODULE_ORDER_TOTAL_THOMSON_BODY_PASSWORD));
-        staticData.setBodySecure(getConfigurationValueAsBool(MODULE_ORDER_TOTAL_THOMSON_BODY_SECURE, false));
+        staticData.setBodySecure(getConfigurationValueAsBool(
+                MODULE_ORDER_TOTAL_THOMSON_BODY_SECURE, false));
 
         staticData.setSaveMsgDb(getConfigurationValueAsBool(MODULE_ORDER_TOTAL_THOMSON_SAVE_MSG_DB,
                 true));
@@ -350,7 +351,10 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         sellerAddr.setADDRESS1(staticData.getStreet());
         sellerAddr.setCITY(staticData.getCity());
         sellerAddr.setCOUNTRY(staticData.getCountry());
-        sellerAddr.setPOSTCODE(staticData.getPostcode());
+        sellerAddr.setPOSTCODE(staticData.getCustomClass().getPostcodeFromPostcode(null,
+                staticData.getPostcode()));
+        sellerAddr.setGEOCODE(staticData.getCustomClass().getGeocodeFromPostcode(null,
+                staticData.getPostcode()));
 
         if (!Utils.isBlank(staticData.getCounty()))
         {
@@ -376,7 +380,10 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         shipFromAddr.setADDRESS1(staticData.getShipFromStreet());
         shipFromAddr.setCITY(staticData.getShipFromCity());
         shipFromAddr.setCOUNTRY(staticData.getShipFromCountry());
-        shipFromAddr.setPOSTCODE(staticData.getShipFromPostcode());
+        shipFromAddr.setPOSTCODE(staticData.getCustomClass().getPostcodeFromPostcode(null,
+                staticData.getShipFromPostcode()));
+        shipFromAddr.setGEOCODE(staticData.getCustomClass().getGeocodeFromPostcode(null,
+                staticData.getShipFromPostcode()));
 
         if (!Utils.isBlank(staticData.getShipFromCounty()))
         {
@@ -557,7 +564,7 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
             inData.setUSERNAME(sd.getBodyUsername());
             inData.setPASSWORD(sd.getBodyPassword());
         }
-        
+
         IndataInvoiceType invoice = new IndataInvoiceType();
 
         invoice.setEXTERNALCOMPANYID(sd.getExternalCompanyId());
@@ -610,11 +617,11 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         invoice.setCALCULATIONDIRECTION("F");
 
         if (!Utils.isBlank(currCode))
-        {               
+        {
             invoice.setCURRENCYCODE(currCode);
         } else
         {
-            invoice.setCURRENCYCODE(sd.getDefaultCurrency());  
+            invoice.setCURRENCYCODE(sd.getDefaultCurrency());
         }
 
         invoice.setCUSTOMERNAME(order.getCustomerName());
@@ -950,6 +957,10 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
             if (!Utils.isBlank(addr.getPOSTCODE()))
             {
                 str += "\n\t POSTCODE  = " + addr.getPOSTCODE();
+            }
+            if (!Utils.isBlank(addr.getPOSTCODE()))
+            {
+                str += "\n\t GEOCODE  = " + addr.getGEOCODE();
             }
             if (!Utils.isBlank(addr.getCOUNTRY()))
             {
@@ -2337,7 +2348,8 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         }
 
         /**
-         * @param bodyUsername the bodyUsername to set
+         * @param bodyUsername
+         *            the bodyUsername to set
          */
         public void setBodyUsername(String bodyUsername)
         {
@@ -2353,7 +2365,8 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         }
 
         /**
-         * @param bodyPassword the bodyPassword to set
+         * @param bodyPassword
+         *            the bodyPassword to set
          */
         public void setBodyPassword(String bodyPassword)
         {
@@ -2369,7 +2382,8 @@ public class Thomson extends BaseOrderTotalModule implements OrderTotalInterface
         }
 
         /**
-         * @param bodySecure the bodySecure to set
+         * @param bodySecure
+         *            the bodySecure to set
          */
         public void setBodySecure(boolean bodySecure)
         {

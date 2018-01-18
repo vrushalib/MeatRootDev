@@ -33,12 +33,10 @@ import com.konakart.appif.ProductIf;
 public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
 {
     private static final long serialVersionUID = 1L;
-    
-    private String xsrf_token;
-    
-    protected int qty = 1;
 
-	public String execute()
+    private String xsrf_token;
+
+    public String execute()
     {
         HttpServletRequest request = ServletActionContext.getRequest();
         HttpServletResponse response = ServletActionContext.getResponse();
@@ -84,13 +82,9 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
                 setRedirectURL(Integer.toString(getProdId()));
                 return SUCCESS;
             }
-            
-            if(getQty() != -1){
-            	qty = getQty();
-            }
 
             // Common code for adding to cart
-            this.addToCart(kkAppEng, selectedProd, null, qty);
+            this.addToCart(kkAppEng, selectedProd, null, 1);
 
             // Common code for setting messages
             this.setMsgs(kkAppEng);
@@ -300,18 +294,97 @@ public class AddToCartFromProdIdAction extends AddToCartOrWishListBaseAction
     }
 
     /**
-     * @param xsrf_token the xsrf_token to set
+     * @param xsrf_token
+     *            the xsrf_token to set
      */
     public void setXsrf_token(String xsrf_token)
     {
         this.xsrf_token = xsrf_token;
     }
 
-    public int getQty() {
-		return qty;
-	}
+    /**
+     * @return the prodName
+     */
+    public String getProdName()
+    {
+        return prodName;
+    }
 
-	public void setQty(int qty) {
-		this.qty = qty;
-	}
+    /**
+     * @param prodName
+     *            the prodName to set
+     */
+    public void setProdName(String prodName)
+    {
+        this.prodName = prodName;
+    }
+
+    /**
+     * @return the prodOptionString
+     */
+    public String getProdOptionString()
+    {
+        return prodOptionString;
+    }
+
+    /**
+     * @param prodOptionString
+     *            the prodOptionString to set
+     */
+    public void setProdOptionString(String prodOptionString)
+    {
+        this.prodOptionString = prodOptionString;
+    }
+
+    /**
+     * @return the prodQty
+     */
+    public int getProdQty()
+    {
+        return prodQty;
+    }
+
+    /**
+     * @param prodQty
+     *            the prodQty to set
+     */
+    public void setProdQty(int prodQty)
+    {
+        this.prodQty = prodQty;
+    }
+
+    /**
+     * @return the prodManuName
+     */
+    public String getProdManuName()
+    {
+        return prodManuName;
+    }
+
+    /**
+     * @param prodManuName
+     *            the prodManuName to set
+     */
+    public void setProdManuName(String prodManuName)
+    {
+        this.prodManuName = prodManuName;
+    }
+
+    /**
+     * @return the prodCatName
+     */
+    public String getProdCatName()
+    {
+        return prodCatName;
+    }
+
+    /**
+     * @param prodCatName
+     *            the prodCatName to set
+     */
+    public void setProdCatName(String prodCatName)
+    {
+        this.prodCatName = prodCatName;
+    }
+
 }

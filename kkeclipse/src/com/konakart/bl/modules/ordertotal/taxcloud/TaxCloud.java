@@ -460,9 +460,9 @@ public class TaxCloud extends BaseOrderTotalModule implements OrderTotalInterfac
         }
     }
 
-    private net.taxcloud.Address verifyAddress(StaticData sd, net.taxcloud.Address address)
+    private net.taxcloud.Address verifyAddress(StaticData sd, net.taxcloud.Address _address)
     {
-
+        net.taxcloud.Address address = _address;
         String uspsUserID = sd.getUspsId();
         AddressService addressService = new AddressService();
 

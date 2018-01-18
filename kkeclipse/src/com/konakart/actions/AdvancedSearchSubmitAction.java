@@ -18,6 +18,7 @@
 package com.konakart.actions;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -44,9 +45,9 @@ public class AdvancedSearchSubmitAction extends BaseAction
 
     private String priceToStr;
 
-    private Date dateAddedFrom;
+    private String dateAddedFrom;
 
-    private Date dateAddedTo;
+    private String dateAddedTo;
 
     private int manufacturerId = -100;
 
@@ -109,18 +110,44 @@ public class AdvancedSearchSubmitAction extends BaseAction
             // Populate the ProductSearch object from the form
             ps.setCategoryId(getCategoryId());
 
-            if (getDateAddedFrom() != null)
+            if (getDateAddedFrom() != null && getDateAddedFrom().length() > 0)
             {
-                GregorianCalendar gc = new GregorianCalendar();
-                gc.setTime(getDateAddedFrom());
-                ps.setDateAddedFrom(gc);
+                SimpleDateFormat sdf = new SimpleDateFormat(kkAppEng.getMsg("date.format"));
+                sdf.setLenient(false);
+                Date d = null;
+                try
+                {
+                    d = sdf.parse(getDateAddedFrom());
+                } catch (Exception e)
+                {
+                    log.warn("Cannot parse DateAddedFrom : " + getDateAddedFrom());
+                }
+                if (d != null)
+                {
+                    GregorianCalendar gc = new GregorianCalendar();
+                    gc.setTime(d);
+                    ps.setDateAddedFrom(gc);
+                }
             }
 
-            if (getDateAddedTo() != null)
+            if (getDateAddedTo() != null && getDateAddedTo().length() > 0)
             {
-                GregorianCalendar gc = new GregorianCalendar();
-                gc.setTime(getDateAddedTo());
-                ps.setDateAddedTo(gc);
+                SimpleDateFormat sdf = new SimpleDateFormat(kkAppEng.getMsg("date.format"));
+                sdf.setLenient(false);
+                Date d = null;
+                try
+                {
+                    d = sdf.parse(getDateAddedTo());
+                } catch (Exception e)
+                {
+                    log.warn("Cannot parse DateAddedTo : " + getDateAddedTo());
+                }
+                if (d != null)
+                {
+                    GregorianCalendar gc = new GregorianCalendar();
+                    gc.setTime(d);
+                    ps.setDateAddedTo(gc);
+                }
             }
 
             ps.setManufacturerId(getManufacturerId());
@@ -353,40 +380,6 @@ public class AdvancedSearchSubmitAction extends BaseAction
     }
 
     /**
-     * @return the dateAddedFrom
-     */
-    public Date getDateAddedFrom()
-    {
-        return dateAddedFrom;
-    }
-
-    /**
-     * @param dateAddedFrom
-     *            the dateAddedFrom to set
-     */
-    public void setDateAddedFrom(Date dateAddedFrom)
-    {
-        this.dateAddedFrom = dateAddedFrom;
-    }
-
-    /**
-     * @return the dateAddedTo
-     */
-    public Date getDateAddedTo()
-    {
-        return dateAddedTo;
-    }
-
-    /**
-     * @param dateAddedTo
-     *            the dateAddedTo to set
-     */
-    public void setDateAddedTo(Date dateAddedTo)
-    {
-        this.dateAddedTo = dateAddedTo;
-    }
-
-    /**
      * @return the priceFromStr
      */
     public String getPriceFromStr()
@@ -418,6 +411,40 @@ public class AdvancedSearchSubmitAction extends BaseAction
     public void setPriceToStr(String priceToStr)
     {
         this.priceToStr = priceToStr;
+    }
+
+    /**
+     * @return the dateAddedFrom
+     */
+    public String getDateAddedFrom()
+    {
+        return dateAddedFrom;
+    }
+
+    /**
+     * @param dateAddedFrom
+     *            the dateAddedFrom to set
+     */
+    public void setDateAddedFrom(String dateAddedFrom)
+    {
+        this.dateAddedFrom = dateAddedFrom;
+    }
+
+    /**
+     * @return the dateAddedTo
+     */
+    public String getDateAddedTo()
+    {
+        return dateAddedTo;
+    }
+
+    /**
+     * @param dateAddedTo
+     *            the dateAddedTo to set
+     */
+    public void setDateAddedTo(String dateAddedTo)
+    {
+        this.dateAddedTo = dateAddedTo;
     }
 
 }

@@ -1,5 +1,5 @@
 //
-// (c) 2014 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -38,14 +38,15 @@ public class ThomsonCustom extends ThomsonCustomBase
     /**
      * Constructor
      * 
-     * @param _eng
+     * @param storefrontEngine
      *            a KKENgIf engine
-     * @param _module
+     * @param thomsonModule
      *            the instance of the module
      */
-    public ThomsonCustom(KKEngIf _eng, com.konakart.bl.modules.ordertotal.thomson.Thomson _module)
+    public ThomsonCustom(KKEngIf storefrontEngine,
+            com.konakart.bl.modules.ordertotal.thomson.Thomson thomsonModule)
     {
-        super(_eng, _module);
+        super(storefrontEngine, thomsonModule);
     }
 
     /**
@@ -77,7 +78,7 @@ public class ThomsonCustom extends ThomsonCustomBase
     {
         return super.getCustomFieldValue(fieldName, customCodeFieldValue, sd, orderProduct);
     }
-    
+
     /**
      * Use the default implementation. Customers can create their own versions in their own class if
      * they wish.
@@ -86,7 +87,7 @@ public class ThomsonCustom extends ThomsonCustomBase
     {
         super.addUserElements(sd, orderProduct, line);
     }
-    
+
     /**
      * Use the default implementation. Customers can create their own versions in their own class if
      * they wish.
@@ -128,9 +129,27 @@ public class ThomsonCustom extends ThomsonCustomBase
     /**
      * Use the default implementation. Customers can create their own versions in their own class if
      * they wish.
-     */    
+     */
     public void calculateTotals(StaticData sd, OrderIf order)
     {
         super.calculateTotals(sd, order);
+    }
+
+    /**
+     * Use the default implementation. Customers can create their own versions in their own class if
+     * they wish.
+     */
+    public String getGeocodeFromPostcode(OrderIf order, String postcode)
+    {
+        return super.getGeocodeFromPostcode(order, postcode);
+    }
+
+    /**
+     * Use the default implementation. Customers can create their own versions in their own class if
+     * they wish.
+     */
+    public String getPostcodeFromPostcode(OrderIf order, String postcode)
+    {
+        return super.getPostcodeFromPostcode(order, postcode);
     }
 }

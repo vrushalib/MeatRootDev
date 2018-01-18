@@ -46,6 +46,11 @@
 										<span class="validation-msg"></span>
 									</div>
 									<div class="form-input">
+										<label><kk:msg  key="register.customer.body.username"/></label>
+										<input type="text" value="<s:property value="username" />"  name="username"/>
+										<span class="validation-msg"></span>
+									</div>
+									<div class="form-input">
 										<label><kk:msg  key="register.customer.body.password"/></label>
 										<input type="password" name="password" id="password" autocomplete="off" value=""/>
 										<span class="required-icon required-blue"></span>

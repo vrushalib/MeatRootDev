@@ -18,6 +18,8 @@
 package com.konakart.bl.modules.ordertotal.thomson;
 
 import java.math.BigDecimal;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,16 +63,16 @@ public class ThomsonCustomBase implements ThomsonCustomIf
     /**
      * Constructor
      * 
-     * @param _eng
+     * @param storefrontEngine
      *            a KKENgIf engine
-     * @param _module
+     * @param thomsonModule
      *            the instance of the module
      */
-    public ThomsonCustomBase(KKEngIf _eng,
-            com.konakart.bl.modules.ordertotal.thomson.Thomson _module)
+    public ThomsonCustomBase(KKEngIf storefrontEngine,
+            com.konakart.bl.modules.ordertotal.thomson.Thomson thomsonModule)
     {
-        this.eng = _eng;
-        this.module = _module;
+        this.eng = storefrontEngine;
+        this.module = thomsonModule;
     }
 
     public ZoneAddressType getShipToAddress(StaticData sd, OrderIf order, Country deliveryCountry,
@@ -95,7 +97,8 @@ public class ThomsonCustomBase implements ThomsonCustomIf
 
         if (!Utils.isBlank(order.getDeliveryPostcode()))
         {
-            shipToAddr.setPOSTCODE(order.getDeliveryPostcode());
+            shipToAddr.setPOSTCODE(getPostcodeFromPostcode(order, order.getDeliveryPostcode()));
+            shipToAddr.setGEOCODE(getGeocodeFromPostcode(order, order.getDeliveryPostcode()));
         }
 
         setStateAndProvince(shipToAddr, deliveryZone, deliveryZoneType, order.getDeliveryState());
@@ -125,7 +128,8 @@ public class ThomsonCustomBase implements ThomsonCustomIf
         billToAddr.setCOUNTRY(getModule().getCountryISO2(sd, order.getBillingCountry()));
         if (!Utils.isBlank(order.getBillingPostcode()))
         {
-            billToAddr.setPOSTCODE(order.getBillingPostcode());
+            billToAddr.setPOSTCODE(getPostcodeFromPostcode(order,order.getBillingPostcode()));
+            billToAddr.setGEOCODE(getGeocodeFromPostcode(order, order.getBillingPostcode()));
         }
 
         setStateAndProvince(billToAddr, billingZone, billingZoneType, order.getBillingState());
@@ -412,6 +416,40 @@ public class ThomsonCustomBase implements ThomsonCustomIf
             order.setTax(order.getTax().add(quote.getTax()));
         }
         order.setTotalIncTax(order.getTotalExTax().add(order.getTax()));
+    }
+
+    public String getGeocodeFromPostcode(OrderIf order, String postcode)
+    {
+        if (postcode != null && postcode.length() == 10 && matchUSZipcode(postcode))
+        {
+            return postcode.substring(6);
+        }
+
+        return null;
+    }
+
+    /**
+     * Use a regular expression to determine whether the postcode matches a US zipcode
+     * 
+     * @param postcode
+     * @return true if the postcode is in the format of a US zipcode
+     */
+    public boolean matchUSZipcode(String postcode)
+    {
+        final String USZipRegexp = "^[0-9]{5}(?:-[0-9]{4})?$";
+        Pattern pattern = Pattern.compile(USZipRegexp);
+        Matcher matcher = pattern.matcher(postcode);
+        return matcher.matches();
+    }
+
+    public String getPostcodeFromPostcode(OrderIf order, String postcode)
+    {
+        if (postcode != null && postcode.length() == 10 && matchUSZipcode(postcode))
+        {
+            return postcode.substring(0, 5);
+        }
+
+        return postcode;
     }
 
     /**

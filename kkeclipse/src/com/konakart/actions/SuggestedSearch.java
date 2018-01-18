@@ -37,6 +37,8 @@ public class SuggestedSearch extends BaseAction
 
     private String term;
 
+    private int categoryId = -1;
+
     private SearchResult[] srArray;
 
     private static final String START_TAG = "<b>";
@@ -49,7 +51,7 @@ public class SuggestedSearch extends BaseAction
         HttpServletResponse response = ServletActionContext.getResponse();
 
         try
-        {
+        {           
 
             if (term == null || term.length() == 0)
             {
@@ -57,6 +59,7 @@ public class SuggestedSearch extends BaseAction
             }
 
             KKAppEng kkAppEng = this.getKKAppEng(request, response);
+            kkAppEng.setSearchParentCategoryId(categoryId);
 
             String maxSsiStr = kkAppEng.getConfig("MAX_NUM_SUGGESTED_SEARCH_ITEMS");
             int maxSsi = 10;
@@ -76,18 +79,25 @@ public class SuggestedSearch extends BaseAction
             options.setSearchText(term.toLowerCase());
             options.setReturnRichText(true);
             options.setReturnRawText(true);
+            options.setCatalogId(kkAppEng.getFetchProdOptions().getCatalogId());
+            if (categoryId > -1)
+            {
+                options.setTopLevelCategoryId(categoryId);
+            }
 
-            SuggestedSearchItemIf[] ssArray = kkAppEng.getEng().getSuggestedSearchItems(
-                    kkAppEng.getSessionId(), options);
+            SuggestedSearchItemIf[] ssArray = kkAppEng.getEng()
+                    .getSuggestedSearchItems(kkAppEng.getSessionId(), options);
             if (ssArray != null && ssArray.length > 0)
             {
                 srArray = new SearchResult[ssArray.length];
                 for (int i = 0; i < ssArray.length; i++)
                 {
                     SuggestedSearchItemIf ss = ssArray[i];
-                    srArray[i] = new SearchResult(processTermResult(ss.getRichText(), /* rich */
-                            true), processTermResult(ss.getRawText(), /* rich */false), ss.getId()
-                            + "," + ss.getManufacturerId() + "," + ss.getCategoryId());
+                    srArray[i] = new SearchResult(
+                            processTermResult(ss.getRichText(), /* rich */
+                                    true),
+                            processTermResult(ss.getRawText(), /* rich */false),
+                            ss.getId() + "," + ss.getManufacturerId() + "," + ss.getCategoryId());
                 }
 
             }
@@ -104,12 +114,13 @@ public class SuggestedSearch extends BaseAction
      * Method to process Solr Term results. Currently the method unescapes any HTML returned by
      * Solr.
      * 
-     * @param result
+     * @param _result
      * @param rich
      * @return Returns the processed String
      */
-    private String processTermResult(String result, boolean rich)
+    private String processTermResult(String _result, boolean rich)
     {
+        String result = _result;
         if (result == null || result.length() == 0 || !result.contains("&"))
         {
             return result;
@@ -151,6 +162,22 @@ public class SuggestedSearch extends BaseAction
     public void setSrArray(SearchResult[] srArray)
     {
         this.srArray = srArray;
+    }
+
+    /**
+     * @return the categoryId
+     */
+    public int getCategoryId()
+    {
+        return categoryId;
+    }
+
+    /**
+     * @param categoryId the categoryId to set
+     */
+    public void setCategoryId(int categoryId)
+    {
+        this.categoryId = categoryId;
     }
 
 }

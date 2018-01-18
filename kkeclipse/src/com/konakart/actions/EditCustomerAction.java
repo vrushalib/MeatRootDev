@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
 
+import com.konakart.al.CustomerMgr;
 import com.konakart.al.KKAppEng;
 import com.konakart.appif.CustomerIf;
 
@@ -46,7 +47,7 @@ public class EditCustomerAction extends BaseAction
     private String telephoneNumber1;
 
     private String faxNumber;
-    
+
     private String taxId;
 
     public String execute()
@@ -76,14 +77,42 @@ public class EditCustomerAction extends BaseAction
                 return null;
             }
 
-            CustomerIf cust = kkAppEng.getCustomerMgr().getCurrentCustomer();
+            CustomerMgr custMgr = kkAppEng.getCustomerMgr();
+            CustomerIf cust = custMgr.getCurrentCustomer();
             if (cust != null)
             {
-                gender = noNull(cust.getGender());
-                firstName = noNull(cust.getFirstName());
-                lastName = noNull(cust.getLastName());
-                birthDateString = noNull(kkAppEng.getDateAsString(cust.getBirthDate()));
-                telephoneNumber = noNull(cust.getTelephoneNumber());
+                if (custMgr.isNoGender())
+                {
+                    gender = "";
+                } else
+                {
+                    gender = noNull(cust.getGender());
+                }
+
+                if (custMgr.isNoName())
+                {
+                    firstName = "";
+                    lastName = "";
+                } else
+                {
+                    firstName = noNull(cust.getFirstName());
+                    lastName = noNull(cust.getLastName());
+                }
+
+                if (custMgr.isNoBirthDate())
+                {
+                    birthDateString = "";
+                } else
+                {
+                    birthDateString = noNull(kkAppEng.getDateAsString(cust.getBirthDate()));
+                }
+                if (custMgr.isNoTelephone())
+                {
+                    telephoneNumber = "";
+                } else
+                {
+                    telephoneNumber = noNull(cust.getTelephoneNumber());
+                }
                 telephoneNumber1 = noNull(cust.getTelephoneNumber1());
                 faxNumber = noNull(cust.getFaxNumber());
                 taxId = noNull(cust.getTaxIdentifier());
@@ -227,7 +256,8 @@ public class EditCustomerAction extends BaseAction
     }
 
     /**
-     * @param taxId the taxId to set
+     * @param taxId
+     *            the taxId to set
      */
     public void setTaxId(String taxId)
     {

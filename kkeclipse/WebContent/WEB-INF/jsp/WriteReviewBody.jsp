@@ -31,6 +31,7 @@
 		    		<div>
 			    		<form action="WriteReviewSubmit.action" id="form1" method="post">
 							<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
+							<input type="hidden" value="<%=prod.getId()%>" name="productId"/>
 							<div class="form-section">
 								<div class="review-input">
 									<div class="form-input">

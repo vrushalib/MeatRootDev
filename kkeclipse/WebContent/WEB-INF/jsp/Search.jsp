@@ -17,9 +17,16 @@
 //
 --%>
 <%@include file="Taglibs.jsp" %>
+<%@page import="com.konakart.app.Content"%>
+<%@page import="com.konakart.app.ContentDescription"%>
+<%@page import="com.konakart.appif.ContentIf"%>
+
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 <% boolean useSolr = kkEng.isUseSolr();%>
 <% boolean showCookieWarning = !kkEng.isAgreedCookies();%>
+<% boolean contentEnabled = kkEng.getContentMgr().isEnabled();%>
+<% String contentDir = kkEng.getContentImagesDir();%>
+<% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
 <%if (useSolr) { %>						
 	<script type="text/javascript">	
@@ -36,6 +43,7 @@
 				        renderURL.setPortletId(document.getElementById('kk_portlet_id').value);
 				        renderURL.setWindowState("exclusive");
 						renderURL.setParameter("term", request.term);
+						renderURL.setParameter("categoryId", $("#top-cat-list").val());
 						
 						$.ajax({
 						type : 'POST',
@@ -58,7 +66,7 @@
 						contentType : "application/json; charset=utf-8",
 						url : "SuggestedSearch.action",
 						dataType : 'json',
-						data : '{"term":"' + request.term + '"}',
+						data : '{"categoryId":"'+$("#top-cat-list").val()+'",'+'"term":"' + request.term + '"}',
 				        success: function(result, textStatus, jqXHR) {					         
 				       		response(result);
 				       }
@@ -67,7 +75,8 @@
 			   },
 			minLength: 1,
 			select: function( event, ui ) {
-				self.kkSearch(ui.item.id,ui.item.value);
+				var catId = $("#top-cat-list").val();
+				self.kkSearch(ui.item.id,ui.item.value,catId);
 			}
 		}).data( "uiAutocomplete" )._renderItem = function( ul, item ) {
 			   ul.addClass('ui-corner-all');
@@ -81,8 +90,9 @@
 		$("#search-button").click(function (){
 		    	var key = document.getElementById('kk_key').value;
 			    var text = document.getElementById('search-input').value;
-		    	self.kkSearch(key,text);
-		});
+			    var catId = $("#top-cat-list").val();
+		    	self.kkSearch(key,text,catId);
+		});		
 	});	
 	</script>
 	
@@ -95,7 +105,7 @@
 	</form>
 <% } %>	
 
-<%if (showCookieWarning && false) { %>	 //added false to hide cookied permanently 
+<%if (showCookieWarning) { %>	
 	<div id="cookie-container">
 		<div id="cookie-warning">
 				<span style="display:table-cell; vertical-align:top;"><kk:msg  key="cookie.warning"/></span>
@@ -106,20 +116,48 @@
 
 <div id="header-container">
 	<div id="header">
-	<a href="Welcome.action"><img id="headerlogo" alt="MeatRoot" src="<%=kkEng.getImageBase()%>/headerLogo.jpg"></a>
 		<div id="logo">
+			<% ContentIf logoImg = null;%>
+			<%if (contentEnabled) { %>
+				<% ContentIf[] logoImgs = kkEng.getContentMgr().getContentForType(1, 13);%>
+				<%if (logoImgs.length == 1) { %>
+					<% logoImg = logoImgs[0];%>
+				<% } %> 
+			<% } %> 
+
+			<%if (logoImg == null) { %>
+				<% logoImg = new Content();%>
+				<% logoImg.setDescription(new ContentDescription());%>
+				<% logoImg.getDescription().setName1("logo.png");%>
+				<% logoImg.getDescription().setTitle("KonaKart logo");%>
+				<% logoImg.setClickUrl("Welcom.action");%>
+			<% } %> 
+			<a href="<%=logoImg.getClickUrl()%>"><img id="logo-1"  
+			    src="<%=kkEng.getImageBase()%>/<%=contentDir%>/<%=logoImg.getDescription().getName1()%>"
+			    alt="<%=logoImg.getDescription().getTitle()%>"/></a>
 		</div>
 		<div id="search">
 			<%if (useSolr) { %>						
-				<input type="text" id="search-input" name="searchText" onkeydown="javascript:kkKeydown();">
+				<select id="top-cat-list" class="rounded-corners-left">
+					<option  value="-1"><kk:msg  key="suggested.search.all"/></option>
+					<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
+						<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>
+						<%if (kkEng.getSearchParentCategoryId() == cat.getId()){ %>
+							<option  value="<%=cat.getId()%>" selected="selected"><%=cat.getName()%></option>
+						<% } else { %>
+							<option  value="<%=cat.getId()%>"><%=cat.getName()%></option>
+						<% } %>						
+					<% } %>					
+				</select>
+				<input type="text" id="search-input"  name="searchText" onkeydown="javascript:kkKeydown();">
 				<input id="kk_key" type="hidden"/>
-				<a id="search-button" ><kk:msg  key="suggested.search.search"/></a>
+				<a id="search-button" class="rounded-corners-right"><kk:msg  key="suggested.search.search"/></a>
 			<% } else { %>	
 				<form action="QuickSearch.action" id="quickSearchForm" method="post">
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 					<input type="hidden" value="true" name="searchInDesc"/>
-					<input type="text" id="search-input"  name="searchText">
-					<a id="search-button" onclick="javascript:document.getElementById('quickSearchForm').submit();"><span class="searchicon icon-search"></span><kk:msg  key="suggested.search.search"/></a>
+					<input type="text" id="search-input" name="searchText" class="rounded-corners-left">
+					<a id="search-button" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchForm').submit();"><kk:msg  key="suggested.search.search"/></a>
 				</form>	
             <% } %>
 		</div>

@@ -1,5 +1,5 @@
 //
-// (c) 2006 DS Data Systems UK Ltd, All rights reserved.
+// (c) 2004-2015 DS Data Systems UK Ltd, All rights reserved.
 //
 // DS Data Systems and KonaKart and their respective logos, are 
 // trademarks of DS Data Systems UK Ltd. All rights reserved.
@@ -257,7 +257,7 @@ public class AdminPayment extends AdminBasePayment implements AdminPaymentIf
 
         parmList.add(new NameValue("x_amount", total.toString()));
         parmList.add(new NameValue("x_currency_code", currency.getCode()));
-        parmList.add(new NameValue("x_invoice_num", order.getId())); // TODO
+        parmList.add(new NameValue("x_invoice_num", order.getId())); 
         parmList.add(new NameValue("x_test_request", (configs.isTestMode() ? "TRUE" : "FALSE")));
 
         // Set the billing address
@@ -791,7 +791,7 @@ public class AdminPayment extends AdminBasePayment implements AdminPaymentIf
         parmList.add(new NameValue("x_amount", refund.getRefundAmount().toString()));
         parmList.add(new NameValue("x_card_num", cardNum));
         parmList.add(new NameValue("x_currency_code", currency.getCode()));
-        parmList.add(new NameValue("x_invoice_num", order.getId())); // TODO
+        parmList.add(new NameValue("x_invoice_num", order.getId())); 
         parmList.add(new NameValue("x_test_request", (configs.isTestMode() ? "TRUE" : "FALSE")));
 
         AdminPaymentDetails pDetails = new AdminPaymentDetails();
