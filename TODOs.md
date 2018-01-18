@@ -1,0 +1,2 @@
+1. Payment functionalities
+	PayU	bc12e2643dccb2c7a3517fe06a6e744750529396
