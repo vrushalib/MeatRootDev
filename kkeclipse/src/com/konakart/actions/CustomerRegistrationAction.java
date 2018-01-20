@@ -42,8 +42,6 @@ public class CustomerRegistrationAction extends BaseAction
 
     private String emailAddr;
 
-    private String username;
-
     private String telephoneNumber;
 
     private String telephoneNumber1;
@@ -807,23 +805,6 @@ public class CustomerRegistrationAction extends BaseAction
     public void setTaxId(String taxId)
     {
         this.taxId = taxId;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername()
-    {
-        return username;
-    }
-
-    /**
-     * @param username
-     *            the username to set
-     */
-    public void setUsername(String username)
-    {
-        this.username = username;
     }
 
 }

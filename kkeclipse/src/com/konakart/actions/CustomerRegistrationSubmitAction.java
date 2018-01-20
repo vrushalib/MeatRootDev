@@ -30,8 +30,6 @@ import com.konakart.al.KKAppEng;
 import com.konakart.app.CustomerRegistration;
 import com.konakart.app.CustomerTag;
 import com.konakart.app.EmailOptions;
-import com.konakart.app.KKException;
-import com.konakart.app.KKUserExistsException;
 import com.konakart.appif.CountryIf;
 import com.konakart.appif.CustomerRegistrationIf;
 import com.konakart.appif.EmailOptionsIf;
@@ -53,8 +51,6 @@ public class CustomerRegistrationSubmitAction extends BaseAction
     private String birthDateString;
 
     private String emailAddr;
-
-    private String username;
 
     private String telephoneNumber;
 
@@ -134,6 +130,7 @@ public class CustomerRegistrationSubmitAction extends BaseAction
         // visible.
         CustomerRegistrationIf cr = new CustomerRegistration();
         KKAppEng kkAppEng = null;
+        String exceptionMsg = "";
 
         try
         {
@@ -142,6 +139,9 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             CustomerTag ct = null;
 
             kkAppEng = this.getKKAppEng(request, response);
+
+            // Msg used in the Exception block
+            exceptionMsg = kkAppEng.getMsg("register.customer.body.user.exists");
 
             custId = this.loggedIn(request, response, kkAppEng, null);
             if (custId > 0 && allowNoRegister)
@@ -177,8 +177,6 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             cr.setTaxIdentifier(escapeFormInput(getTaxId()));
             cr.setCountryId(getCountryId());
             cr.setEmailAddr(escapeFormInput(getEmailAddr()));
-            cr.setUsername(escapeFormInput(getUsername()));
-            cr.setUsernameUnique(true);
             cr.setFaxNumber(escapeFormInput(getFaxNumber()));
             cr.setFirstName(escapeFormInput(getFirstName()));
             cr.setGender(escapeFormInput(getGender()));
@@ -187,15 +185,7 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             cr.setPassword(getPassword());
             cr.setPostcode(escapeFormInput(getPostcode()));
             cr.setProductNotifications(getProductNotifications());
-            if (kkAppEng.getCustomerMgr().getSelectedZones() == null
-                    || kkAppEng.getCustomerMgr().getSelectedZones().length == 0)
-            {
-                cr.setState(escapeFormInput(getState()));
-            } else
-            {
-                // Don't escape since we try to match the state
-                cr.setState(getState());
-            }
+            cr.setState(escapeFormInput(getState()));
             cr.setStreetAddress(escapeFormInput(getStreetAddress()));
             cr.setStreetAddress1(escapeFormInput(getStreetAddress1()));
             cr.setSuburb(escapeFormInput(getSuburb()));
@@ -270,8 +260,6 @@ public class CustomerRegistrationSubmitAction extends BaseAction
              */
             // SSOTokenIf token = new SSOToken();
             // token.setCustomerId(customerId);
-            // token.setCustom1("true"); // If true, emailVerified is also set on the customer
-            // object
             // String secretKey = kkAppEng.getEng().saveSSOToken(token);
             // System.out.println("key = " + secretKey);
 
@@ -339,40 +327,22 @@ public class CustomerRegistrationSubmitAction extends BaseAction
             }
 
             if (kkAppEng.getForwardAfterLogin() != null
-                    && kkAppEng.getForwardAfterLogin().equalsIgnoreCase("Checkout"))
+                    && kkAppEng.getForwardAfterLogin().equalsIgnoreCase("ShowCartItems"))
             {
                 kkAppEng.setForwardAfterLogin(null);
-                return "Checkout";
+                return "ShowCartItems";
             }
 
             return SUCCESS;
 
-        } catch (KKException e)
+        } catch (Exception e)
         {
             /*
              * An exception could occur if the user already exists in which case we let the customer
              * try again with a different user name.
              */
-            String exceptionMsg;
-            if (kkAppEng != null)
-            {
-                if (e.getCode() == KKUserExistsException.DUPLICATE_USERNAME)
-                {
-                    exceptionMsg = kkAppEng.getMsg("register.customer.body.user.exists.username");
-                } else
-                {
-                    exceptionMsg = kkAppEng.getMsg("register.customer.body.user.exists");
-                }
-            } else
-            {
-                exceptionMsg = "";
-            }
             return getForward(request, e, "com.konakart.app.KKUserExistsException", exceptionMsg,
                     "ApplicationError");
-
-        } catch (Exception e1)
-        {
-            return super.handleException(request, e1);
         }
     }
 
@@ -1020,22 +990,5 @@ public class CustomerRegistrationSubmitAction extends BaseAction
     public void setTaxId(String taxId)
     {
         this.taxId = taxId;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername()
-    {
-        return username;
-    }
-
-    /**
-     * @param username
-     *            the username to set
-     */
-    public void setUsername(String username)
-    {
-        this.username = username;
     }
 }

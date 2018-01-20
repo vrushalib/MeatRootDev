@@ -27,20 +27,10 @@ var validationRules = {
 		birthDateString : {
 			required : true
 		},
-		loginUsername : {
-			required : true,
-			minlength : 3,
-			maxlength : 64
-		},
 		emailAddr : {
 			required : true,
 			email : true,
 			maxlength : 96
-		},
-		username : {
-			required : false,
-			minlength : 3,
-			maxlength : 64
 		},
 		emailAddrOptional : {
 			email : true,
@@ -73,13 +63,13 @@ var validationRules = {
 		},
 		postcode : {
 			required : true,
-			minlength : 2,
-			maxlength : 10
+		/*	minlength : 6,
+			maxlength : 6 */ 
 		},
 		city : {
 			required : true,
-			minlength : 2,
-			maxlength : 32
+	/*		minlength : 2,
+			maxlength : 32*/
 		},
 		state : {
 			required : true,
@@ -87,12 +77,14 @@ var validationRules = {
 		},
 		telephoneNumber : {
 			required : true,
-			minlength : 3,
+			digits : true,
+			minlength : 10,
 			maxlength : 32
 		},
 		telephoneNumber1 : {
 			required : false,
-			minlength : 3,
+			digits : true,
+			minlength : 10,
 			maxlength : 32
 		},
 		faxNumber : {
@@ -173,14 +165,18 @@ var validationRules = {
 			maxlength : 40,
 			digits : true
 		},
-		adminDiscount : {
-			number : true
+		delivery_date : {
+			required : true
+		},
+		delivery_slot : {
+			required : true
 		}
 	},
 	highlight : function(element, errorClass, validClass) {
 		var reqElement = $(element).parent().children(".required-icon");
 		if (reqElement == null || reqElement.length == 0) {
-			reqElement = $(element).parent().parent().children(".required-icon");
+			reqElement = $(element).parent().parent()
+					.children(".required-icon");
 		}
 		if (reqElement != null) {
 			reqElement.removeClass("required-green").addClass("required-blue");
@@ -189,7 +185,8 @@ var validationRules = {
 	unhighlight : function(element, errorClass, validClass) {
 		var reqElement = $(element).parent().children(".required-icon");
 		if (reqElement == null || reqElement.length == 0) {
-			reqElement = $(element).parent().parent().children(".required-icon");
+			reqElement = $(element).parent().parent()
+					.children(".required-icon");
 		}
 		if (reqElement != null) {
 			reqElement.removeClass("required-blue").addClass("required-green");
@@ -200,7 +197,8 @@ var validationRules = {
 		if (val.length > 0) {
 			var msgElement = element.parent().children(".validation-msg");
 			if (msgElement == null || msgElement.length == 0) {
-				msgElement = element.parent().parent().children(".validation-msg");
+				msgElement = element.parent().parent().children(
+						".validation-msg");
 			}
 			if (msgElement != null) {
 				error.appendTo(msgElement);
@@ -222,13 +220,8 @@ function formValidate(form, continueBtn, noSubmit) {
 	if (val) {
 		if (noSubmit == undefined || noSubmit == null || noSubmit != 'true') {
 			if (continueBtn != undefined && continueBtn != null) {
-				var btn = $('#' + continueBtn);
-				var currentClass = btn.attr("class");
-				if (currentClass != null && currentClass.indexOf('button-loading') > -1) {
-					return val;
-				} else {
-					btn.removeClass().text("").addClass('button-loading');
-				}
+				$('#' + continueBtn).removeClass().text("").addClass(
+						'button-loading');
 			}
 			document.getElementById(form).submit();
 		}
@@ -236,51 +229,26 @@ function formValidate(form, continueBtn, noSubmit) {
 	return val;
 }
 
-function formValidateWithCallback(form, continueBtn, callback) {
-	var val = $('#' + form).validate(validationRules).form();
-	if (val) {
-		if (continueBtn != undefined && continueBtn != null) {
-			var btn = $('#' + continueBtn);
-			var currentClass = btn.attr("class");
-			if (!(currentClass != null && currentClass.indexOf('button-loading') > -1)) {
-				btn.removeClass().text("").addClass('button-loading');
-			}
-		}
-		if (callback != null) {
-			callback();
-		}
-	}
-	return val;
-}
-
-function removeButtonLoading(continueBtn, text) {
-	if (continueBtn != undefined && continueBtn != null) {
-		var btn = $('#' + continueBtn);
-		var currentClass = btn.attr("class");
-		if (currentClass != null && currentClass.indexOf('button-loading') > -1) {
-			btn.removeClass().text(text).addClass('button small-rounded-corners');
-		}
-	}		
-}
-
 /*
  * Call address validation service if address passes static validation rules
  */
-function addrValidate(form) {
+function addrValidate(form) {	
 	var val = $('#' + form).validate(validationRules).form();
 	if (val) {
 		$('#buttonLabel_conf').val($('#continue-button').text());
-		$('#continue-button').removeClass().text("").addClass('validate-addr');
+		$('#continue-button').removeClass().text("").addClass('button-loading');
 		var streetAddress = $('input[name="streetAddress"]').val();
 		var streetAddress1 = $('input[name="streetAddress1"]').val();
 		var suburb = $('input[name="suburb"]').val();
-		var postcode = $('input[name="postcode"]').val();
-		var city = $('input[name="city"]').val();
+		var postcode = $('select[name="postcode"]').val();
+		var city = $('select[name="city"]').val();
 		var state = $('select[name="state"]').val();
 		var countryId = $('select[name="countryId"]').val();
-
-		callAction(new Array("streetAddress", streetAddress, "streetAddress1", streetAddress1, "suburb", suburb, "postcode", postcode, "city", city,
-				"state", state, "countryId", countryId), validateAddressCallback, "ValidateAddress.action");
+	
+		callAction(new Array("streetAddress", streetAddress, "streetAddress1",
+				streetAddress1, "suburb", suburb, "postcode", postcode, "city",
+				city, "state", state, "countryId", countryId),
+				validateAddressCallback, "ValidateAddress.action");
 	}
 	return val;
 }
@@ -295,12 +263,13 @@ var validateAddressCallback = function(result, textStatus, jqXHR) {
 	 */
 	if (!result.performedCheck) {
 		formValidate('form1', 'continue-button');
-		return;
 	}
 
-	var txt = '<div class="form-section-title"><h4>' + result.popupMsg + '</h4></div>';
+	var txt = '<div class="form-section-title"><h4>' + result.popupMsg
+			+ '</h4></div>';
 	if (result.ret.error) {
-		txt += '<div class="messageStackError">' + result.ret.message + '</div>';
+		txt += '<div class="messageStackError">' + result.ret.message
+				+ '</div>';
 		$('#addr-val-error').show();
 		$('#addr-val-ok').hide();
 	} else {
@@ -340,3 +309,4 @@ function closeAddrValPopup() {
 	$("#addr-val-dialog").dialog("close");
 	$('#continue-button').removeClass().text($('#buttonLabel_conf').val()).addClass('button small-rounded-corners');
 }
+

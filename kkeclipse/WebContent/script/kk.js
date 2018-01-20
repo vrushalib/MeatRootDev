@@ -3,6 +3,7 @@
  */
 function callAction(parmArray, callback, url) {
 	
+	
 	if (document.getElementById('kk_portlet_id')) {
 		AUI().ready('liferay-portlet-url', function(A) { 
 	        var renderURL = Liferay.PortletURL.createResourceURL();
@@ -22,7 +23,7 @@ function callAction(parmArray, callback, url) {
 	        
 			$.ajax({
 				type : 'POST',
-				timeout : '20000',
+				//timeout : '20000',
 				scriptCharset : "utf-8",
 				contentType : "application/json; charset=utf-8",
 				url : url,
@@ -43,10 +44,12 @@ function callAction(parmArray, callback, url) {
 			});
 		});		
 	} else {
+		
 		var parms='{"":""}';
         if (parmArray) {
         	parms = '{';
 			for ( var i = 0; i < parmArray.length; i=i+2) {
+				
 				parms = parms + '"' + parmArray[i]+'":"'+ parmArray[i+1]+ '"';
 				if (i+2 < parmArray.length) {
 					parms = parms + ',';
@@ -55,7 +58,6 @@ function callAction(parmArray, callback, url) {
 			parms = parms + ',"xsrf_token":"'+ document.getElementById('kk_xsrf_token').value + '"';
 	        parms = parms + '}';
 		}
-		
 		$.ajax({
 			type : 'POST',
 			timeout : '20000',
@@ -63,6 +65,7 @@ function callAction(parmArray, callback, url) {
 			contentType : "application/json; charset=utf-8",
 			url : url,
 			data : parms,
+			dataType : 'json',
 			success : callback,
 			error : function(jqXHR, textStatus, errorThrown) {
 				var errorMsg = "JSON API call to the URL " + url
@@ -74,8 +77,7 @@ function callAction(parmArray, callback, url) {
 					errorMsg += "\nError:\t" + errorThrown;
 				}
 				alert(errorMsg);
-			},
-			dataType : 'json'
+			}
 		});
 	}
 }
@@ -120,10 +122,11 @@ function getURL(action, parmArray) {
 }
 
 /*
- * Suggested search code used in TopBar.jsp. Figure out which search to do based
+ * Suggested search code used in Header.jsp. Figure out which search to do based
  * on value in key.
  */
-function kkSearch(key, text, parentCatId) {
+function kkSearch(key, text) {
+
 	if (key != null && key.length > 0) {
 		var keyArray = key.split(',');
 		if (keyArray.length == 3) {
@@ -147,9 +150,7 @@ function kkSearch(key, text, parentCatId) {
 				document.getElementById('ssForm').action = getURL("ShowSearchByManufacturerResultsByLink.action");
 				document.getElementById('ssForm').submit();
 			} else {
-				if (parentCatId != null) {
-					document.getElementById('catId').value = parentCatId;
-				}
+				// Search based on text
 				document.getElementById('searchText').value = text;
 				document.getElementById('ssForm').action = getURL("QuickSearch.action");
 				document.getElementById('ssForm').submit();
@@ -170,9 +171,6 @@ function kkSearch(key, text, parentCatId) {
 					getURL("SuggestedSearch.action"));
 		} else {
 			// Search based on text
-			if (parentCatId != null) {
-				document.getElementById('catId').value = parentCatId;
-			}
 			document.getElementById('searchText').value = text;
 			document.getElementById('ssForm').action = getURL("QuickSearch.action");
 			document.getElementById('ssForm').submit();
@@ -241,6 +239,11 @@ $(function() {
 				$(this).find(".item-over").hide();
 			});
 
+	$('.add-to-cart-qty').click(function (evt) {
+	    evt.stopPropagation();
+
+	   
+	});
 	
 	/*
 	 * Hover effects for Sliding Cart 
@@ -310,8 +313,10 @@ $(function() {
 	$(".add-to-cart-button")
 	.click(
 			function() {
-				var prodId = (this.id).split('-')[1];
-				callAction(new Array("prodId",prodId), 
+				
+				var prodId = (this.id).split('-')[1];			
+				var qty = $("#prodQuantityId_"+prodId).val();			
+				callAction(new Array("prodId",prodId,"qty",qty), 
 						addToCartCallback,
 						"AddToCartFromProdId.action");
 				return false;
@@ -331,14 +336,19 @@ $(function() {
 					});
 	
 	/*
-	 * Subscribe to newslette
+	 * Subscribe to newsletter
 	 */
 	$("#newsletter-button").click(submitNewsletterForm);
 	
 	/*
 	 * Basket checkout button on fade in / out basket widget
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage);
+	
+	/*
+	 * Tooltips
+	 */
+	$(".has-tooltip").tooltip();
 	
 	/*
 	 * Agree to use of cookies
@@ -351,8 +361,66 @@ $(function() {
 						"AgreeToCookies.action");
 				return false;
 			});
+	
+	/*
+	 * Add postcode suggested by user
+	 */
+	$('#go')
+	.click(
+			function(){
+				$("#pincode_area").hide();
+				$("#email_area").show();
+			});
+	
+	$("#back")
+	.click(
+			function(){
+				$("#message_area").hide();
+				$("#error_message").hide();
+				$("#success_message").hide();
+				$("#pincode_area").show();
+			});
+	
+	$("#done")
+	.click(
+			function(){
+				var pincode = $("#pincode").val().trim();
+				var emailId = $("#emailId").val().trim();
+				var valid = validate(pincode, emailId);
+				$("#email_area").hide();
+				$("#message_area").show();
+				if(valid){
+				callAction(new Array("pincode", pincode, "emailId", emailId), suggestedAreaCallback, "SuggestedArea.action");
+					$("#success_message").show();
+					$("#pincode").val("");
+					$("#emailId").val("");
+				}
+				else{
+					$("#error_message").show();
+				}
+			});
 
 });
+
+var suggestedAreaCallback = function(result, textStatus, jqXHR) {
+	$("#success_message").show();
+	$("#pincode").val("");
+	$("#emailId").val("");
+};
+
+
+function validate(pincode, emailId){
+	if(pincode == "" || emailId == ""){
+		return false;
+	}
+	var mailformat = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+	var pinformat = /^\d{6}$/;
+	if(mailformat.test(emailId) && pinformat.test(pincode)){
+		return true;
+	}
+	return false;
+	return true;
+}
 
 /*
  * Submits the sign up to newsletter form
@@ -569,7 +637,7 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	/*
 	 * Set event code on checkout button
 	 */
-	$("#shopping-cart-checkout-button").click(goToCheckoutPage);
+	$("#shopping-cart-checkout-button").click(goToCartPage); //Currently user should be redirected to edit cart page before heading to checkout
 	
 	/*
 	 * Update cart summary with new basket data
@@ -596,32 +664,6 @@ var addToCartCallback = function(result, textStatus, jqXHR) {
 	 */
 	showCart("#shopping-cart");
 	window.setTimeout("hideCart('#shopping-cart')", 2000);
-	
-	/*
-	 * Call analytics
-	 */
-	if (typeof(ga) != 'undefined' && ga != null){
-		if (result.prodOptionString == null) {
-			ga('ec:addProduct', {
-			    'id': result.prodId,
-			    'name': result.prodName,
-			    'category': result.prodCatName,
-			    'brand': result.prodManuName,
-			    'quantity': result.prodQty
-			});			
-		}else {
-			ga('ec:addProduct', {
-			    'id': result.prodId,
-			    'name': result.prodName,
-			    'category': result.prodCatName,
-			    'brand': result.prodManuName,
-			    'variant': result.prodOptionString,
-			    'quantity': result.prodQty
-			});
-		}
-		ga('ec:setAction', 'add'); 
-		ga('send', 'event', 'UX', 'click', 'add to cart');  	
-	}
 };
 
 /*
@@ -716,7 +758,6 @@ var subscribeNewsletterCallback = function(result, textStatus, jqXHR) {
 var agreeToCookiesCallback = function(result, textStatus, jqXHR) {
 	 $("#cookie-container").slideUp();
 };
-
 /*
  * Menu sizing algorithm on each browser width change
  */
@@ -731,10 +772,10 @@ function sizeMenu() {
 
 	// reset width and unwrap items from extra divs
 	// calculate menuLineWidth
-	var menuLineWidth = 0
+	var menuLineWidth = 0;
 	var numItems = 0;
 	var itemPadding = 14;
-	var itemMarginRight = 5;
+	var itemMarginRight = 0;
 	$("#main-menu a").each(function(index) {
 		var item = $(this);
 		item.css('width', 'auto');
@@ -841,6 +882,3 @@ function setControls(carousel, prev, next) {
 		next.removeClass('next-items-inactive').addClass('next-items');
 	}
 }  
-
-
-
