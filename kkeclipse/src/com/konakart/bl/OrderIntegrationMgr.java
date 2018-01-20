@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +33,11 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import com.konakart.app.Booking;
 import com.konakart.app.Coupon;
@@ -169,6 +178,7 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
          */
         if (order.getStatus() == com.konakart.bl.OrderMgr.PAYMENT_RECEIVED_STATUS)
         {
+			sendSMS(order);
             manageDigitalDownloads(order);
             manageGiftCertificates(order);
             manageGiftRegistries(order);
@@ -200,7 +210,10 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             // Uncomment to export the order for shipping
             // createOrderExportForShipping(order);
-        }
+
+        } else if (order.getStatus() == OrderMgr.PENDING_STATUS) {
+			sendSMS(order);
+		}
 
         // By default we don't create any invoices.
         // createInvoice(order);
@@ -235,6 +248,9 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
 
             if (newStatus == OrderMgr.PAYMENT_RECEIVED_STATUS)
             {
+            	//Code to send SMS on Successful order
+            	sendSMS(order);
+            	
                 manageDigitalDownloads(order);
                 manageGiftCertificates(order);
                 manageGiftRegistries(order);
@@ -257,7 +273,10 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
                 // Uncomment if using Bookable Products
                 // manageBookings(order);
             }
-
+			
+			else if (newStatus == OrderMgr.PENDING_STATUS) {
+				sendSMS(order);
+			}
             /*
              * Uncomment the call to createInvoice() if you want your invoice to be created when the
              * order reaches a particular state and not when it is first saved.
@@ -269,7 +288,77 @@ public class OrderIntegrationMgr extends BaseMgr implements OrderIntegrationMgrI
         }
     }
 
-    /**
+	private void sendSMS(OrderIf order) {
+		String nonEmptyMobile = order.getCustomerTelephone();
+		System.out.println("SendSMS - Mobile Number: " + nonEmptyMobile);
+		if (null == nonEmptyMobile || nonEmptyMobile.isEmpty()) {
+			nonEmptyMobile = order.getCustomerTelephone1();
+		}
+		
+		System.out.println("SendSMS - Mobile Number1: " + nonEmptyMobile);
+		
+		if (null != nonEmptyMobile && !nonEmptyMobile.isEmpty()) {
+			String mobileNumber = order.getCustomerTelephone()
+					.replaceAll("\\+", "").replaceAll(" ", "")
+					.replaceAll("\\-", "");
+			if (mobileNumber.length() == 10) {
+				mobileNumber = "91" + mobileNumber;
+			}
+
+			if (mobileNumber.length() != 12 || mobileNumber.matches("[a-zA-Z]")) {
+				log.warn("Invalid Customer Mobile Number Provided : "
+						+ order.getCustomerTelephone() + "Processed : "
+						+ mobileNumber);
+				return;
+			}
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+			String today = dateFormat.format(new Date());
+			String slot = "6pm - 8pm";
+			if (order.getCustom1().equalsIgnoreCase("m")) {
+				slot = "7am - 10:30am";
+			} else if (order.getCustom1().equalsIgnoreCase("a")) {
+				slot = "1pm - 3pm";
+			}
+			
+			String amount = order.getOrderTotals()[0].getText();			
+			// Sending SMS using Http Client
+			String message = String.format("Dear %s, Your order #%s of amount %s has been received by MeatRoot on %s. We are pleased to inform that your order will be delivered on %s between %s. Order details and e-receipt has been sent to the registered email. Happy Meating!", order.getCustomerName(),order.getId(),amount, today, order.getCustom2(), slot);
+			// String message = "Your order is placed successfully";
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			
+			String URLParams = String.format("method=SendMessage&send_to=%s&msg=%s&msg_type=TEXT&userid=2000143934&auth_scheme=plain&password=QcK1qjsBB&v=1.1&format=text", mobileNumber, message);
+			System.out.println("URL Params: " + URLParams);
+			URI uri = null;
+			try {
+				uri = new URI(
+				        "http", 
+				        "enterprise.smsgupshup.com", 
+				        "/GatewayAPI/rest",
+				        URLParams,
+				        null);
+			} catch (URISyntaxException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			HttpGet httpGet = new HttpGet(uri.toASCIIString());
+			try {
+				CloseableHttpResponse response1 = httpclient.execute(httpGet);
+				System.out.println("SMS Sending Response :  " + response1.getStatusLine());
+				log.info("SMS Sending Response :  " + response1.getStatusLine());
+			} catch (ClientProtocolException e) {
+				log.error("Exception Occured while Sending SMS : "
+						+ e.getMessage());
+				e.printStackTrace();
+			} catch (IOException e) {
+				log.error("Exception Occured while Sending SMS : "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
      * Called just before a subscription is inserted. This method gives the opportunity to modify
      * any detail of the subscription before it is inserted. If null is returned, then no action is
      * taken. If a non null subscription is returned, then this is the subscription that will be
