@@ -16,8 +16,10 @@
 // Lesser General Public License for more details.
 //
 --%>
+
 <%@include file="Taglibs.jsp" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -34,7 +36,6 @@
     <tiles:useAttribute id="defName" name="defName" classname="java.lang.String" ignore="true"/>
     
     <%if (kkEng.isPortlet()) {%>
-    	<%@include file="LiferayIncludes.jsp" %>
 	    <%request.getSession().setAttribute("konakartKey", kkEng); %> 
 	    <% boolean dontSetContext =  kkEng.getPropertyAsBoolean("dont.set.portlet.context.path", false);%>
 	    <%if (!dontSetContext) {%>
@@ -48,24 +49,26 @@
     <% } else { %>
 		<html>
 			<head>
-				<meta http-equiv="X-UA-Compatible" content="IE=edge">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
-				<title><%=kkEng.getPageTitle()%></title>
+				<meta name="google-site-verification" content="tckwGFjiZX1gylwtvH5QWdJ-y0B7sF8nMmiT4yi61FQ" />
+				<title>MeatRoot : Online Meat Shop - Buy Fresh, Frozen and Processed Chicken, Mutton and Fish online</title>
+				<link rel="icon" href="images/titlelogo.jpg" type="image/x-icon">
 				<meta name="keywords" content="<%=kkEng.getMetaKeywords()%>" />
 				<meta name="description" content="<%=kkEng.getMetaDescription()%>" />
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<%for (java.util.Iterator<String> iterator = kkEng.getMetaList().iterator(); iterator.hasNext();) {out.print(iterator.next());}%>
-				<link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" />
+				<link type="text/css" rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/jquery.selectboxit.css" />
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/font-awesome/css/font-awesome.css" />
-				<link type='text/css' rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600,700'  >		
+				<link type='text/css' rel='stylesheet' href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600,700'  >		
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/jcarousel.css" />				
 				<link type="text/css" rel="stylesheet" href="<%=kkEng.getStyleBase()%>/kk-style.css" />
 
-		 		<script src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script> 
-				<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"   integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="   crossorigin="anonymous"></script>
+		 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+				<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>				
+				<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.validate.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.json-2.3.min.js"></script>
+				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.tools.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.selectboxit.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.ui.datepicker-en.js"></script>			 
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.ui.datepicker-de.js"></script>			 
@@ -81,7 +84,6 @@
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.jcarousel.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.touchSwipe.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery.cookie.js"></script>
-				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/jquery-backward-timer.min.js"></script>
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.js"></script>	
 				<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.validation.js"></script>	
 				<script>
@@ -98,7 +100,29 @@
 				String base = scheme+server+((port==80)?"":":"+port)+path+"/";
 				%>
 				<base href="<%=base%>"/>										
-				<!--- KonaKart v8.7.0.0.14740 -->
+				<!--- KonaKart v7.4.0.1.12158 -->
+				
+				<script type="text/javascript">
+				$(window).bind("load", function(){
+					$("#page-container").css("overflow","hidden");
+				});
+				
+				 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+					  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+					  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+					  ga('create', 'UA-55023986-1', 'auto');
+					  ga('send', 'pageview');
+					 /* 
+					  (function() {
+					      var a = document.createElement('script');a.type = 'text/javascript'; a.async = true;
+					      a.src=('https:'==document.location.protocol?'https://':'http://cdn.')+'chuknu.sokrati.com/15047/tracker.js';
+					      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
+					           })();
+					*/
+
+				</script>
 			</head>
 			<%if (defName != null) {%>
 				<body id="<%=defName%>">
@@ -107,7 +131,6 @@
 			<%}%>
 			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" id="kk_xsrf_token"/>
 	<%}%>
-	<%=kkEng.getAnalyticsCode()%>
 	<script language="JavaScript" type="text/javascript">
 		if (top.location != location) {
 					top.location.href = document.location.href ;
@@ -150,9 +173,114 @@
 	    		</div>
 				<tiles:insertAttribute name="footer2" />
 						
+				<%=kkEng.getAnalyticsCode()%>
     <%if (!kkEng.isPortlet()) {%>
-			</body>
-		</html>
+     <!--Start of Tawk.to Script-->
+        <script type="text/javascript">
+                var $_Tawk_API={},$_Tawk_LoadStart=new Date();
+                (function(){
+                var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+                s1.async=true;
+                s1.src='https://embed.tawk.to/56011a5772d58d716ae44217/default';
+                s1.charset='UTF-8';
+                s1.setAttribute('crossorigin','*');
+                s0.parentNode.insertBefore(s1,s0);
+                })();
+        </script>
+        <!--End of Tawk.to Script-->
+
+	<!-- Start of Agnie Script, Google Tag Manager -->
+
+		<noscript>
+			<iframe src="//www.googletagmanager.com/ns.html?id=GTM-NV3N9M"
+				height="0" width="0" style="display:none;visibility:hidden">
+			</iframe>
+		</noscript>
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+			'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+			})(window,document,'script','dataLayer','GTM-NV3N9M');
+		</script>
+		
+
+	<!-- End of Agnie Script, Google Tag Manager -->
+
+	<!-- ViralMint JS -->
+		
+	<script type="text/javascript">
+    			window.vrlmnt = (function(d, s, id) {
+    			var js, vjs = d.getElementsByTagName(s)[0];
+    			if (d.getElementById(id)) return; js = d.createElement(s);
+    			js.src = "//cdn.viralmint.com/js/viralmint-min.js";
+    			js.id = id; js.acc_id = "1444756064";
+    			vjs.parentNode.insertBefore(js, vjs);
+    			return window.vrlmnt || (v = { _e: [], ready: function(f){v._e.push(f)}});
+    		}(document, "script", "viralmint-js"));
+	</script>
+	
+	<!-- ViralMint JS -->
+
+	<!-- ViralMint Custom Variable -->
+<!--		<script type="text/javascript">
+			vrlmnt.ready(function () {
+    			vrlmnt.setCustomData({
+        		login_status: "TRUE_OR_FALSE",
+        		total_cart_value: TOTAL_CART_AMOUNT,
+        		total_purchases: NUMBER_OF_ITEM_IN_CART,
+        		purchases: [{
+         			id: "1ST_PRODUCT_ID",
+            			title: "1ST_PRODUCT_TITLE_HERE",
+            			category: "1ST_PRODUCTS_CATEGORY",
+            			link: "1ST_PRODUCT_ABSOLUTE_LINK",
+            			image: "1ST_PRODUCT_ABSOLUTE_IMAGE_URL",
+            			price: 1ST_PRODUCT_PRICE,
+            			quantity: 1ST_PRODUCT_QUANTITY
+        		}, {
+         			id: "2ND_PRODUCT_ID",
+            			title: "2ND_PRODUCT_TITLE_HERE",
+            			category: "1ST_PRODUCTS_CATEGORY",
+            			link: "2ND_PRODUCT_ABSOLUTE_LINK",
+            			image: "2ND_PRODUCT_ABSOLUTE_IMAGE_URL",
+            			price: 2ND_PRODUCT_PRICE,
+            			quantity: 2ND_PRODUCT_QUANTITY
+        			}]
+     			});
+		});
+		</script>
+	-->
+		<!-- ViralMint Custom Variable -->
+	
+	<!-- KudoBuzz Script -->
+<!--	<script>
+		!function(){ 
+			var e=document.createElement("script");
+			e.type="text/javascript",
+			e.async=!0;
+			var t=location.protocol+"//widgets.kudobuzz.com/js/widgetLoader.js";
+			e.src=t;document.getElementsByTagName("head")[0].appendChild(e);
+			window.Kudos={Widget:function(e){this.uid=e.uid}},
+			Kudos.Widget({uid:"44a4y2t24323p274r2b4s2330314y2z274v2y2a4y2r2q2w2t2c4w2"})
+		}()
+	</script>
+-->
+	<!-- End of KudoBuzz -->
+
+
+	<!-- YotPo Script -->
+<!--
+		<script type="text/javascript">
+			(function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/qf0SjfLBl29nxy9XVWNdNalL52dsXzscAhknL8Ce/widget.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+		</script>
+                        
+-->
+	<!-- End of YotPo -->
+
+
+
+
+	</body>
+	</html>
 	<%} else {%>
 		</div>
 	<%}%>

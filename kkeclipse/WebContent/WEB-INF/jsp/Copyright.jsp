@@ -18,5 +18,5 @@
 --%>
 <div id="copyright-container">
 	<!-- Please leave the "Powered by KonaKart" link - it's a condition of the licence  -->
-	<div id="copyright">© 2014 - 2016 KonaKart Store - Powered by <a href="http://www.konakart.com">KonaKart</a></div>
+	<div id="copyright">© 2014 MeatRoot Store - Powered by <a href="http://www.konakart.com">KonaKart</a></div>
 </div>

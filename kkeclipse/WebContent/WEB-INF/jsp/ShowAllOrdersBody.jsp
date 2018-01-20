@@ -21,7 +21,6 @@
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 <% com.konakart.al.OrderMgr orderMgr = kkEng.getOrderMgr();%>
 <%boolean enableInvoice=kkEng.getConfigAsBoolean("ENABLE_PDF_INVOICE_DOWNLOAD", false); %>
-<% com.konakart.appif.CustomerIf adminUser = kkEng.getAdminUser();%>
 
  				<h1 id="page-title"><kk:msg  key="show.all.orders.myorderhistory"/></h1>			
 	    		<div id="show-all-orders" class="content-area rounded-corners">
@@ -41,9 +40,7 @@
 							</div>
 						</div>
 						<div class="order-data">
-						
-								<% int numOrders = (orderMgr.getCurrentOrders().length == orderMgr.getPageSize()+1)?orderMgr.getCurrentOrders().length-1:orderMgr.getCurrentOrders().length;%>
-								<% for (int i = 0; i < numOrders; i++){ %>
+								<% for (int i = 0; i < orderMgr.getCurrentOrders().length; i++){ %>
 									<% com.konakart.appif.OrderIf order = orderMgr.getCurrentOrders()[i];%>
 									<% int numItems = (order.getOrderProducts()!=null)?order.getOrderProducts().length:0;%>
 									<% String statusClass = (order.getStatusText()!=null&&order.getStatusText().equalsIgnoreCase("delivered"))?"shipped":"pending";%>
@@ -56,17 +53,14 @@
 				    							<td class="status-col"><div class="label <%=statusClass%>"><%=order.getStatusText()%></div></td>
 				    							<td class="narrow-col"><a class="text-link" href='<%="ShowOrderDetails.action?orderId="+order.getId()%>'><kk:msg  key="common.view"/></a></td>	
 				    							<td class="narrow-col"><a class="text-link" href='<%="RepeatOrder.action?orderId="+order.getId()%>'><kk:msg  key="common.repeat"/></a></td>	
-				    							<td class="narrow-col"><a class="text-link"><kk:msg  key="common.track"/></a></td>	
-												<%if (enableInvoice) {%>	
+				    							<%--<td class="narrow-col"><a class="text-link"><kk:msg  key="common.track"/></a></td>	--%>
+												<%-- <%if (enableInvoice) {
 													<%if (kkEng.isPortlet()){ %>
 														<td class="narrow-col"><a class="text-link" href='<%="DownloadInvoicePortlet.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 													<%} else {%>
 														<td class="narrow-col"><a class="text-link" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'><kk:msg  key="common.invoice"/></a></td>
 													<%}%>
-												<% } %>
-												<%if (adminUser != null && kkEng.getConfigAsBoolean("ALLOW_EDIT_ORDER",false)) {%>	
-														<td class="narrow-col"><a class="text-link" href='<%="EditOrder.action?orderId="+order.getId()%>'><kk:msg  key="common.edit"/></a></td>	
-												<% } %>
+												<% } %> --%>	
 			    							</tr>
 				    						<%if (order.getOrderProducts() != null && order.getOrderProducts().length > 0){ %>
 					    						<tr>
@@ -124,9 +118,6 @@
 														<%} else {%>
 															<a title='<%=kkEng.getMsg("common.invoice")%>' class="text-link fa fa-file-pdf-o order-action" href='<%="DownloadInvoice.action?orderId="+order.getId()%>'></a>
 														<%}%>
-													<% } %>
-													<%if (adminUser != null && kkEng.getConfigAsBoolean("ALLOW_EDIT_ORDER",false)) {%>	
-															<a class="text-link fa fa-edit order-action" title='<%=kkEng.getMsg("common.edit")%>' href='<%="EditOrder.action?orderId="+order.getId()%>'></a>
 													<% } %>
 												</td>
 			    							</tr>
@@ -189,4 +180,5 @@
 						<a href="MyAccount.action" id="back-button" class="button small-rounded-corners"><span><kk:msg  key="common.back"/></span></a>
 					</div>
 		    	</div>
+
 

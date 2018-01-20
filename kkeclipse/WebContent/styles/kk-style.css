@@ -17,6 +17,7 @@
 */
 body{
 	background-color: #eff0f1;
+	/*background-image: url("images/wallpaper-tile.png"); */
 	color: #333;
 	font: 13px 'Open Sans', sans-serif;
 	margin: 0;
@@ -183,7 +184,7 @@ input[type=checkbox] {
      -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
-    border-radius: 10px;
+    border-radius: 0px;
 }
 
 .rounded-corners-top {
@@ -252,7 +253,7 @@ input[type=checkbox] {
 	padding: 8px 2.5%;
 	position: relative;
 	max-width: 945px;
-	height: 1.65em;
+	height: 2em;
 	text-align: right;
 }
 
@@ -263,6 +264,10 @@ input[type=checkbox] {
 
 #top-bar #search-container, #top-bar #selections-container, #top-bar #options-container{
 	display: inline-block;
+}
+
+#top-bar #area-message{
+	float: left;
 }
 
  #top-bar #selections-container{
@@ -347,6 +352,14 @@ input[type=checkbox] {
 }
 
 /* Header */
+#mainHeader{
+	color: #B22222;
+}
+
+#headerlogo{
+	height: 97px;
+	width: 267px;
+}
 
 #cookie-container{
 	background-color: #fff;
@@ -449,38 +462,37 @@ ul.ui-autocomplete  {
 
 
 #search input{
-	background-color: #f1f2f3;
+	background-color: #FFFFFF;
 	color: #333;
 	border: 1px solid #e5e5e5;
-	float: left;
+	float: right;
 	padding: 5px;
 	width: 50%;
 	display: block;
 	height:  14px;
 }
 
-#quickSearchForm input{
-	width: 80%;
+.searchicon {
+	background-image: url('../images/icons/search_icon.png');
 }
 
-#top-cat-list, #top-cat-list1 {
-	background-color: #f1f2f3;
-	color: #333;
-	border: 1px solid #e5e5e5;
-	float: left;
-	width: 30%;
+.icon-search {
 	display: block;
-	height:  26px;
+	float: left;
+	height: 16px;
+	margin: -1px 3px 0 0;
+	width: 17px;
 }
 
 #search-button,#search-button-mobile {
-	background: #000;
-	color: #fff;
-	font-size: 0.92em;
+	background: #FFFFFF;
+	color: #000;
+	border: 1px solid #e5e5e5;
+	font-size: 0.88em;
 	font-size: 11px\9;
 	font-weight: bold\9;
-	height: 13px;
-	padding: 5px 30px 8px ;
+	height: 11px;
+	padding: 5px 10px 8px ;
 	position: absolute; 
 	text-decoration: none;
 	text-transform: uppercase;
@@ -533,8 +545,11 @@ ul.ui-autocomplete  {
 }
 
 #main-menu{
-	margin: 0.75em 0 0.5em;
+	margin: 0px 0;
+	margin-bottom: 15px;
 	overflow: hidden;
+	width: 100%;
+	display: flex;
 }
 
 
@@ -543,19 +558,23 @@ ul.ui-autocomplete  {
 }
 
 #main-menu a{
-	background-color: #dfe1e2;
+	background-color: #B22222;
 	float: left;
-	margin: 2.5px 0.5% 2.5px 0;
+	margin: 2.5px 1% 2.5px 0;
 	overflow: hidden;
-	padding: 5px 0;
+	padding: 12px 0;
 	text-align: center;
-	color: #353e45;
-	font-size: calc((13.5/12.5) * 1em );
+	color: #FFFFFF;
+	font-size: calc((15.5/12.5) * 1em );
 	text-decoration: none;
+	flex-grow: 1;
+	display : block;
+	border-right: 1px solid #b5b38a;
 }
 
+
 #main-menu a:hover{
-	background-color: #fff;
+	background-color: #000;
 }
 
 #main-menu .current-menu-item{
@@ -566,6 +585,8 @@ ul.ui-autocomplete  {
 	overflow: hidden;
 	padding-bottom: 0.25em;
 	clear:both;
+	width: 100%;
+	display: flex;
 }
 
 /* Slideshow */
@@ -605,6 +626,76 @@ ul.ui-autocomplete  {
 
 /* Banners */
 
+.uiv2-slider-block-one{
+	display: inline-block;
+	position: relative;
+}
+
+.button2{
+opacity: 0.6;
+position: absolute;
+background-color: #000;
+bottom: 0;
+color: #FFFFFF;
+/* right: 0; */
+/* border-radius: 20px; */
+height: 65px;
+width: 354px;
+float: right;
+margin-left: 60%;
+margin-bottom: 1%;
+/*font: 400 17px/20px 'Roboto Slab', serif;*/
+font: 400 16px/20px Helvetica Neue, Arial, sans-serif;
+display: table;
+}
+
+.button2 span{
+	vertical-align:middle;
+    display: table-cell;
+	padding-left: 11px;
+}
+
+.button3{
+	position: absolute;
+	background-color: #B22222;
+	bottom: 0;
+	color: #FFFFFF;
+	/* right: 0; */
+	height: 34px;
+	width: 99px;
+	float: right;
+	margin-left: -34%;
+	margin-bottom: 4%;
+	/*font: 400 17px/20px 'Roboto Slab', serif;*/
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;
+}
+
+.deliveryarea{
+	position: absolute;
+	bottom: 0;
+	/* right: 0; */
+	height: 27px;
+	width: 246px;
+	float: right;
+	margin-left: 4%;
+	margin-bottom: 5%;
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;;
+}
+
+.gobutton{
+	position: absolute;
+	background-color: #B22222;
+	bottom: 0;
+	color: #FFFFFF;
+	/* right: 0; */
+	height: 34px;
+	width: 68px;
+	float: right;
+	margin-left: 78%;
+	margin-bottom: 5%;
+	font: 400 16px/20px Helvetica Neue, Arial, sans-serif;;
+}
+
 #content.narrow #banner{
 	height: 252px;
 	width: 760px;
@@ -641,6 +732,7 @@ ul.ui-autocomplete  {
 .item-area{
 	background: #fff;
 	margin-top: 1em;
+/*	float: left;*/
 	display: inline-block;
 	overflow: hidden;
 }
@@ -934,6 +1026,7 @@ ul.ui-autocomplete  {
 
 .item-over-container{
 	border: 1px solid #bfc2c4;
+	/*margin: -1px 9px -1px -1px;*/
 }
 
 .carousel-item .item-over-container{
@@ -1030,11 +1123,6 @@ ul.ui-autocomplete  {
 	float: right;
 }
 
-.third-button{
-	float: right;
-	margin-right: 5px;
-}
-
 .item-buttons-container{
 	height: 12em;	
 	position: absolute;
@@ -1076,9 +1164,11 @@ ul.ui-autocomplete  {
 
 #kkfooter{
 	float: left;
-	font-size: 0.96em;
-	line-height: 1.6em;
-	padding: 20px 0;
+	font-size: 0.96em; /* 13px;*/
+	line-height: 1.6em; /*20px;*/
+/*	border-top: 1px solid #d8d8d8;*/
+	padding: 20px 0px 0px -2px;
+	margin-bottom: 16px;
 }
 
 #kkfooter a{
@@ -1092,7 +1182,7 @@ ul.ui-autocomplete  {
 
 .footer-area{
 	float: left;
-	margin-right: 2%;
+	margin-right: 20px; /*2%;*/
 }
 
 #kkfooter .fa{
@@ -1102,14 +1192,104 @@ ul.ui-autocomplete  {
 
 #kkfooter .last-child{
 	margin-right: 0;
+	margin-top: 22px; /*14px;*/
+	width: 240px;
 }
 
-#kkfooter .narrow{
+/*#kkfooter .narrow{
 	width: 14.6666667%;
-}
+}*/
 
 #kkfooter .wide{
-	width: 31.3333333%;
+	width: 300px; /*31.3333333%;*/
+}
+
+/*ul,li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}*/
+
+#social ul li{
+	display: inline;
+}
+
+#links-1{
+	width: 200px;
+	margin-top: 11px;
+}
+
+#product-links{
+	width: 200px;
+	margin-top: 11px; 
+}
+
+#links-2{
+	width: 190px; 
+	/*padding-left: 45px;*/
+	margin-top: 18px;
+}
+
+#links-3{
+	width: 140px;
+}
+
+/* Social Media Icons */
+.social-icon{
+	display: inline-block;
+/*	float: left;*/
+	height: 17px;
+	margin: 1px 3px 0 0;
+	width: 17px;
+}
+
+.email{
+	background-image: url('../images/icons/email.png');
+	width: 18px;
+}
+
+.twitter{
+	background-image: url('../images/icons/twitter.png');
+}
+
+.facebook{
+	background-image: url('../images/icons/facebook.png');
+}
+
+.pinterest{
+	background-image: url('../images/icons/pinterest.png');
+}
+
+.twitter-grey{
+	background-image: url('../images/icons/twitter-grey.png');
+}
+
+.twitter-grey:hover{
+	background-image: url('../images/icons/twitter.png');
+}
+
+.facebook-grey{
+	background-image: url('../images/icons/facebook-grey.png');
+}
+
+.facebook-grey:hover{
+	background-image: url('../images/icons/facebook.png');
+}
+
+.pinterest-grey{
+	background-image: url('../images/icons/pinterest-grey.png');
+}
+
+.pinterest-grey:hover{
+	background-image: url('../images/icons/pinterest.png');
+}
+
+.google-grey{
+	background-image: url('../images/icons/google_plus.png');
+}
+
+.google-grey:hover{
+	background-image: url('../images/icons/googleplus.png');
 }
 
 /* Newsletter Signup */
@@ -1306,6 +1486,19 @@ ul.ui-autocomplete  {
 	float: right;
 	font-weight: normal;
 }
+
+.final-checkout-button{
+	background: #1a6baa; ;
+	width: 130px;
+	padding-left: 5px; 
+	padding-right: 5px; 
+	text-align: center;
+}
+
+.final-checkout-button:hover{
+	background: #1a6baa;;
+}
+
 
 .slide-out-shadow{
 	background-color: #ccc;
@@ -1624,6 +1817,17 @@ ul.ui-autocomplete  {
 	margin:	0 1em 0.5em 0;
 	padding: 8px 10px;
 	width: auto !important;
+}
+
+.add-to-cart-qty1{
+	font-size: 12px;
+	float: left;
+	margin-right: 10px;
+	padding: 5px 9px;
+}
+
+.select-qty{
+	padding: 3px 0px;
 }
 
 .update-button{
@@ -2462,15 +2666,15 @@ ul.ui-autocomplete  {
 	margin: 0.75em !important;
 }
 
-.sign-in-column-left .form-section .form-input{
+#sign-in-column-left .form-section .form-input{
 	margin-bottom:5px;
 }
 
-.sign-in-column-left .form-section .form-input label{
+#sign-in-column-left .form-section .form-input label{
 	margin-bottom:2px;
 }
 
-.sign-in-column-left .form-section .form-input .validation-msg {
+#sign-in-column-left .form-section .form-input .validation-msg {
 	margin-left:0px;
 	margin-top:3px;
 	float: left;
@@ -2486,17 +2690,17 @@ ul.ui-autocomplete  {
 	margin-right: 10px;
 }
 
-.sign-in-column-left, .sign-in-column-right{
+#sign-in-column-left, #sign-in-column-right{
 	float: left;
 	width: 49%;
 	vertical-align:text-top;
 }
 
-.sign-in-column-left{
+#sign-in-column-left{
 	border-right: 1px solid #bfbfbf;
 }
 
-.sign-in-column-right div{
+#sign-in-column-right div{
 	padding-top: 20px;
 }
 
@@ -2590,7 +2794,7 @@ ul.ui-autocomplete  {
 
 #checkout-area table tbody tr td .validation-msg, #checkout-area table tbody tr td .validation-msg .error {
 	margin-left:3px;
-	width: 100%;
+	width: 90px;
 	white-space:normal;
 }
 
@@ -2646,38 +2850,17 @@ td.cost-overview-labels {
 	width: 40%;
 }
 
-.basket-body  label {
-	width: auto !important;
-}
-
 .remove{
 	color: #999;
 	font-size: 1.25em !important;
 	margin: 0 0 0 0.5em;
-	cursor: pointer;
 }
 
 .remove:hover{
 	text-decoration: none;
 }
 
-.cart-total-warning {
-	color: #A00000;
-	background-image: url('../images/info.png');
-    background-repeat: no-repeat;
-    display: table-cell;
-    vertical-align: bottom;
-    padding-left: 20px;
-}
-
-
 /* Order Confirmation */
-
-#reservation-timer{
-	display: inline;
-	color: #A00000;
-	font-weight: bold;
-}
 
 .order-confirmation-options{
 	float: left;
@@ -2844,86 +3027,31 @@ td.cost-overview-labels {
 }
 
 
+#expiryYear, #expiryMonth{
+	width: 47.5% !important;
+}
+
+#credit-card #expiryYear{
+	margin-left: 42.5%;
+}
+
 /*
 * Animated gif
 */
-.loading, .button-loading, .validate-addr {
+.loading, .button-loading {
 	background-image:url('../images/loader.gif');
 	background-repeat: no-repeat;
     background-position: center center;
     height: 16px;
 	width: 16px;
-	display: inline-block;
 }
 
-.fb-loading {
-	/*background-image:url('../images/loader.gif');
-	background-repeat: no-repeat;*/
-    height: 16px;
-	width: 16px;
-	margin: 0 auto;
-}
-
-#fb-wait {
-	width: 120px;
-	text-align: center;
-	padding: 0px;
-}
-
-.gp-loading {
-	/*background-image:url('../images/loader.gif');
-	background-repeat: no-repeat;*/
-    height: 16px;
-	width: 16px;
-	margin: 0 auto;
-}
-
-#gp-wait {
-	width: 120px;
-	text-align: center;
-	padding: 0px;
-}
-
-#fb-button, #gp-button {
-	cursor: pointer;
-	text-align: center !important;
-}
-
-#fb-button img, #gp-button img{
-	vertical-align: bottom !important;
-}
-
-#social-status {
-	text-align: center;
-}
-
-#social-status ul { 
-	list-style: none; text-align: center; font-size: 0;
-}
-#social-status li { 
-	display: inline-block; font-size: 16px; position: relative; padding: 8px 20px;
-}
-
-.button-loading, .validate-addr {
+.button-loading {
 	margin: 0 20px;
 }
 
 #ot-table .loading {
     padding-top:150px;
-}
-
-.cc-loading {
-	background-image:url('../images/loader.gif');
-	background-repeat: no-repeat;
-    height: 16px;
-	width: 16px;
-	margin: 0 auto;
-}
-
-#cc-wait {
-	width: 120px;
-	text-align: center;
-	padding: 0px;
 }
 
 /*
@@ -2936,9 +3064,11 @@ td.cost-overview-labels {
 /*
 * Credit Card Page
 */
-
-#expiryYear, #expiryMonth{
-	width: 23.5% !important;
+#expiryMonth{
+	width:136px;
+}
+#expiryYear{
+	width:136px;
 }
 
 .form-buttons .loading, .form-buttons-wide .loading {
@@ -3062,17 +3192,6 @@ td.cost-overview-labels {
 	padding: 0 5px;
 }
 
-.confirm-dialog-buttons {
-	display: inline-block;
-	width:100%;
-	text-align: center;
-}
-
-.confirm-dialog-buttons .button{
-	color: #fff !important;
-	margin: 0.5em 0.5em;
-}
-
 /* orders */
 .order-data {
 	width: 100%;
@@ -3156,6 +3275,10 @@ td.cost-overview-labels {
 #payment-method-view {
 	display:table;
 }	
+
+.payment-dropdown {
+	margin-top:6px;
+}
 	
 #order-details .form-buttons-wide {
 	display:table;
@@ -3323,6 +3446,18 @@ td.right {
 td.center {
 	text-align:center;
 }
+
+ /* Tool tip */
+  
+.tooltip {
+    display:none;
+    background:transparent url('../images/tooltip/white_arrow.png');
+  	font-size: 12px;
+    height:70px;
+    width:160px;
+    padding:25px;
+    color:#333;
+  }
   
 /*
 * Address Validation Dialog
@@ -3387,22 +3522,7 @@ td.center {
 	background-color: #e3e5e6;
 	border-color: #c9cdd0;
 	margin: 0;
-	width: 60%;
-	display: block;
-	float: left;
-}
-
-#slide-out-search #search form input{
 	width: 90%;
-}
-
-#slide-out-search #top-cat-list1{
-	background-color: #e3e5e6;
-	border-color: #c9cdd0;
-	margin: 0;
-	width: 30%;
-	display: block;
-	float: left;
 }
 
 #slide-out-search #search-button-mobile{
@@ -3605,7 +3725,7 @@ td.center {
 	}
 
 
-	#kkfooter .narrow{
+	/*#kkfooter .narrow{
 		width: 28%;
 	}
 
@@ -3620,7 +3740,7 @@ td.center {
 
 	#copyright{
 			text-align: center;
-	}
+	}*/
 
 	#side-menu{
 		display: none;
@@ -3702,21 +3822,22 @@ td.center {
 		margin: 1.5em 0;
 	}
 
-	.sign-in-column-left, .sign-in-column-right{
+	#sign-in-column-left, #sign-in-column-right{
 		width: 100%;
 	}
 
-	.sign-in-column-left{
+	#sign-in-column-left{
 		border-bottom: 1px solid #bfbfbf;
 		border-right: none;
 		padding-bottom: 1em;
 	}
 
-	.sign-in-column-right{
+	#sign-in-column-right{
 		margin: 1em 0;
-	}	
+	 	text-align: left;
+	}
 
-	.sign-in-column-right div{
+	#sign-in-column-right div{
 		padding-top: 1.125em;
 	}
 
@@ -3724,7 +3845,7 @@ td.center {
 		margin: 1em 1em 1em 0;
 	}
 
-	.sign-in-column-right h3{
+	#sign-in-column-right h3{
 		float: left;
 	}
 
@@ -3841,10 +3962,6 @@ td.center {
 
 	#breadcrumbs{
 		display: none;
-	}
-
-	#main-menu a{
-		margin: 2.5px 1% 2.5px 0;
 	}
 
 	#language-selector .selectboxit-container .selectboxit{
@@ -3988,96 +4105,18 @@ td.center {
 	color: #A00000 !important;
 }
 
-#kk-portlet-body #search input {
-    height: 30px !important;
-    font-size: 13px !important;
+/*custom css*/
+.order-confirmation-area-content-select .payment-radio-buttons {
+	height: 30px;
+    margin: 14px 0 0 0;
+    display: inline-flex;
+    font-size: 13px;
+    
+		
 }
 
-#kk-portlet-body #top-cat-list {
-    height: 30px !important;
-    font-size: 13px !important;
-}
-
-#kk-portlet-body #top-cat-list1 {
-    height: 30px !important;
-    font-size: 13px !important;
-}
-
-#kk-portlet-body #search-button {
-    height: 29px !important;
-}
-
-#kk-portlet-body #search-button-mobile {
-    height: 29px !important;
-}
-
-#kk-portlet-body #top-bar-container{
-	border-bottom: 1px solid #ffffff !important;	
-}
-
-#kk-portlet-body #newsletter-input{
-	height: 19px !important;	
-}
-
-/* Manage Credit Cards */
-
-.credit-card-header{	
-	display: table;
-}
-.credit-card-explanation{
-	width:100%;
-}
-
-.credit-card-card{
-	padding: 1em 0;
-	width:100%;	
-}
-
-.select-card-section{	
-	display: table;
-	padding: 0.5em 0;
-}
-
-.select-card{
-	display: table;
-	width:390px;
-	float:left;
-}
-
-.select-card-buttons{
-	display: inline-block;
-	padding: 0.5em 0;
-	width:100%;
-}
-
-.select-card-details {
-	display: table-cell;
-}
-
-.select-card-label {
-	display: table-cell;
-	width: 60%;	
-}
-
-.select-card-row {
-	display: table-row;
-}
-
-.card-warning {
-	color: #A00000;
-	background-image: url('../images/info.png');
-    background-repeat: no-repeat;
-    display: table-cell;
-    vertical-align: bottom;
-    padding-left: 20px;
-}
-
-.credit-card-add-vault, .credit-card-pay-now {
-	margin-top: 10px;
-}
-
-#add-card, #pay-card {
-	margin-left: 50%;
+.order-confirmation-area-content-select .payment-radio-buttons p {
+	width: 200px;
 }
 
 

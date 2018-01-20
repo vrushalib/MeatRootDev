@@ -22,7 +22,6 @@
 <% int basketItems = kkEng.getBasketMgr().getNumberOfItems();%>
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf currentCustomer = customerMgr.getCurrentCustomer();%>
-<% com.konakart.al.CategoryMgr catMgr = kkEng.getCategoryMgr();%>
 
 <%int wishlistItems = 0;%>
 <%if (currentCustomer.getWishLists() != null){%>
@@ -74,7 +73,6 @@ $(function() {
 				        renderURL.setPortletId(document.getElementById('kk_portlet_id').value);
 				        renderURL.setWindowState("exclusive");
 						renderURL.setParameter("term", request.term);
-						renderURL.setParameter("categoryId", $("#top-cat-list1").val());
 						
 						$.ajax({
 						type : 'POST',
@@ -97,7 +95,7 @@ $(function() {
 						contentType : "application/json; charset=utf-8",
 						url : "SuggestedSearch.action",
 						dataType : 'json',
-						data : '{"categoryId":"'+$("#top-cat-list1").val()+'",'+'"term":"' + request.term + '"}',
+						data : '{"term":"' + request.term + '"}',
 				        success: function(result, textStatus, jqXHR) {					         
 				       		response(result);
 				       }
@@ -106,8 +104,7 @@ $(function() {
 			   },
 			minLength: 1,
 			select: function( event, ui ) {
-				var catId = $("#top-cat-list").val();
-				self.kkSearch(ui.item.id,ui.item.value,catId);
+				self.kkSearch(ui.item.id,ui.item.value);
 			}
 		}).data( "uiAutocomplete" )._renderItem = function( ul, item ) {
 			   ul.addClass('ui-corner-all');
@@ -120,8 +117,7 @@ $(function() {
 		$("#search-button-mobile").click(function (){
 		    	var key = document.getElementById('kk_key-mobile').value;
 			    var text = document.getElementById('search-input-mobile').value;
-			    var catId = $("#top-cat-list1").val();
-		    	self.kkSearch(key,text,catId);
+		    	self.kkSearch(key,text);
 		});
 	}
 <% } %>	
@@ -135,18 +131,7 @@ $(function() {
 		 <div id="search">
 			<%if (useSolr) { %>	
 				<div id="quickSearchFormMobile">			
-					<select id="top-cat-list1" class="rounded-corners-left">
-						<option  value="-1"><kk:msg  key="suggested.search.all"/></option>
-						<%for (int i = 0; i < catMgr.getCats().length; i++) {%>
-							<%com.konakart.appif.CategoryIf cat = catMgr.getCats()[i]; %>							
-							<%if (kkEng.getSearchParentCategoryId() == cat.getId()){ %>
-								<option  value="<%=cat.getId()%>" selected="selected"><%=cat.getName()%></option>
-							<% } else { %>
-								<option  value="<%=cat.getId()%>"><%=cat.getName()%></option>
-							<% } %>													
-						<% } %>					
-					</select>
-					<input type="text" id="search-input-mobile" name="searchText" onkeydown="javascript:kkKeydownMobile();">
+					<input type="text" id="search-input-mobile" class="rounded-corners-left" name="searchText" onkeydown="javascript:kkKeydownMobile();">
 					<input id="kk_key-mobile" type="hidden"/>
 					<a id="search-button-mobile" class="rounded-corners-right"><kk:msg  key="suggested.search.search"/></a>
 				</div>	
@@ -154,7 +139,7 @@ $(function() {
 				<form action="QuickSearch.action" id="quickSearchFormMobile" method="post">
 					<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 					<input type="hidden" value="true" name="searchInDesc"/>
-					<input type="text" id="search-input"  name="searchText" class="rounded-corners-left">
+					<input type="text" id="search-input" class="rounded-corners-left" name="searchText">
 					<a id="search-button-mobile" class="rounded-corners-right" onclick="javascript:document.getElementById('quickSearchFormMobile').submit();"><kk:msg  key="suggested.search.search"/></a>
 				</form>	
             <% } %>
@@ -164,28 +149,32 @@ $(function() {
 		<span id="close-search" class="fa fa-times" title='<kk:msg  key="common.close"/>'></span>
 	</div>
   	<div id="top-bar">
+  		<div id="area-message" >
+		
+		Free Home Delivery All Across Pune* &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Convenient Delivery Slots! 
+        </div>
   		<div id="search-container">
 	  		<div id="top-bar-search" class="top-bar-menu-item">
 			  	<span id="open-search" class="fa fa-search top-bar-menu-icon" title="<kk:msg  key='suggested.search.search'/>"></span> 
 			</div>
 		</div>
-		<div id="selections-container">
+		<%--<div id="selections-container">
 			<div id="selections">
 		  		<div id="language-selector" class="top-bar-menu-item">
 		  			<form action="SetLocale.action" method="post">  
 		  				<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-						<select id="lang-select" name="locale"  onchange="submit()">
+					 <select id="lang-select" name="locale"  onchange="submit()">
 							<option  value="en_GB" data-icon="flag flag-en-GB" <%=kkEng.getLocale().equals("en_GB")?"selected=\"selected\"":""%>>English</option>
 							<option  value="de_DE" data-icon="flag flag-de-DE"  <%=kkEng.getLocale().equals("de_DE")?"selected=\"selected\"":""%>>Deutsch</option>
 							<option  value="es_ES" data-icon="flag flag-es-ES"  <%=kkEng.getLocale().equals("es_ES")?"selected=\"selected\"":""%>>Español</option>
 							<option  value="pt_BR" data-icon="flag flag-pt-BR"  <%=kkEng.getLocale().equals("pt_BR")?"selected=\"selected\"":""%>>Português</option>
-						</select>
+						</select> -
 					</form>									
 		  		</div>
 		  		<div id="currency-selector"  class="top-bar-menu-item">
 					<form action="SelectCurrency.action" method="post">  
 						<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
-						<select id="currency-select" name="currencyCode"  onchange="submit()">
+					 	<select id="currency-select" name="currencyCode"  onchange="submit()">
 							<% for (int i = 0; i < kkEng.getCurrencies().length; i++){ %>
 								<% com.konakart.appif.CurrencyIf currency = kkEng.getCurrencies()[i];%>
 								<% if (currency != null) { %>
@@ -196,7 +185,7 @@ $(function() {
 					</form>										  			
 		  		</div>
 		  	</div>
-		  </div>
+		  </div>--%>
 		 <div id="options-container">
 	  		<div id="options">		
 
@@ -242,7 +231,7 @@ $(function() {
 												<% com.konakart.appif.WishListItemIf item = wishList.getWishListItems()[j];%>
 												<%if (item.getProduct() != null) { %>		
 													<div class="shopping-cart-item">
-											  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'><img src="<%=kkEng.getProdImage(item.getProduct(), item.getOpts(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title=" <%=item.getProduct().getName()%> "></a>
+											  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'><img src="<%=kkEng.getProdImage(item.getProduct(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title=" <%=item.getProduct().getName()%> "></a>
 											  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>' class="shopping-cart-item-title"><%=item.getProduct().getName()%></a>
 										  				<kk:prodOptions options="<%=item.getOpts()%>"/>
 											  			<div class="shopping-cart-item-price">
@@ -293,7 +282,7 @@ $(function() {
 									<% com.konakart.appif.BasketIf item = customerMgr.getCurrentCustomer().getBasketItems()[i];%>
 									<%if (item.getProduct() != null) { %>		
 										<div class="shopping-cart-item">
-								  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'><img src="<%=kkEng.getProdImage(item.getProduct(), item.getOpts(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title=" <%=item.getProduct().getName()%> "></a>
+								  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>'><img src="<%=kkEng.getProdImage(item.getProduct(), com.konakart.al.KKAppEng.IMAGE_TINY)%>" border="0" alt="<%=item.getProduct().getName()%>" title=" <%=item.getProduct().getName()%> "></a>
 								  			<a href='<%="SelectProd.action?prodId="+item.getProduct().getId()%>' class="shopping-cart-item-title"><%=item.getProduct().getName()%></a>
 							  				<kk:prodOptions options="<%=item.getOpts()%>"/>
 								  			<div class="shopping-cart-item-price">

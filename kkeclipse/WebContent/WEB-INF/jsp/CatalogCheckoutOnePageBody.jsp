@@ -16,6 +16,7 @@
 // Lesser General Public License for more details.
 //
 --%>
+<%@page import="java.util.Locale"%>
 <%@include file="Taglibs.jsp" %>
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
@@ -25,15 +26,30 @@
 <% com.konakart.al.CustomerMgr customerMgr = kkEng.getCustomerMgr();%>
 <% com.konakart.appif.CustomerIf cust = customerMgr.getCurrentCustomer();%>
 <% boolean isMultivendor = kkEng.isMultiVendor() && order.getVendorOrders() != null && order.getVendorOrders().length > 0;%>
-<% boolean canChangeAddress = customerMgr.isCanChangeAddress();%>
-<% com.konakart.appif.CustomerIf adminUser = kkEng.getAdminUser();%>
-<s:set scope="request" var="stockExpirySecs" value="stockExpirySecs"/>
-<%int stockExpirySecs = ((Integer)request.getAttribute("stockExpirySecs")).intValue(); %>
-<s:set scope="request" var="checkoutMsg" value="checkoutMsg"/> 
-<%String checkoutMsg = (String)(request.getAttribute("checkoutMsg")); %>
+<%@ page import=" java.util.Date, java.sql.Time, java.util.Calendar,
+                 java.util.GregorianCalendar, java.text.SimpleDateFormat" %>
+<%@ page import="com.konakart.app.PaymentDetails" %>
 
 <script type="text/javascript">	
 
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=order.getCustomerName()%>",
+		"cust_email" : "<%=order.getCustomerEmail()%>",
+	    "cust_phone" : "<%=order.getCustomerTelephone()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "sale_pagetype" : null,
+	    "sale_prodnames" : "<%=order.getOrderProducts()%>",
+	    "sale_skus" : null,
+	    "sale_currency" : "<%=order.getCurrency().getTitle()%>",
+	    "sale_deliverymethod" : null,
+	    "sale_prodqtys" : "<%=order.getNumProducts()%>",
+	    "sale_payment_method" : "<%=order.getPaymentMethod()%>",
+	    "sale_coupon" : null,
+	    "event" : "checkout" 
+};
 
 var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 	if (result.timeout != null) {
@@ -103,16 +119,6 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 			}			
 		}
 		
-		if (result.couponCodeWarning != null) {
-			$("#couponCodeUpdateMsg").html(result.couponCodeWarning);
-		} else {
-			$("#couponCodeUpdateMsg").html("");
-		}
-		if (result.giftCertCodeWarning != null) {
-			$("#giftCertCodeUpdateMsg").html(result.giftCertCodeWarning);
-		} else {
-			$("#giftCertCodeUpdateMsg").html("");
-		}
 		if (result.formattedDeliveryAddr != null) {
 			$("#formattedDeliveryAddr").html(result.formattedDeliveryAddr);
 			$("#editDelivery").attr("href", "EditAddr.action?addrId="+result.deliveryAddrId+"&opcdelivery=true");
@@ -125,9 +131,8 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 		if ($("#couponCodeUpdate").length) $('#couponCodeUpdate').hide();
 		if ($("#giftCertCodeUpdate").length) $('#giftCertCodeUpdate').hide();
 		if ($("#rewardPointsUpdate").length) $('#rewardPointsUpdate').hide();
-		if ($("#adminDiscountUpdate").length) $('#adminDiscountUpdate').hide();
-		if (result.checkoutMsg != null) {
-			openErrorDialog(result.checkoutMsg);
+		if (!result.otValid) {
+			openErrorDialog();
 		}else{
 			$('#continue-button').show();
 		}
@@ -143,15 +148,16 @@ var onePageRefreshCallback = function(result, textStatus, jqXHR) {
 				}
 			}			
 			$('#paymentDetails').html(txt);
-		}		
+		}
 	}
+	
 };
 
 function getOrderTotalRow(ot) {	
 	var rowClass = "costs-and-promotions";
 	if (ot.className == "ot_total") rowClass = "shopping-cart-total";
 	var row = '<tr class="'+rowClass+'">';
-	if (ot.className == "ot_reward_points" || ot.className == "ot_product_reward_points") {
+	if (ot.className == "ot_reward_points") {
 		row += '<td class="cost-overview">'+ot.title+'</td>';	
 		row += '<td class="cost-overview-amounts right">'+ot.value+'</td>';
 	} else if (ot.className == "ot_free_product") {
@@ -175,8 +181,7 @@ function isDiscountModule(module) {
 	if (module != null
             && (module=="ot_product_discount" || module=="ot_total_discount"
             || module=="ot_buy_x_get_y_free"  || module=="ot_gift_certificate"
-            || module=="ot_redeem_points"     || module=="ot_shipping_discount"
-            || module=="ot_total_discount_admin"))
+            || module=="ot_redeem_points"     || module=="ot_shipping_discount"))
     {
         return true;
     }
@@ -215,7 +220,7 @@ function getOrderProductRow(result, op) {
 		row += '</td>';
 	}
 	row += '</tr>';		
-	return row
+	return row;
 }
 
 function shippingRefresh(storeId) {
@@ -232,11 +237,21 @@ function shippingRefresh(storeId) {
 	}
 }
 
-function paymentRefresh() {	
-	var paymentDetails = document.getElementById("paymentDetails");
-	var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+function paymentRefresh(e) {
+	
+	//var paymentDetails = document.getElementById("paymentDetails");
+	//var selectedPayment = paymentDetails.options[paymentDetails.selectedIndex].value;
+	var selectedPayment = e.value;
 	callAction(new Array("payment",selectedPayment), onePageRefreshCallback, "OnePageRefresh.action");
 	setLoading();
+
+		//var selectedPaymentMode = $("#paymentDetails").val();
+		
+		if(selectedPayment == 'cod'){//cod
+		    $('#continue-button').text("Confirm Order");
+		}else{
+			$('#continue-button').text("Proceed to Payment");
+		}
 }
 
 function couponCodeRefresh() {	
@@ -257,13 +272,6 @@ function rewardPointsRefresh() {
 	setLoading();
 }
 
-function adminDiscountRefresh() {	
-	var val = document.getElementById("adminDiscount").value;
-	callAction(new Array("adminDiscount",val), onePageRefreshCallback, "OnePageRefresh.action");
-	setLoading();
-}
-
-
 function setLoading() {
 	$("#ot-table").empty().append('<tr><td colspan="3" class="loading"></td></tr>');	
 }
@@ -281,9 +289,8 @@ function selectAddr(id) {
 	setLoading();
 }
 
-function openErrorDialog(msg) {
+function openErrorDialog() {
 	$('#continue-button').hide();
-	$('#kk-validation-msg').text(msg);
 	$("#error-dialog").dialog('open');
 }
 
@@ -291,13 +298,59 @@ function closeErrorDialog() {
 	$("#error-dialog").dialog('close');
 }
 
-
-
 $(function() {
 	
     if ($("#form1").length) {
 		$("#form1").validate(validationRules);
 	}
+    $.datepicker.setDefaults($.datepicker.regional['<%=kkEng.getLocale().substring(0,2)%>']);
+	$('#datepicker').datepicker(
+	{ 
+		dateFormat: '<%=kkEng.getMsg("datepicker.date.format")%>', 
+		minDate: '<s:property value="deliveryDate"/>',
+		maxDate: '+7d'  
+	}).on("change", function(){
+		if ($('#datepicker').val() == $('#datepicker').datepicker("option", "minDate")){
+			//$('#deliveryDay').text("Today");
+			if ('<s:property value="morningSlot"/>' == 'true' ) {
+				$("#morningSlot").attr("disabled", false);
+				$("#morningSlot").attr('checked', 'checked');
+			}
+			else{
+				$("#morningSlot").attr("disabled", true);
+				if ('<s:property value="afternoonSlot"/>' == 'true') {
+					$("#afternoonSlot").attr('checked', 'checked');
+				} else {
+					$("#eveningSlot").attr('checked', 'checked');
+				}
+			}
+			if ('<s:property value="afternoonSlot"/>' == 'true') {
+				$("#afternoonSlot").attr("disabled", false);
+			}
+			else{
+				$("#afternoonSlot").attr("disabled", true);
+			}
+			if ('<s:property value="eveningSlot"/>' == 'true') {
+				$("#eveningSlot").attr("disabled", false);
+			}
+			else{
+				$("#eveningSlot").attr("disabled", true);
+			}			
+
+		}
+		else{
+			//console.log(($('#datepicker').val().split('/')[0]) + 1);
+			//console.log($('#datepicker').datepicker("option", "minDate").split('/')[0]);
+			
+			//$('#deliveryDay').text( parseInt($('#datepicker').val().split()[0]) + 1 == $('#datepicker').datepicker("option", "minDate").split()[0]);
+			
+			$("#morningSlot").attr("disabled", false);
+			$("#morningSlot").attr('checked', 'checked');
+			$("#afternoonSlot").attr("disabled", false);
+			$("#eveningSlot").attr("disabled", false);
+		}
+	});
+
 	
 	$("#addr-dialog").dialog({
 		autoOpen: false,
@@ -319,22 +372,11 @@ $(function() {
 		hide: "blind"
 	});
 	
-	<%if (checkoutMsg != null){ %>
-		openErrorDialog("<%=checkoutMsg%>");
+	<s:set scope="request" var="otValid" value="otValid"/> 
+	<%Boolean otValid = (Boolean)(request.getAttribute("otValid")); %>
+	<%if (!otValid){ %>
+		openErrorDialog();
 	<%}%>
-	
-	<%if (stockExpirySecs > -1) { %>
-		$('#reservation-timer').backward_timer({
-			  seconds: <%=stockExpirySecs%>,
-			  format: 'm%:s%',
-			  on_exhausted: function(timer) {
-				  $('#continue-button').removeClass().text("").addClass(
-					'button-loading');
-				  return redirect(getURL("ShowCartItems.action"));				  
-			  }, 
-		});
-		$('#reservation-timer').backward_timer('start')
-	<%} %>
 	
 	$('#couponCode').keyup(function() {
 		  var elem = $(this);
@@ -346,6 +388,7 @@ $(function() {
 		  }
 	});
 	
+
 	$('#giftCertCode').keyup(function() {
 		  var elem = $(this);
 		  var val = elem.valid();
@@ -367,16 +410,6 @@ $(function() {
 		  }
 	});
 
-	$('#adminDiscount').keyup(function() {
-		  var elem = $(this);
-		  var val = elem.valid();
-		  if (val==1 || elem.val()=="") {
-			  $('#adminDiscountUpdate').show();
-		  } else {
-			  $('#adminDiscountUpdate').hide();
-		  }
-	});
-
 	$("#abdelivery").click(function() {
 		deliveryAddr = true;
 		$("#addr-dialog").dialog( "open" );
@@ -393,41 +426,49 @@ $(function() {
 
 </script>
 
+  	    	    
+<%!
+public boolean empty(String s)
+	{
+		if(s== null || s.trim().equals(""))
+			return true;
+		return false;
+	}
 
-				<%if (order.getArchiveId() != null) {%>
-					<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation.edit" arg0="<%=order.getArchiveId()%>"/></h1><p><kk:msg  key="checkout.confirmation.remove.edit"/></p>
-				<%}else{%>
-					<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
-				<%}%>
-    			
+%>
+
+			<%  
+						String continueButtonText = ((String)request.getAttribute("payment")).equals("cod") ? "Checkout Order" : "Proceed to Payment";
+						int error=0;
+			%>
+			
+    		<h1 id="page-title"><kk:msg  key="checkout.confirmation.orderconfirmation"/></h1>
 	    		<div id="order-confirmation" class="content-area rounded-corners">
-		    		<form action="CheckoutConfirmationSubmit.action" id="form1" method="post" class="form-section">
+	    			<s:if test="zorabianAfterEight">
+	    				<div id = "deliveryMessage" style="font-size: 13.5px"> Please note that cut off time for Zorabian Fresh is 8pm. So next available delivery day for zorabian fresh is <b><s:property value="deliveryDate"/></b>.
+	    		        For earlier delivery slot, please check for alternative options.
+	    		    </div><br>
+					</s:if>
+		    		<form id="form1" action="CheckoutConfirmationSubmit.action" method="post" class="form-section">
 		    			<input type="hidden" value="<%=kkEng.getXsrfToken()%>" name="xsrf_token"/>
 		    			<div id="order-confirmation-column-left">
-		    				<%if (stockExpirySecs > -1) { %>		    			
-		    					<div id="reservation-notice"><kk:msg  key="checkout.confirmation.reservation.notice.1"/> <div id="reservation-timer"></div> <kk:msg  key="checkout.confirmation.reservation.notice.2"/></div>
-							<%} %>
-		    				<div id="delivery-address" class="order-confirmation-area">
+		    				<div id="delivery-address"  >
 			    				<div class="heading-container">
 			    					<h3><kk:msg  key="show.order.details.body.deliveryaddress"/></h3>
 			    					<div class="order-confirmation-options">
-			    						<%if (canChangeAddress) { %>
-				    						<a href="NewAddr.action?opcdelivery=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="common.new"/></a>
-				    						<span class="separator-small"></span>
-				    						<a id="editDelivery" href='<%="EditAddr.action?addrId="+order.getDeliveryAddrId()+"&opcdelivery=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="common.edit"/></a>
-										<% } %>
-										<%if (cust != null && cust.getType() != 2) { %>
-											<%if (canChangeAddress) { %>
-				    							<span class="separator-small"></span>
-				    						<% } %>
-				    						<a id="abdelivery" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="checkout.confirmation.addr.book"/></a>
-										<% } %>
-			    					</div>
+			    					<a href="NewAddr.action?opcdelivery=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.new"/></a>
+			    					<span class="separator-small"></span>
+			    					<a id="editDelivery" href='<%="EditAddr.action?addrId="+order.getDeliveryAddrId()+"&opcdelivery=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.edit"/></a>
+									<%if (cust != null && cust.getType() != 2) { %>
+				    					<span class="separator-small"></span>
+				    					<a id="abdelivery" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="checkout.confirmation.addr.book"/></a>
+									<% } %>
+			    				</div>
 			    				</div>
 			    				<div class="order-confirmation-area-content">
 				    				<span id="formattedDeliveryAddr"><%=kkEng.removeCData(order.getDeliveryFormattedAddress())%></span>
 				    				<%if (!isMultivendor){ %>
-										<div id="shipping-info" class="order-confirmation-area-content-select">
+										<div id="shipping-info" class="order-confirmation-area-content-select" hidden="true">
 											<label><kk:msg  key="show.order.details.body.shippingmethod"/></label>
 											<select name="shipping" onchange="javascript:shippingRefresh();" id="shippingQuotes">
 												<%if (orderMgr.getShippingQuotes() != null && orderMgr.getShippingQuotes().length > 0){ %>										
@@ -448,61 +489,102 @@ $(function() {
 									<% } %>
 								</div>		    				
 			    			</div>
+			    			<br>
+			    			<div id="delivery-date" class="order-confirmation-area">
+			    				<h3><kk:msg  key="show.order.details.body.deliverydate"/></h3>
+			    				<input id="datepicker" type="text" readonly="readonly"  name="delivery_date" value="<s:property value="deliveryDate" />"/>
+			    				<span id="deliveryDay"></span>
+			    				<span class="validation-msg"></span>
+			    			</div>
+			    			<br><br>
+			    			<div id="delivery-slot" class="order-confirmation-area">
+			    				<h3><kk:msg  key="show.order.details.body.deliveryslot"/></h3>
+			    					<s:if test="morningSlot">
+			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" checked>Morning (7am - 10:30am)
+			    					</s:if>
+			    					<s:else>
+			    						<input id="morningSlot" type="radio" name="delivery_slot" value="m" disabled>Morning (7am - 10:30am)
+			    					</s:else>
+			    					<s:if test="afternoonSlot and !morningSlot">
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" checked>Afternoon (1pm - 3pm)
+									</s:if>
+									<s:elseif test="afternoonSlot and morningSlot">
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" >Afternoon (1pm - 3pm)
+									</s:elseif>
+									<s:else>
+										<input id="afternoonSlot" type="radio" name="delivery_slot" value="a" disabled>Afternoon (1pm - 3pm)
+									</s:else>
+			    				    <s:if test="eveningSlot and !morningSlot and !afternoonSlot">
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" checked>Evening (6pm - 8pm)
+									</s:if>
+									<s:elseif test="eveningSlot and (morningSlot or afternoonSlot)">
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e">Evening (6pm - 8pm)
+									</s:elseif>
+									<s:else>
+										<input id="eveningSlot" type="radio" name="delivery_slot" value="e" disabled>Evening (6pm - 8pm)
+									</s:else>
+									<span class="validation-msg"></span>
+			    			</div>
+			    			<br>
 			    			<div id="billing-address" class="order-confirmation-area">
-			    				<div class="heading-container">
-			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3>
-			    					<div class="order-confirmation-options">
-			    						<%if (canChangeAddress) { %>
-					    					<a href="NewAddr.action?opcbilling=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="common.new"/></a>
-					    					<span class="separator-small"></span>
-					    					<a id="editBilling" href='<%="EditAddr.action?addrId="+order.getBillingAddrId()+"&opcbilling=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="common.edit"/></a>
-										<% } %>
-										<%if (cust != null && cust.getType() != 2) { %>
-					    					<%if (canChangeAddress) { %>
-					    						<span class="separator-small"></span>
-					    					<% } %>
-					    					<a id="abshipping" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link"><kk:msg  key="checkout.confirmation.addr.book"/></a>
-										<% } %>
-			    					</div>
-			    				</div>
+<!-- 			    				<div class="heading-container"> -->
+<%-- 			    					<h3><kk:msg  key="show.order.details.body.billingaddress"/></h3> --%>
+<!-- 			    					<div class="order-confirmation-options"> -->
+<%-- 			    					<a href="NewAddr.action?opcbilling=true" title='<%=kkEng.getMsg("checkout.confirmation.new.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.new"/></a> --%>
+<!-- 			    					<span class="separator-small"></span> -->
+<%-- 			    					<a id="editBilling" href='<%="EditAddr.action?addrId="+order.getBillingAddrId()+"&opcbilling=true"%>' title='<%=kkEng.getMsg("checkout.confirmation.edit.addr.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="common.edit"/></a> --%>
+<%-- 									<%if (cust != null && cust.getType() != 2) { %> --%>
+<!-- 				    					<span class="separator-small"></span> -->
+<%-- 				    					<a id="abshipping" title='<%=kkEng.getMsg("checkout.confirmation.addr.book.tip")%>' class="order-confirmation-option text-link has-tooltip"><kk:msg  key="checkout.confirmation.addr.book"/></a> --%>
+<%-- 									<% } %> --%>
+<!-- 			    				</div> -->
+<!-- 			    				</div> -->
 			    				<div class="order-confirmation-area-content">
-			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span>
-									<div id="payment-method" class="order-confirmation-area-content-select">
-										<label><kk:msg  key="show.order.details.body.paymentmethod"/></label>
-										<select name="payment" onchange="javascript:paymentRefresh();" id="paymentDetails">
-											<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+<%-- 			    					<span id="formattedBillingAddr"><%=kkEng.removeCData(order.getBillingFormattedAddress())%></span> --%>
+								     <div id="payment-method" class="order-confirmation-area-content-select">
+										<h3><kk:msg  key="show.order.details.body.paymentmethod"/></h3>
+										<div class="payment-radio-buttons">
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
 												<s:set scope="request" var="payment"  value="payment"/> 						
 												<% String payment = ((String)request.getAttribute("payment"));%> 
 												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
 													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
-													<% String code = pd.getCode() + ((pd.getSubCode() == null) ? "" : ("~~" + pd.getSubCode()));%>
-													<%if (payment.equals(code)){ %>
-														<option  value="<%=code%>" selected="selected"><%=pd.getDescription()%></option>
+													<%if (payment.equals(pd.getCode())){ %>														
+														<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" checked="checked">
+														<span style="width:180px;"><%=pd.getDescription()%></span>																											
+													<% } else { %>								
+															<input id="<%=pd.getCode()%>" onchange="javascript:paymentRefresh(this);" value="<%=pd.getCode()%>" type="radio" name="payment-method" style="margin-left:-10px;">
+															<span style="width:100px;"><%=pd.getDescription()%></span>
+													<% } %>
+												<% } %>										
+											<%} %>
+										
+										</div>
+										<%-- <select name="payment" class="payment-dropdown" onchange="javascript:paymentRefresh();" id="paymentDetails">
+										<%if (orderMgr.getPaymentDetailsArray() != null && orderMgr.getPaymentDetailsArray().length > 0){ %>										
+												<s:set scope="request" var="payment"  value="payment"/> 						
+												<% String payment = ((String)request.getAttribute("payment"));%> 
+												<% for (int i = 0; i < orderMgr.getPaymentDetailsArray().length; i++){ %>
+													<% com.konakart.appif.PaymentDetailsIf pd = orderMgr.getPaymentDetailsArray()[i];%>
+													<%if (payment.equals(pd.getCode())){ %>
+														<option  value="<%=pd.getCode()%>" selected="selected"><%=pd.getDescription()%></option>
 													<% } else { %>
-														<option  value="<%=code%>"><%=pd.getDescription()%></option>
+														<option  value="<%=pd.getCode()%>"><%=pd.getDescription()%></option>
 													<% } %>
 												<% } %>										
 											<%} else {%>
 												<option  value="-1" selected="selected"><kk:msg  key="one.page.checkout.no.payment.methods"/></option>
 											<% } %>
-										</select>
+										</select> --%>
 									</div>
-									<div id="promotion-codes">
+								 	<%-- <div id="promotion-codes">
 										<div id="promotion-codes-container">
-											<%if (adminUser != null && kkEng.getConfigAsBoolean("ALLOW_ADMIN_ORDER_DISCOUNT",false)) { %>
-												<div class="promotion-codes-field">				
-													<label><kk:msg  key="checkout.common.admindiscount"/></label>
-													<input type="text" name="adminDiscount" id="adminDiscount" value="<s:property value="adminDiscount" />"/>
-													<a id="adminDiscountUpdate" class="update-button small-rounded-corners" onclick="adminDiscountRefresh();" onmouseover="resetGoToCheckout()"><kk:msg  key="common.update"/></a>
-													<span class="validation-msg"></span>
-												</div>
-											<% } %>
 									    	<%if (kkEng.getConfigAsBoolean("DISPLAY_COUPON_ENTRY",false)) { %>
 									    		<div class="promotion-codes-field">				
 													<label><kk:msg  key="checkout.common.couponcode"/></label>
 													<input type="text" name="couponCode" id="couponCode" value="<s:property value="couponCode" />"/>
 													<a id="couponCodeUpdate" class="update-button small-rounded-corners" onclick="couponCodeRefresh();" onmouseover="resetGoToCheckout()"><kk:msg  key="common.update"/></a>
-													<span id="couponCodeUpdateMsg" class="validation-msg"></span>
+													<span class="validation-msg"></span>
 												</div>
 											<% } %>
 											<%if (kkEng.getConfigAsBoolean("DISPLAY_GIFT_CERT_ENTRY",false)) { %>
@@ -510,7 +592,7 @@ $(function() {
 													<label><kk:msg  key="checkout.common.giftcertcode"/></label>
 													<input type="text" name="giftCertCode" id="giftCertCode" value="<s:property value="giftCertCode" />"/>
 													<a id="giftCertCodeUpdate" class="update-button small-rounded-corners" onclick="giftCertCodeRefresh();" onmouseover="resetGoToCheckout()"><kk:msg  key="common.update"/></a>
-													<span id="giftCertCodeUpdateMsg" class="validation-msg"></span>
+													<span class="validation-msg"></span>
 												</div>
 											<% } %>
 											<%if (kkEng.getConfigAsBoolean("ENABLE_REWARD_POINTS",false)) { %>
@@ -525,8 +607,8 @@ $(function() {
 												<% } %>
 											<% } %>
 										</div>
-		    						</div>
-								</div>		    				
+		    						</div>--%>    
+								</div>						
 			    			</div>
 			    			<div id="delivery-notes" class="order-confirmation-area">
 			    				<div class="heading-container">
@@ -616,7 +698,7 @@ $(function() {
 													<%rowClass = "shopping-cart-total";%>
 												<% } %>										
 												<tr class="<%=rowClass%>">															
-													<%if (ot.getClassName().equals("ot_reward_points") || ot.getClassName().equals("ot_product_reward_points")){%>
+													<%if (ot.getClassName().equals("ot_reward_points")){%>
 													    <td class="cost-overview"><%=ot.getTitle()%></td>	
 														<td class="cost-overview-amounts right"><%=ot.getValue()%></td>
 													<%}else if (ot.getClassName().equals("ot_free_product")) {%>
@@ -671,7 +753,7 @@ $(function() {
 														<%rowClass = "shopping-cart-total";%>
 													<% } %>										
 													<tr class="<%=rowClass%>">															
-														<%if (ot.getClassName().equals("ot_reward_points") || ot.getClassName().equals("ot_product_reward_points")){%>
+														<%if (ot.getClassName().equals("ot_reward_points")){%>
 														    <td class="cost-overview"><%=ot.getTitle()%></td>	
 															<td class="cost-overview-amounts right"><%=ot.getValue()%></td>
 														<%}else if (ot.getClassName().equals("ot_free_product")) {%>
@@ -694,11 +776,12 @@ $(function() {
 		    						</table>
 	    						<% } %>
 							</div>
-						</div>			    				
+						</div>			
+						
 						<div id="confirm-order-button-container">	
-							<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners">
-								<span><kk:msg  key="common.confirmorder"/></span>
-							</a>
+						<a onclick="javascript:formValidate('form1', 'continue-button');" id="continue-button" class="button small-rounded-corners final-checkout-button"  >
+								<%=continueButtonText %>
+							</a> 
 						</div>
 					</form>			    	
 	    		</div>
@@ -707,7 +790,7 @@ $(function() {
 	    		<div>
 					<div class="form-section">
 						<div class="form-section-title no-margin">
-							<h3><span id="kk-validation-msg"></span></h3>									
+							<h3><kk:msg  key="one.page.checkout.problem"/></h3>									
 						</div>
 						<a onclick='closeErrorDialog();' class="button small-rounded-corners">
 							<span ><kk:msg  key="common.close"/></span>
@@ -742,6 +825,4 @@ $(function() {
 		    </div>
 
 
-
-
-
+	

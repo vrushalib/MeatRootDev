@@ -20,5 +20,5 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");%>
 		    	
-<kk:carousel prods="<%=kkEng.getProductMgr().getCustomProducts1()%>" title='<%=kkEng.getMsg("featured.products.body.title")%>' width="180" widthSmall="150" breakpointSmall="440"/>
+<%-- <kk:carousel prods="<%=kkEng.getProductMgr().getCustomProducts1()%>" title='<%=kkEng.getMsg("featured.products.body.title")%>' width="180"/> --%>
 

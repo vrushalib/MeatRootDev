@@ -29,7 +29,6 @@
 <% String sortBy = revMgr.getDataDesc().getOrderBy();%>
 <% String title = "";%>
 
-
 <%if (!kkEng.isPortlet()){%>
 	<script type="text/javascript" src="<%=kkEng.getScriptBase()%>/kk.proddetails.js"></script>	
 <% } %>
@@ -44,6 +43,28 @@
 	<%int rating = (prod.getRating()==null)?0:prod.getRating().setScale(0, java.math.BigDecimal.ROUND_HALF_UP).intValue();  %>
 	<%String ratingDecStr = (prod.getRating()==null)?"0":(prod.getRating().setScale(1, java.math.BigDecimal.ROUND_HALF_UP)).toPlainString();  %>
 	<%com.konakart.appif.ReviewSearchIf search = revMgr.getRevSearch();%>
+
+	<script type="text/javascript">
+//Variable used for Sokrati tracking
+var _sokParams = {
+		"cust_name" : "<%=cust.getFirstName()%>",
+		"cust_email" : "<%=cust.getEmailAddr()%>",
+	    "cust_phone" : "<%=cust.getTelephoneNumber()%>",
+	    "cust_location" : null,
+	    "cust_fbid" : null,
+	    "cust_twhandle" : null,
+	    "view_prodid" : <%=prod.getId()%>,
+	    "view_prodnames" : "<%=prod.getName()%>",
+	    "view_skus" : null,
+	    "view_prodprices" : <%=prod.getPriceIncTax()%>,
+	    "view_pagetype" : null,
+	    "view_prodcurrency" : null,
+	    "view_prodcategory" : <%=prod.getCategoryId()%>,
+	    "view_prodsubcategory" : null,
+	    "view_prodavailability" : null,
+	    "event" : "viewproduct" 
+};
+</script>
 	
    		<h1 id="page-title"><%=prod.getName()%></h1>
     	<div id="product-area" class="rounded-corners">
@@ -53,7 +74,9 @@
 						<div class="gallery_output" id="gallery_output"></div>									
 						<div id="gallery_nav" class="gallery_nav">
 							<input id="gallery_nav_base" value="<%=kkEng.getImageBase()%>" type="hidden"/>								
+							<input id="gallery_nav_dir" value="<%=prod.getImageDir()%>" type="hidden"/>								
 							<input id="gallery_nav_uuid" value="<%=prod.getUuid()%>" type="hidden"/>								
+							<input id="gallery_nav_extension" value="<%=kkEng.getProdImageExtension(prod)%>" type="hidden"/>								
 						</div>																		
 						<div class="clear"></div>
 					</div>
@@ -80,7 +103,7 @@
 	    			<div id="product-content-tabs">
 		    			<div id="product-description-tab" class="<%=revMgr.isShowTab()?"":"selected-product-content-tab"%> product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.product.description"/></div>		
     			    	<div class="product-content-tab-spacer"></div>
-		    			<div id="product-specifications-tab" class="product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.specifications"/></div>
+		    		<%--	<div id="product-specifications-tab" class="product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.specifications"/></div> --%>
 		    			<div class="product-content-tab-spacer"></div>
 				    	<div id="product-reviews-tab" class="<%=revMgr.isShowTab()?"selected-product-content-tab":""%> product-content-tab small-rounded-corners-top"><kk:msg  key="product.details.body.reviews"/> (<%=prod.getNumberReviews()%>)</div>
 		    			<div class="product-content-tab-filler"></div>
@@ -88,7 +111,7 @@
 	    			<div id="product-description">
 	    				<p style="clear:both"><%=prod.getDescription()%></p>		    			
 	    			</div>
-					<div id="product-specifications">	
+				<%--	<div id="product-specifications">	
 						<%if (prod.getCustomAttrArray() != null && prod.getCustomAttrArray().length > 0){ %>
 							<table>
 		    					<thead>
@@ -106,7 +129,7 @@
 							<% } else { %>
 								<p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>
 							<%}%>												
-	    			</div>    			
+	    			</div>    	 --%>		
  	    			<div id="product-reviews">
  	    			<%if (prod.getNumberReviews() > 0){ %>
 	    				<div id="average-customer-reviews">
@@ -200,7 +223,7 @@
 	    				<p style="clear:both"><%=prod.getDescription()%></p>		    			
 	    			</div>
 					<span class="header"><kk:msg  key="product.details.body.specifications"/></span>
-	    			<div id="product-specifications">	
+	    		<%--	<div id="product-specifications">	
 						<%if (prod.getCustomAttrArray() != null && prod.getCustomAttrArray().length > 0){ %>
 							<table>
 		    					<thead>
@@ -218,7 +241,7 @@
 							<% } else { %>
 								<p style="clear:both"><kk:msg  key="product.details.body.add.specifications"/></p>
 							<%}%>												
-	    			</div>  
+	    			</div>   --%>
 	    			<span class="header"><kk:msg  key="product.details.body.reviews"/> (<%=prod.getNumberReviews()%>)</span>
 
  	    			
@@ -348,21 +371,5 @@
 	 			<kk:carousel prods="<%=prodMgr.getAlsoPurchased()%>" title="<%=title%>" width="180" widthSmall="150" breakpointSmall="440"/>
 				
  		</div>
- 		
-	<%if (kkEng.getAnalyticsCode()!=null && kkEng.getAnalyticsCode().length() > 0){%>
-		<script type="text/javascript">
-			if (typeof(ga) != 'undefined' && ga != null) {
-				ga('ec:addProduct', {
-				  'id': '<%=prod.getId()%>',
-				  'name': '<%=kkEng.removeSingleQuotes(prod.getName())%>',
-					<%if (prodMgr.getSelectedProductCategory() !=null){%>
-					  'category': '<%=kkEng.removeSingleQuotes(prodMgr.getSelectedProductCategory().getName())%>',
-					<% } %>
-				  'brand': '<%=kkEng.removeSingleQuotes(prod.getManufacturerName())%>'
-				});	
-				ga('ec:setAction', 'detail');	
-				ga('send', 'pageview');
-			}
-		</script>	
-	<% } %>		
+		
 <% } %>    	

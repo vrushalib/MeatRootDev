@@ -20,20 +20,19 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 
- 				<h1 id="page-title"><kk:msg  key="header.contact.us"/></h1>			
+ 				<h1 id="page-title"><kk:msg  key="header.placing.order"/></h1>			
 	    		<div class="content-area rounded-corners">
-		    		<div id="about-us">
+		    		<div id="placing-order">
 		    		<p align="justify">
-		    			Your comments, suggestions and concerns are very important to us. We welcome any
-suggestions you have that will help us provide better service to our customers.
-<br>Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9765197365.<br>
-<br>
-Mail us:
-<br>Mohini Apartments,
-<br>Lane No. 11, Prabhat Road,
-<br>Pune - 411004
-<br>Maharashtra, India.
-						</p>
+		    			MeatRoot endeavors to deal with reputable third parties who provide good quality meat products,
+however we accept no responsibility or liability for the quality or quantity of any products delivered
+from said third parties. It is the responsibility of the customer to thoroughly check the supplied
+products before agreeing to receive an order.
+<br>Incorrect personal details may lead to problems or delays in delivery, so please ensure that you
+have included your correct address, email address and contact number when
+ordering.<br/>
+				</p>			
+						
 			    	</div>
 	    		</div>
 

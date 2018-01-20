@@ -20,20 +20,22 @@
 
 <% com.konakart.al.KKAppEng kkEng = (com.konakart.al.KKAppEng) session.getAttribute("konakartKey");  %>
 
- 				<h1 id="page-title"><kk:msg  key="header.contact.us"/></h1>			
+ 				<h1 id="page-title"><kk:msg  key="header.cancellation.policy"/></h1>			
 	    		<div class="content-area rounded-corners">
-		    		<div id="about-us">
+		    		<div id="cancellation-policy">
 		    		<p align="justify">
-		    			Your comments, suggestions and concerns are very important to us. We welcome any
-suggestions you have that will help us provide better service to our customers.
-<br>Please reach us at customercare@meatroot.com with your comments or call us on : +91&#8208;9765197365.<br>
+		    			We have a very liberal cancellation policy.
+Cancellation will be considered only if requested within 1 hour of order placement. However,
+there won't be any cancellation if order is in Process state.
+In case of quality deliverance failure, there will be refund or replacement. But it should bring to
+our notice within 1 hour of delivery. After inspecting the delivered products decision will be taken
+by our service team.
 <br>
-Mail us:
-<br>Mohini Apartments,
-<br>Lane No. 11, Prabhat Road,
-<br>Pune - 411004
-<br>Maharashtra, India.
-						</p>
+While every effort is made to ensure that accurate pricing and descriptions are maintained, we
+reserve the right to cancel any order that is based on inaccurate information. We will endeavor to
+notify you immediately of any such cancellation.<br/>
+						</p>	
+					
 			    	</div>
 	    		</div>
 
