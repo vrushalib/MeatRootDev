@@ -778,5 +778,12 @@
 			<result name="success" type="tiles">catalog.external.payment.from.frame.page</result>
 		</action>
 	</package>
+	
+	<package name="json" namespace="/json" extends="json-default">
+      <action name="getJSONResult"
+           class="com.konakart.actions.JSONDataAction">
+       	   <result type="json" />
+      </action>
+    </package>
 
 </struts>
